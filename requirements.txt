@@ -1,3 +1,4 @@
 PyYaml
 lxml
 python-magic
+xattr
