@@ -276,6 +276,12 @@ def strip_file(context, pretty, file, magic_string, mode=None):
                 "AR=\"gcc-ar\"",
                 "RANLIB=\"gcc-ranlib\"",
                 "NM=\"gcc-nm\""])
+    else:
+        if context.spec.pkg_clang:
+            exports.extend([
+                "AR=\"llvm-ar\"",
+                "RANLIB=\"llvm-ranlib\"",
+                "NM=\"llvm-nm\""])
 
     cmd = "{} strip {} \"{}\""
     flags = ""

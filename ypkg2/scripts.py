@@ -170,6 +170,11 @@ class ScriptGenerator:
                 self.define_export("AR", "gcc-ar")
                 self.define_export("RANLIB", "gcc-ranlib")
                 self.define_export("NM", "gcc-nm")
+        else:
+            if self.context.spec.pkg_clang:
+                self.define_export("AR", "llvm-ar")
+                self.define_export("RANLIB", "llvm-ranlib")
+                self.define_export("NM", "llvm-nm")
 
         if not console_ui.allow_colors:
             self.define_export("TERM", "dumb")
