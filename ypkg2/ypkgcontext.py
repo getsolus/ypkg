@@ -66,6 +66,7 @@ PGO_USE_FLAGS_CLANG = "-fprofile-instr-use=\"{}/default.profdata\""
 # AVX2
 AVX2_ARCH = "haswell"
 AVX2_TUNE = "haswell"
+AVX2_FLAGS = "-mprefer-avx128"
 
 
 class Flags:
@@ -404,6 +405,10 @@ class YpkgContext:
         """ Adjust flags for AVX2 builds """
         self.build.cflags = self.repl_flags_avx2(self.build.cflags)
         self.build.cxxflags = self.repl_flags_avx2(self.build.cxxflags)
+        if self.spec.pkg_optimize:
+            if "avx256" not in self.spec.pkg_optimize:
+                self.build.cflags.extend(AVX2_FLAGS.split(" "))
+                self.build.cxxflags.extend(AVX2_FLAGS.split(" "))
 
     def enable_pgo_generate(self):
         """ Enable PGO generate step """
