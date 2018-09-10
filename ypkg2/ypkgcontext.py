@@ -40,11 +40,11 @@ SIZE_FLAGS_CLANG = "-O2"
 # Allow optimizing for lto
 LTO_FLAGS = "-flto"
 
-# Use linker plugin when not compiling with Clang
-LTO_FLAGS_GCC = "-fuse-linker-plugin"
+# Allow optimizing for thin-lto
+THIN_LTO_FLAGS = "-flto=thin"
 
-# Use gold for thin LTO
-THIN_LTO_FLAGS = "-flto=thin -fuse-ld=gold"
+# Use gold linker with GCC
+GOLD_LINKER_FLAGS = "-fuse-ld=gold"
 
 # Allow unrolling loops
 UNROLL_LOOPS_FLAGS = "-funroll-loops"
@@ -111,8 +111,6 @@ class Flags:
                     newflags.extend(SIZE_FLAGS.split(" "))
         elif opt_type == "lto":
             newflags.extend(LTO_FLAGS.split(" "))
-            if not clang:
-                newflags.extend(LTO_FLAGS_GCC.split(" "))
         elif opt_type == "unroll-loops":
             newflags.extend(UNROLL_LOOPS_FLAGS.split(" "))
         elif opt_type == "runpath":
@@ -124,7 +122,7 @@ class Flags:
         elif opt_type == "thin-lto":
             newflags.extend(THIN_LTO_FLAGS.split(" "))
             if not clang:
-                newflags.extend(LTO_FLAGS_GCC.split(" "))
+                newflags.extend(GOLD_LINKER_FLAGS.split(" "))
         else:
             console_ui.emit_warning("Flags", "Unknown optimization: {}".
                                     format(opt_type))
