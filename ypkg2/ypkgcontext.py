@@ -31,6 +31,9 @@ BIND_NOW_FLAGS = ["-Wl,-z,now", "-Wl,-z -Wl,relro", "-Wl,-z -Wl,now"]
 # Allow turning off the symbolic functions linker flag
 SYMBOLIC_FLAGS = ["-Wl,-Bsymbolic-functions"]
 
+# Remove unsupported linker flag when using gold or lld linkers
+NON_LD_LINKER_FLAGS = ["-Wl,--copy-dt-needed-entries"]
+
 # Allow optimizing for size
 SIZE_FLAGS = "-Os"
 
@@ -337,9 +340,15 @@ class YpkgContext:
         if self.spec.pkg_clang:
             self.build.cc = "clang"
             self.build.cxx = "clang++"
+            self.build.ldflags = Flags.filter_flags(self.build.ldflags, \
+                                                    NON_LD_LINKER_FLAGS)
         else:
             self.build.cc = "{}-gcc".format(self.pconfig.values.build.host)
             self.build.cxx = "{}-g++".format(self.pconfig.values.build.host)
+            if self.spec.pkg_optimize:
+                if "thin-lto" in self.spec.pkg_optimize:
+                    self.build.ldflags = Flags.filter_flags(self.build.ldflags, \
+                                                        NON_LD_LINKER_FLAGS)
 
         if self.spec.pkg_optimize:
             self.init_optimize()
@@ -360,7 +369,8 @@ class YpkgContext:
                 self.build.cxxflags = Flags.optimize_flags(self.build.cxxflags,
                                                         opt,
                                                         self.spec.pkg_clang)
-            if opt == "no-bind-now" or opt == "no-symbolic" or opt == "runpath":
+            if opt == "no-bind-now" or opt == "no-symbolic" \
+                or opt == "runpath":
                 self.build.ldflags = Flags.optimize_flags(self.build.ldflags,
                                                           opt,
                                                           self.spec.pkg_clang)
