@@ -66,7 +66,7 @@ PGO_USE_FLAGS_CLANG = "-fprofile-instr-use=\"{}/default.profdata\""
 # AVX2
 AVX2_ARCH = "haswell"
 AVX2_TUNE = "haswell"
-AVX2_FLAGS = "-mprefer-avx128"
+AVX2_FLAGS = "-mprefer-vector-width=128"
 
 
 class Flags:
