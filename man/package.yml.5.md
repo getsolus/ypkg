@@ -464,7 +464,7 @@ It may also be beneficial to study the `rc.yml` file defining the build macros:
 
 ## COPYRIGHT
 
- * Copyright © 2016 Ikey Doherty, License: CC-BY-SA-3.0
+ * Copyright © 2016-2018 Ikey Doherty, License: CC-BY-SA-3.0
 
 
 ## SEE ALSO

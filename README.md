@@ -130,7 +130,7 @@ License
 
 GPL-3.0
 
-Copyright © 2015-2017 Ikey Doherty
+Copyright © 2015-2018 Ikey Doherty
 
 Some portions: Copyright (C) 2016 Intel Corporation
 
