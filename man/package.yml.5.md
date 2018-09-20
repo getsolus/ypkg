@@ -313,7 +313,7 @@ additional functionality.
      * `no-symbolic`: Disable `-Wl,-Bsymbolic-functions` linker flag
      * `unroll-loops`: Enable `-funroll-loops`. Use this sparingly, only when it provides benefit.
      * `runpath`: Enable `-Wl,--enable-new-dtags` to make linker use RUNPATH's instead of RPATH's.
-     * `avx256`: Disables `-mprefer-avx128` in avx2 builds
+     * `avx256`: Disables `-mprefer-vector-width=128` in avx2 builds
      * `thin-lto`: Enable Thin Link Time Optimization
      * `lto`: Enable Link Time Optimization
 

@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "PACKAGE\.YML" "10" "September 2018" "" ""
+.TH "PACKAGE\.YML" "20" "September 2018" "" ""
 .
 .SH "NAME"
 \fBpackage\.yml\fR \- Solus package build format
@@ -324,7 +324,7 @@ Valid keys are restricted to:
 \fBrunpath\fR: Enable \fB\-Wl,\-\-enable\-new\-dtags\fR to make linker use RUNPATH\'s instead of RPATH\'s\.
 .
 .IP "\(bu" 4
-\fBavx256\fR: Disables \fB\-mprefer\-avx128\fR in avx2 builds
+\fBavx256\fR: Disables \fB\-mprefer\-vector\-width=128\fR in avx2 builds
 .
 .IP "\(bu" 4
 \fBthin\-lto\fR: Enable Thin Link Time Optimization
