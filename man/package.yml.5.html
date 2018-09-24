@@ -384,6 +384,12 @@ additional functionality.</p>
 
 <p>  If for any reason, networking is still required, you can set this key to <code>yes</code>.
   However, always evaluate whether it is avoidable first.</p></li>
+<li><p><code>environment</code> [unicode]</p>
+
+<p>  By default, this key is empty and no additional content is exported to
+  each build step. The <code>environment</code> key provides an easy method
+  to export content such as variables to the environment for the entirety of
+  the build (where the environment is reset between each build step).</p></li>
 </ul>
 
 
@@ -567,7 +573,7 @@ builddeps:
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>July 2018</li>
+    <li class='tc'>September 2018</li>
     <li class='tr'>package.yml(5)</li>
   </ol>
 

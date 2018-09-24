@@ -98,6 +98,7 @@ class YpkgSpec:
     pkg_extract = True
     pkg_optimize = None
     pkg_libsplit = True
+    pkg_environment = None
 
     # Only used by solbuild
     pkg_networking = False
@@ -219,6 +220,7 @@ class YpkgSpec:
             ("conflicts", MultimapFormat(self, self.add_conflict, "main")),
             ("replaces", MultimapFormat(self, self.add_replace, "main")),
             ("optimize", OneOrMoreString),
+            ("environment", unicode),
         ])
         # Build steps are handled separately
         self.build_steps = OrderedDict([

@@ -151,6 +151,8 @@ def execute_step(context, step, step_n, work_dir):
 
     # Add our exports
     full_text += "\n".join(exports)
+    if context.spec.pkg_environment:
+        full_text += "\n\n{}\n".format(context.spec.pkg_environment)
     if extraScript:
         full_text += "\n\n{}\n".format(extraScript)
     full_text += "\n\n{}\n".format(step)

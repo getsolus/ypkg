@@ -326,6 +326,13 @@ additional functionality.
     If for any reason, networking is still required, you can set this key to `yes`.
     However, always evaluate whether it is avoidable first.
 
+* `environment` [unicode]
+
+    By default, this key is empty and no additional content is exported to
+    each build step. The `environment` key provides an easy method to
+    export content such as variables to the environment for the entirety of
+    the build (where the environment is reset between each build step).
+
 `Build Steps`
 
 The build steps are text-only data values. `ypkg-build(1)` will interpret special
