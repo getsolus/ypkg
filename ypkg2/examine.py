@@ -291,6 +291,8 @@ def strip_file(context, pretty, file, magic_string, mode=None):
         flags = "-g --strip-unneeded"
     elif mode == "ar":
         flags = "--strip-debug"
+        if context.spec.pkg_clang:
+            cmd = "{} llvm-objcopy {} \"{}\""
     try:
         s = " ".join(exports)
         subprocess.check_call(cmd.format(s, flags, file), shell=True)
