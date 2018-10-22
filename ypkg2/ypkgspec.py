@@ -278,8 +278,6 @@ class YpkgSpec:
         if self.pkg_emul32:
             extras.extend(["glibc-32bit-devel", "libgcc-32bit",
                            "libstdc++-32bit", "fakeroot-32bit"])
-            if self.pkg_clang:
-                extras.extend(["llvm-clang-32bit", "llvm-clang-32bit-devel"])
         if self.pkg_clang:
             extras.extend(["llvm-clang", "llvm-clang-devel"])
         if self.pkg_optimize:
