@@ -173,7 +173,7 @@ actions:
 
             if [[ -z $1 ]]; then
                 python2 setup.py test || exit 1
-            elif [[ $1 =~ .*\.py$ ]]; then
+            elif [[ $1 =~ .*\.py$ ]] || [[ $1 == \-* ]]; then
                 python2 "$@" || exit 1
             else
                 "$@" || exit
@@ -239,7 +239,7 @@ actions:
 
             if [[ -z $1 ]]; then
                 python3 setup.py test || exit 1
-            elif [[ $1 =~ .*\.py$ ]]; then
+            elif [[ $1 =~ .*\.py$ ]] || [[ $1 == \-* ]]; then
                 python3 "$@" || exit 1
             else
                 "$@" || exit
