@@ -381,13 +381,13 @@ class YpkgContext:
         ncflags = list()
         for flag in self.build.cflags:
             if flag.startswith("-march="):
-                flag = "-march=i686"
+                flag = "-march=i686 -msse2"
             ncflags.append(flag)
         self.build.cflags = ncflags
         ncxxflags = list()
         for flag in self.build.cxxflags:
             if flag.startswith("-march="):
-                flag = "-march=i686"
+                flag = "-march=i686 -msse2"
             ncxxflags.append(flag)
         self.build.cxxflags = ncxxflags
 
