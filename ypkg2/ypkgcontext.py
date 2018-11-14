@@ -409,6 +409,9 @@ class YpkgContext:
             if "avx256" not in self.spec.pkg_optimize:
                 self.build.cflags.extend(AVX2_FLAGS.split(" "))
                 self.build.cxxflags.extend(AVX2_FLAGS.split(" "))
+        else:
+            self.build.cflags.extend(AVX2_FLAGS.split(" "))
+            self.build.cxxflags.extend(AVX2_FLAGS.split(" "))
 
     def enable_pgo_generate(self):
         """ Enable PGO generate step """
