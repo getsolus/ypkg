@@ -164,10 +164,15 @@ actions:
         python_install
     - python_test: |
         function python_test() {
-            [[ -d py2build ]] && cd py2build
+            if [[ -d py2build ]]; then
+                cd py2build
+            fi
 
             if [[ -z $PYTHONPATH ]]; then
-                export PYTHONPATH=%installroot%/usr/lib/python%python2_version%/site-packages:$PWD/build/lib
+                export PYTHONPATH=%installroot%/usr/lib/python%python2_version%/site-packages:$PWD
+                if [[ -d build/lib ]]; then
+                    PYTHONPATH+=/build/lib
+                fi
                 local do_unset=true
             fi
 
@@ -179,9 +184,13 @@ actions:
                 "$@" || exit
             fi
 
-            [[ $do_unset ]] && unset PYTHONPATH
+            if [[ $do_unset ]]; then
+                unset PYTHONPATH
+            fi
 
-            [[ -d ../py2build ]] && cd ..
+            if [[ -d ../py2build ]]; then
+                cd ..
+            fi
         }
         python_test
     - python_compile: |
@@ -230,10 +239,15 @@ actions:
         python3_install
     - python3_test: |
         function python3_test() {
-            [[ -d py3build ]] && cd py3build
+            if [[ -d py3build ]]; then
+                cd py3build
+            fi
 
             if [[ -z $PYTHONPATH ]]; then
-                export PYTHONPATH=%installroot%/usr/lib/python%python3_version%/site-packages:$PWD/build/lib
+                export PYTHONPATH=%installroot%/usr/lib/python%python3_version%/site-packages:$PWD
+                if [[ -d build/lib ]]; then
+                    PYTHONPATH+=/build/lib
+                fi
                 local do_unset=true
             fi
 
@@ -245,9 +259,13 @@ actions:
                 "$@" || exit
             fi
 
-            [[ $do_unset ]] && unset PYTHONPATH
+            if [[ $do_unset ]]; then
+                unset PYTHONPATH
+            fi
 
-            [[ -d ../py3build ]] && cd ..
+            if [[ -d ../py3build ]]; then
+                cd ..
+            fi
         }
         python3_test
     - python3_compile: |
