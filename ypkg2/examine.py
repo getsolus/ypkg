@@ -25,9 +25,9 @@ import multiprocessing
 global share_ctx
 
 
-v_dyn = re.compile(r"ELF (64|32)\-bit LSB shared object,")
-v_bin = re.compile(r"ELF (64|32)\-bit LSB executable,")
-v_rel = re.compile(r"ELF (64|32)\-bit LSB relocatable,")
+v_dyn = re.compile(r".*ELF (64|32)\-bit LSB shared object,")
+v_bin = re.compile(r".*ELF (64|32)\-bit LSB executable,")
+v_rel = re.compile(r".*ELF (64|32)\-bit LSB relocatable,")
 shared_lib = re.compile(r".*Shared library: \[(.*)\].*")
 r_path = re.compile(r".*Library rpath: \[(.*)\].*")
 r_soname = re.compile(r".*Library soname: \[(.*)\].*")
