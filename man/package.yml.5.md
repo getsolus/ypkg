@@ -478,9 +478,9 @@ It may also be beneficial to study the `rc.yml` file defining the build macros:
 
 `solbuild(1)`, `ypkg(1)` `ypkg-build(1)`, `ypkg-install-deps(1)`
 
- * https://wiki.getsol.us/Package.yml
+ * https://getsol.us/articles/packaging
  * https://github.com/getsolus/ypkg
- * https://wiki.getsol.us/Packaging
+ * https://getsol.us/articles/packaging
  * https://spdx.org/licenses/
  * https://en.wikipedia.org/wiki/Advanced_Vector_Extensions
  * https://en.wikipedia.org/wiki/Profile-guided_optimization
