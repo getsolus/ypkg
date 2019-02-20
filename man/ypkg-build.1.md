@@ -67,8 +67,8 @@ On success, 0 is returned. A non-zero return code signals a failure.
 
 `solbuild(1)`, `ypkg-install-deps(1)`, `ypkg(1)`, `package.yml(5)`
 
- * https://github.com/solus-project/ypkg
- * https://wiki.solus-project.com/Packaging
+ * https://github.com/getsolus/ypkg
+ * https://wiki.getsol.us/Packaging
 
 
 ## NOTES

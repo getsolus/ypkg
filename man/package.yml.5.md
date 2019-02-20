@@ -395,12 +395,12 @@ ypkg supports a wide range of macros for easier package building. They evolve
 often and quickly, so you should always refer to the main `package.yml`
 documentation:
 
- * https://solus-project.com/articles/packaging/package.yml/en/#actionable-macros
- * https://solus-project.com/articles/packaging/package.yml/en/#variable-macros
+ * https://getsol.us/articles/packaging/package.yml/en/#actionable-macros
+ * https://getsol.us/articles/packaging/package.yml/en/#variable-macros
 
 It may also be beneficial to study the `rc.yml` file defining the build macros:
 
- * https://github.com/solus-project/ypkg/blob/master/ypkg2/rc.yml
+ * https://github.com/getsolus/ypkg/blob/master/ypkg2/rc.yml
 
 
 ## EXAMPLES
@@ -432,7 +432,7 @@ It may also be beneficial to study the `rc.yml` file defining the build macros:
 `Git sources`
 
     source     :
-        - git|https://github.com/solus-project/ypkg.git : v17.0
+        - git|https://github.com/getsolus/ypkg.git : v17.0
 
 `Multimap examples`
 
@@ -478,9 +478,9 @@ It may also be beneficial to study the `rc.yml` file defining the build macros:
 
 `solbuild(1)`, `ypkg(1)` `ypkg-build(1)`, `ypkg-install-deps(1)`
 
- * https://wiki.solus-project.com/Package.yml
- * https://github.com/solus-project/ypkg
- * https://wiki.solus-project.com/Packaging
+ * https://wiki.getsol.us/Package.yml
+ * https://github.com/getsolus/ypkg
+ * https://wiki.getsol.us/Packaging
  * https://spdx.org/licenses/
  * https://en.wikipedia.org/wiki/Advanced_Vector_Extensions
  * https://en.wikipedia.org/wiki/Profile-guided_optimization
