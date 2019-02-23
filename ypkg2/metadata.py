@@ -463,7 +463,7 @@ def write_spec(context, gene, outputDir):
     spec = pisi.specfile.SpecFile()
 
     legacy_sha1 = "79eb0752a961b8e0d15c77d298c97498fbc89c5a"
-    legacy_url = "https://solus-project.com/sources/README.Solus"
+    legacy_url = "https://getsol.us/sources/README.Solus"
 
     history = None
     pkg_main = accum_packages[packages[0]]
