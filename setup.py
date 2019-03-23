@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name = "ypkg2",
-    version = "29.0.0",
+    version = "30.0.0",
     author = "Ikey Doherty",
     author_email = "ikey@solus-project.com",
     description = ("Solus YPKG build Tool"),
