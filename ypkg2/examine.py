@@ -27,6 +27,7 @@ global share_ctx
 
 v_dyn = re.compile(r".*ELF (64|32)\-bit LSB shared object,")
 v_bin = re.compile(r".*ELF (64|32)\-bit LSB executable,")
+v_pie = re.compile(r".*ELF (64|32)\-bit LSB pie executable,")
 v_rel = re.compile(r".*ELF (64|32)\-bit LSB relocatable,")
 shared_lib = re.compile(r".*Shared library: \[(.*)\].*")
 r_path = re.compile(r".*Library rpath: \[(.*)\].*")
@@ -260,6 +261,8 @@ class FileReport:
                 self.scan_binary(file, True)
             elif v_bin.match(mgs):
                 self.scan_binary(file, False)
+            elif v_pie.match(mgs):
+                self.scan_binary(file, False)
             elif v_rel.match(mgs) and file.endswith(".ko"):
                 self.scan_kernel(file)
 
@@ -339,6 +342,10 @@ def examine_file(*args):
         store_debug(context, pretty, file, mgs)
         strip_file(context, pretty, file, mgs, mode="shared")
     elif v_bin.match(mgs):
+        # Get direct deps, and strip
+        store_debug(context, pretty, file, mgs)
+        strip_file(context, pretty, file, mgs, mode="executable")
+    elif v_pie.match(mgs):
         # Get direct deps, and strip
         store_debug(context, pretty, file, mgs)
         strip_file(context, pretty, file, mgs, mode="executable")
@@ -426,7 +433,7 @@ class PackageExaminer:
 
     def file_is_of_interest(self, pretty, file, mgs):
         """ So we can keep our list of things to check low """
-        if v_dyn.match(mgs) or v_bin.match(mgs) or v_rel.match(mgs):
+        if v_dyn.match(mgs) or v_bin.match(mgs) or v_pie.match(mgs) or v_rel.match(mgs):
             if not self.can_kernel and file.endswith(".ko"):
                 return False
             return True
