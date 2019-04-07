@@ -44,7 +44,7 @@ actions:
     - qml_cache: |
         function generate_cache() {
             pushd $installdir
-            for i in `find -type f -name "*.qml"`; do
+            find . -type f -name "*.qml" -print0 | while IFS= read -r -d '' i; do
                 if ! [ -a "${i}"c ]; then
                     qmlcachegen -o "${i}"c "${i}" $*
                 fi
