@@ -41,7 +41,8 @@ SIZE_FLAGS = "-Os"
 SIZE_FLAGS_CLANG = "-O2"
 
 # Allow optimizing for lto
-LTO_FLAGS = "-flto"
+LTO_FLAGS = "-flto=%YJOBS%"
+LTO_FLAGS_CLANG = "-flto"
 
 # Allow optimizing for thin-lto
 THIN_LTO_FLAGS = "-flto=thin"
@@ -114,7 +115,10 @@ class Flags:
                 else:
                     newflags.extend(SIZE_FLAGS.split(" "))
         elif opt_type == "lto":
-            newflags.extend(LTO_FLAGS.split(" "))
+            if clang:
+                newflags.extend(LTO_FLAGS_CLANG.split(" "))
+            else:
+                newflags.extend(LTO_FLAGS.split(" "))
         elif opt_type == "unroll-loops":
             newflags.extend(UNROLL_LOOPS_FLAGS.split(" "))
         elif opt_type == "runpath":
