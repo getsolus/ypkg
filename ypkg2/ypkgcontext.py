@@ -423,6 +423,9 @@ class YpkgContext:
         self.build.cxxflags = Flags.pgo_gen_flags(self.build.cxxflags,
                                                   pgo_dir,
                                                   self.spec.pkg_clang)
+        self.build.ldflags = Flags.pgo_gen_flags(self.build.ldflags,
+                                                  pgo_dir,
+                                                  self.spec.pkg_clang)
 
     def enable_pgo_use(self):
         """ Enable PGO use step """
