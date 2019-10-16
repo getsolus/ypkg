@@ -127,6 +127,9 @@ class Flags:
             newflags.extend(THIN_LTO_FLAGS.split(" "))
             if not clang:
                 newflags.extend(GOLD_LINKER_FLAGS.split(" "))
+        elif opt_type == "avx256":
+            #flag is handled in init_avx2
+            pass
         else:
             console_ui.emit_warning("Flags", "Unknown optimization: {}".
                                     format(opt_type))
