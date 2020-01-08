@@ -130,9 +130,9 @@ License
 
 GPL-3.0
 
-Copyright © 2015-2018 Ikey Doherty
+Copyright © 2015-2020 Solus Project
 
-Some portions: Copyright (C) 2016 Intel Corporation
+Some portions: Copyright © 2016 Intel Corporation
 
 Some elements have been gratefully borrowed from autospec:
 
