@@ -18,6 +18,7 @@ import hashlib
 import subprocess
 import fnmatch
 import shutil
+from .ypkgcontext import YpkgContext
 
 KnownSourceTypes = {
     'tar': [
@@ -201,10 +202,10 @@ class TarSource(YpkgSource):
     hash = None
     filename = None
 
-    def __init__(self, uri, hash):
+    def __init__(self, uri, hash, filename):
         YpkgSource.__init__(self)
         self.uri = uri
-        self.filename = os.path.basename(uri)
+        self.filename = filename
         self.hash = hash
 
     def __str__(self):
@@ -361,6 +362,25 @@ class SourceManager:
 
             uri = source.keys()[0]
             hash = source[uri]
+            filename = os.path.basename(uri)
+
+            #Check if the filename is already used by another file, if that's the case use existing.1, then existing.2 and so on
+            filenameToCheck = filename
+            filenameSuffix = 1
+            needToCheck = True
+
+            while needToCheck == True:
+                needToCheck = False
+                for sourceToCheck in self.sources:
+                    if filenameToCheck == sourceToCheck.filename:
+                        needToCheck = True
+                        filenameToCheck = filename + '.' + str(filenameSuffix)
+                        filenameSuffix = filenameSuffix + 1
+
+            #replace the filename if a duplicate has been detected
+            if filenameSuffix != 1:
+                filename = filenameToCheck
+
             # Check if its a namespaced support type
             if "|" in uri:
                 brk = uri.split("|")
@@ -369,7 +389,7 @@ class SourceManager:
                     uri = "|".join(brk[1:])
                     self.sources.append(GitSource(uri, hash))
                     continue
-            self.sources.append(TarSource(uri, hash))
+            self.sources.append(TarSource(uri, hash, filename))
 
         return True
 
