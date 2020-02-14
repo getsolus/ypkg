@@ -182,7 +182,7 @@ def build_package(filename, outputDir):
         print("Unable to continue - aborting")
         sys.exit(1)
 
-    possibles = ["{}/.solus/packager", "{}/.evolveos/packager"]
+    possibles = ["{}/.config/solus/packager", "{}/.solus/packager", "{}/.evolveos/packager"]
 
     packager_name = ypkg2.packager_name
     packager_email = ypkg2.packager_email
