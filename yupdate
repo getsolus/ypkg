@@ -11,40 +11,28 @@
 #  (at your option) any later version.
 #
 
+import argparse
 import sys
 import ruamel.yaml
 import os
 import subprocess
 import pisi.version
 
+parser = argparse.ArgumentParser()
+parser.add_argument("version", type=str, help="new version of package")
+parser.add_argument("url", type=str, help="url to new package version")
+parser.add_argument("--tag-prefix", type=str, help="git version tag prefix [default: v]", default="v")
+parser.add_argument("--yml", type=str, help="path to package yml config [default: ./package.yml]", default="package.yml")
 
 def usage(msg=None, ex=1):
     if msg:
         print(msg)
     else:
-        print("Usage: %s [version] [url]" % sys.argv[0])
+        parser.print_help()
     sys.exit(ex)
 
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        usage()
-
-    ymlfile = "package.yml"
-    if not os.path.exists(ymlfile):
-        usage("Specified file does not exist")
-    if not ymlfile.endswith(".yml"):
-        usage("%s does not look like a valid package.yml file")
-
-    newversion = sys.argv[1]
-    try:
-        d = pisi.version.Version(newversion)
-    except Exception as e:
-        print("Problematic version string: %s" % e)
-        sys.exit(1)
-
-    url = sys.argv[2]
-    file = url.split("/")[-1]
-
+def shasum(url):
+    fname = os.path.basename(url)
     try:
         r = os.system("wget \"%s\"" % url)
     except:
@@ -54,16 +42,38 @@ if __name__ == "__main__":
         print("Failed to download file")
         sys.exit(1)
 
-    sha256 = subprocess.check_output(["sha256sum",  file]).split()[0].strip()
+    sha256 = subprocess.check_output(["sha256sum",  fname]).split()[0].strip()
+    os.unlink(fname)
+    return sha256
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+
+    ymlfile = args.yml
+    if not os.path.exists(ymlfile):
+        usage("Specified file does not exist")
+    if not ymlfile.endswith(".yml"):
+        usage("%s does not look like a valid package.yml file" % ymlfile)
+
+    newversion = args.version
+    try:
+        d = pisi.version.Version(newversion)
+    except Exception as e:
+        print("Problematic version string: %s" % e)
+        sys.exit(1)
+
+    url = args.url
+    if not url.startswith("git|"):
+        source = {url: shasum(url)}
+    else:
+        source = {url: args.tag_prefix + newversion}
 
     with open(ymlfile, "r") as infile:
         data = ruamel.yaml.round_trip_load(infile)
     data['source'] = sources = []
-    sources.append({url: sha256})
+    sources.append(source)
     data['release'] += 1
     data['version'] = newversion
-
-    os.unlink(file)
 
     try:
         with open(ymlfile, 'w') as fp:
