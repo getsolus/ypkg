@@ -302,6 +302,11 @@ actions:
             fi
         }
         gem_install
+    # Make life easier with Gradle
+    - gradle: |
+        GRADLE_USER_HOME=$workdir/.gradle gradle --no-daemon
+    - gradlew: |
+        GRADLE_USER_HOME=$workdir/.gradle ./gradlew --no-daemon
     - waf_configure: |
         ./waf configure --prefix=%PREFIX%
     - waf_build: |
