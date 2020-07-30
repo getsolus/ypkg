@@ -304,9 +304,24 @@ actions:
         gem_install
     # Make life easier with Gradle
     - gradle: |
-        GRADLE_USER_HOME=$workdir/.gradle gradle --no-daemon
+        function gradle_run() {
+            export GRADLE_USER_HOME=$workdir/.gradle_home
+            export _JAVA_OPTIONS="-Djava.util.prefs.userRoot=$workdir/.java_prefs" 
+            gradle --no-daemon --stacktrace $@
+        }
+        gradle_run
     - gradlew: |
-        GRADLE_USER_HOME=$workdir/.gradle ./gradlew --no-daemon
+        function gradlew_run() {
+            export GRADLE_USER_HOME=$workdir/.gradle_home
+            export _JAVA_OPTIONS="-Djava.util.prefs.userRoot=$workdir/.java_prefs"
+            ./gradlew --no-daemon --stacktrace $@
+        }
+        gradlew_run
+    # Make life easier with Maven
+    - mvn: |
+        mvn --threads %YJOBS% -Dmaven.repo.local=$workdir/.m2_local  $@
+    - mvnw: |
+        ./mvnw --threads %YJOBS% -Dmaven.repo.local=$workdir/.m2_local $@
     - waf_configure: |
         ./waf configure --prefix=%PREFIX%
     - waf_build: |
