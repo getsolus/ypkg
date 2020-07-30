@@ -319,9 +319,9 @@ actions:
         gradlew_run
     # Make life easier with Maven
     - mvn: |
-        mvn --threads %YJOBS% -Dmaven.repo.local=$workdir/.m2_local  $@
+        mvn --threads %YJOBS% -Dmaven.repo.local=$workdir/.m2_local
     - mvnw: |
-        ./mvnw --threads %YJOBS% -Dmaven.repo.local=$workdir/.m2_local $@
+        ./mvnw --threads %YJOBS% -Dmaven.repo.local=$workdir/.m2_local
     - waf_configure: |
         ./waf configure --prefix=%PREFIX%
     - waf_build: |
