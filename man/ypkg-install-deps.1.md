@@ -50,7 +50,9 @@ On success, 0 is returned. A non-zero return code signals a failure.
 
 ## COPYRIGHT
 
- * Copyright © 2016-2018 Ikey Doherty, License: CC-BY-SA-3.0
+ * Copyright © 2016-2020 Solus Project
+
+Released under the terms of the CC-BY-SA-3.0 license
 
 
 ## SEE ALSO

@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "PACKAGE\.YML" "20" "September 2018" "" ""
+.TH "PACKAGE\.YML" "5" "September 2020" "" ""
 .
 .SH "NAME"
 \fBpackage\.yml\fR \- Solus package build format
@@ -344,8 +344,6 @@ When built using \fBsolbuild(1)\fR, access to the network is removed\. A new loo
 .IP
 If for any reason, networking is still required, you can set this key to \fByes\fR\. However, always evaluate whether it is avoidable first\.
 .
-.IP "" 0
-.
 .IP "\(bu" 4
 \fBenvironment\fR [unicode]
 .
@@ -548,9 +546,12 @@ builddeps:
 .SH "COPYRIGHT"
 .
 .IP "\(bu" 4
-Copyright © 2016\-2018 Ikey Doherty, License: CC\-BY\-SA\-3\.0
+Copyright © 2016\-2020 Solus Project
 .
 .IP "" 0
+.
+.P
+Released under the terms of the CC\-BY\-SA\-3\.0 license
 .
 .SH "SEE ALSO"
 \fBsolbuild(1)\fR, \fBypkg(1)\fR \fBypkg\-build(1)\fR, \fBypkg\-install\-deps(1)\fR
@@ -562,7 +563,7 @@ https://getsol\.us/articles/packaging/package\.yml/en/
 https://github\.com/getsolus/ypkg
 .
 .IP "\(bu" 4
-https://getsol\.us/articles/packaging/
+https://getsol\.us/articles/packaging
 .
 .IP "\(bu" 4
 https://spdx\.org/licenses/

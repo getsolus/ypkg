@@ -471,14 +471,16 @@ It may also be beneficial to study the `rc.yml` file defining the build macros:
 
 ## COPYRIGHT
 
- * Copyright © 2016-2018 Ikey Doherty, License: CC-BY-SA-3.0
+ * Copyright © 2016-2020 Solus Project
+
+Released under the terms of the CC-BY-SA-3.0 license
 
 
 ## SEE ALSO
 
 `solbuild(1)`, `ypkg(1)` `ypkg-build(1)`, `ypkg-install-deps(1)`
 
- * https://getsol.us/articles/packaging
+ * https://getsol.us/articles/packaging/package.yml/en/
  * https://github.com/getsolus/ypkg
  * https://getsol.us/articles/packaging
  * https://spdx.org/licenses/
