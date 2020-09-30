@@ -132,14 +132,12 @@ class GitSource(YpkgSource):
         if not os.path.exists(os.path.join(ddir, ".gitmodules")):
             return True
 
-        cmd1 = "git -C \"{}\" submodule init".format(ddir)
-        cmd2 = "git -C \"{}\" submodule update".format(ddir)
+        submodule_cmd = "git -C \"{}\" submodule update --init --recursive".format(ddir)
 
         try:
-            r = subprocess.check_call(cmd1, shell=True)
-            r = subprocess.check_call(cmd2, shell=True)
+            r = subprocess.check_call(submodule_cmd, shell=True)
         except Exception as e:
-            console_ui.emit_error("Git", "Failed to submodule init {}".format(
+            console_ui.emit_error("Git", "Failed to fetch git submodules {}".format(
                                   e))
             return False
         return True
