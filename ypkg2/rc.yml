@@ -25,6 +25,14 @@ actions:
             popd
         }
         cmake_ninja
+    - ninja_qt6_install: *ninja_install |
+        function ninja_qt6_install() {
+            install -Ddm00755 $installdir/usr/bin
+            for bin in $installdir/usr/lib64/qt6/bin/* ; do
+                ln -vs $installdir/usr/lib64/qt6/bin/$(basename $bin) $installdir/usr/bin/$(basename $bin)-qt6
+            done
+        }
+        ninja_qt6_install
     - meson_configure: |
         CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" LDFLAGS="${LDFLAGS}" meson --prefix %PREFIX% --buildtype=plain --libdir="lib%LIBSUFFIX%" --libexecdir="lib%LIBSUFFIX%/%PKGNAME%" --sysconfdir=/etc --localstatedir=/var solusBuildDir
     - ninja_build: &ninja_build |
@@ -52,6 +60,17 @@ actions:
             popd
         }
         generate_cache
+    - qmlqt6_cache: |
+        function generate_qt6_cache() {
+            pushd $installdir
+            find . -type f -name "*.qml" -print0 | while IFS= read -r -d '' i; do
+                if ! [ -a "${i}"c ]; then
+                    qmlcachegen-qt6 -o "${i}"c "${i}" $*
+                fi
+            done
+            popd
+        }
+        generate_qt6_cache
     - patch: |
         patch -t -E --no-backup-if-mismatch -f
     # Only works if the user has a series file. They can provide the name to
