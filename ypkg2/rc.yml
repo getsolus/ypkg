@@ -324,6 +324,8 @@ actions:
           mv %installroot%/%libdir%/* $PKG_BUILD_DIR/haswell
           mv $PKG_BUILD_DIR/haswell %installroot%/%libdir%/
         fi
+    - python3_avx2_lib_shift: |
+        find %installroot%/usr/lib/python%python3_version%/ -name '*.so' -exec sh -c 'mv "$0" "${0%.so}.so.avx2"' {} \;
 defines:
     - CONFOPTS: |
         --prefix=%PREFIX% --build=%HOST% --libdir=%libdir% --mandir=/usr/share/man \
