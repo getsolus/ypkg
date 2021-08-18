@@ -316,6 +316,8 @@ additional functionality.
      * `avx256`: Disables `-mprefer-vector-width=128` in avx2 builds
      * `thin-lto`: Enable Thin Link Time Optimization
      * `lto`: Enable Link Time Optimization
+     * `icf-safe`: Enable `-Wl,--icf=safe` to utilize the safe Identical Code Folding linker optimization.
+     * `icf-all`: Enable `-Wl,--icf=all` to utilize the Identical Code Folding linker optimization.
 
 * `networking` [boolean]
 

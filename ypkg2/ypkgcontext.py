@@ -46,6 +46,12 @@ LTO_FLAGS = "-flto"
 # Allow optimizing for thin-lto
 THIN_LTO_FLAGS = "-flto=thin"
 
+# Allow optimizing for ICF all (identical code folding)
+ICF_ALL_FLAGS = "-Wl,--icf=all"
+
+# Allow optimizing for ICF safe
+ICF_SAFE_FLAGS = "-Wl,--icf=safe"
+
 # Use gold linker with GCC
 GOLD_LINKER_FLAGS = "-fuse-ld=gold"
 
@@ -125,6 +131,14 @@ class Flags:
             newflags = Flags.filter_flags(f, SYMBOLIC_FLAGS)
         elif opt_type == "thin-lto":
             newflags.extend(THIN_LTO_FLAGS.split(" "))
+            if not clang:
+                newflags.extend(GOLD_LINKER_FLAGS.split(" "))
+        elif opt_type == "icf-safe":
+            newflags.extend(ICF_SAFE_FLAGS.split(" "))
+            if not clang:
+                newflags.extend(GOLD_LINKER_FLAGS.split(" "))
+        elif opt_type == "icf-all":
+            newflags.extend(ICF_ALL_FLAGS.split(" "))
             if not clang:
                 newflags.extend(GOLD_LINKER_FLAGS.split(" "))
         else:
@@ -347,7 +361,7 @@ class YpkgContext:
             self.build.cc = "{}-gcc".format(self.pconfig.values.build.host)
             self.build.cxx = "{}-g++".format(self.pconfig.values.build.host)
             if self.spec.pkg_optimize:
-                if "thin-lto" in self.spec.pkg_optimize:
+                if "thin-lto" or "icf-safe" or "icf-all" in self.spec.pkg_optimize:
                     self.build.ldflags = Flags.filter_flags(self.build.ldflags, \
                                                         NON_LD_LINKER_FLAGS)
 
@@ -363,7 +377,9 @@ class YpkgContext:
     def init_optimize(self):
         """ Handle optimize settings within the spec """
         for opt in self.spec.pkg_optimize:
-            if opt != "runpath":
+            if opt == "runpath" or opt == "icf-safe" or opt == "icf-all":
+                pass
+            else:
                 self.build.cflags = Flags.optimize_flags(self.build.cflags,
                                                         opt,
                                                         self.spec.pkg_clang)
@@ -371,7 +387,8 @@ class YpkgContext:
                                                         opt,
                                                         self.spec.pkg_clang)
             if opt == "no-bind-now" or opt == "no-symbolic" \
-                or opt == "runpath":
+                or opt == "runpath" or opt == "icf-safe"    \
+                or opt == "icf-all":
                 self.build.ldflags = Flags.optimize_flags(self.build.ldflags,
                                                           opt,
                                                           self.spec.pkg_clang)
