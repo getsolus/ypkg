@@ -376,6 +376,7 @@ additional functionality.</p>
 <li> <code>lto</code>: Enable Link Time Optimization</li>
 <li> <code>icf-safe</code>: Enable <code>-Wl,--icf=safe</code> to utilize the safe Identical Code Folding linker optimization.</li>
 <li> <code>icf-all</code>: Enable <code>-Wl,--icf=all</code> to utilize the Identical Code Folding linker optimization.</li>
+<li> <code>function-sections</code>: Enables <code>-ffunction-sections</code> to generate a seperate ELF section for each function. Recommended for icf with gcc.</li>
 </ul>
 </li>
 <li><p><code>networking</code> [boolean]</p>
@@ -577,7 +578,7 @@ builddeps:
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>August 2021</li>
+    <li class='tc'>September 2021</li>
     <li class='tr'>package.yml(5)</li>
   </ol>
 

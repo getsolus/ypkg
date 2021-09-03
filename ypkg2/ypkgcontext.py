@@ -52,6 +52,10 @@ ICF_ALL_FLAGS = "-Wl,--icf=all"
 # Allow optimizing for ICF safe
 ICF_SAFE_FLAGS = "-Wl,--icf=safe"
 
+# Generate a seperate ELF section for each function
+# Recommended for use with gcc/gold ICF
+FUNCTION_SECTION_FLAGS = "-ffunction-sections"
+
 # Use gold linker with GCC
 GOLD_LINKER_FLAGS = "-fuse-ld=gold"
 
@@ -141,6 +145,8 @@ class Flags:
             newflags.extend(ICF_ALL_FLAGS.split(" "))
             if not clang:
                 newflags.extend(GOLD_LINKER_FLAGS.split(" "))
+        elif opt_type == "function-sections":
+            newflags.extend(FUNCTION_SECTION_FLAGS.split(" "))
         else:
             console_ui.emit_warning("Flags", "Unknown optimization: {}".
                                     format(opt_type))

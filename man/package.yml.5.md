@@ -318,6 +318,7 @@ additional functionality.
      * `lto`: Enable Link Time Optimization
      * `icf-safe`: Enable `-Wl,--icf=safe` to utilize the safe Identical Code Folding linker optimization.
      * `icf-all`: Enable `-Wl,--icf=all` to utilize the Identical Code Folding linker optimization.
+     * `function-sections`: Enables `-ffunction-sections` to generate a seperate ELF section for each function. Recommended for icf with gcc.
 
 * `networking` [boolean]
 
