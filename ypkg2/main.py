@@ -118,6 +118,10 @@ def execute_step(context, step, step_n, work_dir):
         script.define_export("PKG_CONFIG_PATH", EMUL32PC)
     if context.avx2:
         script.define_export("AVX2BUILD", "1")
+    if context.gen_pgo:
+        script.define_export("PGO_GEN_BUILD", "1")
+    if context.use_pgo:
+        script.define_export("PGO_USE_BUILD", "1")
     extraScript = None
     endScript = None
 
