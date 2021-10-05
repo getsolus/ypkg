@@ -33,6 +33,17 @@ actions:
         DESTDIR="%installroot%" ninja install %JOBS% -C solusBuildDir
     - ninja_check: &ninja_check |
         ninja test %JOBS% -C solusBuildDir
+    - ninja_qt6_install: |
+        DESTDIR="%installroot%" ninja install %JOBS% -C solusBuildDir
+        function ninja_qt6_install() {
+            pushd $installdir
+                install -dm00755 usr/bin
+                while read _line; do
+                    ln -s $_line
+                done < %workdir%/solusBuildDir/user_facing_tool_links.txt
+            popd
+        }
+        ninja_qt6_install
     # These macros are for backward compatibility only. Please use the ninja ones
     - meson_build: *ninja_build
     - meson_install: *ninja_install
@@ -52,6 +63,17 @@ actions:
             popd
         }
         generate_cache
+    - qml6_cache: |
+        function generate_qt6_cache() {
+            pushd $installdir
+            find . -type f -name "*.qml" -print0 | while IFS= read -r -d '' i; do
+                if ! [ -a "${i}"c ]; then
+                    qmlcachegen-qt6 -o "${i}"c "${i}" $*
+                fi
+            done
+            popd
+        }
+        generate_qt6_cache
     - patch: |
         patch -t -E --no-backup-if-mismatch -f
     # Only works if the user has a series file. They can provide the name to
