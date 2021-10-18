@@ -277,6 +277,12 @@ actions:
             fi
         }
         python3_compile
+    # Generate a wheel file from pyproject.toml
+    - pyproject_build: |
+        python3 -m pip wheel --no-deps --use-pep517 --no-build-isolation --disable-pip-version-check --no-clean --verbose .
+    # Install generated wheel file
+    - pyproject_install: |
+        python3 -m pip install --root=%installroot% --no-deps --disable-pip-version-check --verbose --ignore-installed --no-warn-script-location --no-index --no-cache-dir *.whl
     # Make life easier with Ruby gems
     - gem_build: |
         function gem_build() {
