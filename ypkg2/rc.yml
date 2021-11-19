@@ -33,10 +33,6 @@ actions:
         DESTDIR="%installroot%" ninja install %JOBS% -C solusBuildDir
     - ninja_check: &ninja_check |
         ninja test %JOBS% -C solusBuildDir
-    # These macros are for backward compatibility only. Please use the ninja ones
-    - meson_build: *ninja_build
-    - meson_install: *ninja_install
-    - meson_check: *ninja_check
     - qmake: |
         qmake QMAKE_CFLAGS_RELEASE="${CFLAGS}" QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS}" QMAKE_LFLAGS="${LDFLAGS}"
     - qmake4: |
