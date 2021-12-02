@@ -31,7 +31,7 @@ if __name__ == "__main__":
     try:
         with open(sys.argv[1], 'w') as fp:
             ruamel.yaml.round_trip_dump(
-                data, fp, indent=4, block_seq_indent=4,
+                data, fp, indent=4, block_seq_indent=4, width=200,
                 top_level_colon_align=True, prefix_colon=' ')
     except Exception as e:
         print("Error writing file, may need to reset it.")
