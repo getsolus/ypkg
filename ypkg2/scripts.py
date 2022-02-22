@@ -177,8 +177,9 @@ class ScriptGenerator:
                 self.define_export("NM", "llvm-nm")
 
         # Handle sccache. It is enabled together with ccache
-        if self.context.build.ccache and self.spec.pkg_ccache:
-            self.define_export("RUSTC_WRAPPER", "/usr/bin/sccache")
+        if os.path.exists("/usr/bin/sccache"):
+            if self.context.build.ccache and self.spec.pkg_ccache:
+                self.define_export("RUSTC_WRAPPER", "/usr/bin/sccache")
 
         if not console_ui.allow_colors:
             self.define_export("TERM", "dumb")

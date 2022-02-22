@@ -246,7 +246,10 @@ class YpkgContext:
         # If ccache is enabled, sccache is also enabled. However, sccache
         # doesn't need to manipulate PATH, so only a log is emitted. No further
         # action is done
-        console_ui.emit_info("Build", "Enabling sccache")
+        if os.path.exists("/usr/bin/sccache"):
+            console_ui.emit_info("Build", "Enabling sccache")
+        else:
+            console_ui.emit_warning("Build", "sccache is enabled but cannot be found. Disabling sccache")
 
         return default_path
 
