@@ -242,6 +242,7 @@ class YpkgContext:
             if os.path.exists(i):
                 console_ui.emit_info("Build", "Enabling ccache")
                 path = "{}:{}".format(i, path)
+                break # To prevent emitting the same info twice.
 
         # If ccache is enabled, sccache is also enabled. However, sccache
         # doesn't need to manipulate PATH, so only a log is emitted. No further
