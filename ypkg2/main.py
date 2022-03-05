@@ -369,7 +369,7 @@ def build_package(filename, outputDir):
                 console_ui.emit_success("Build", "{} successful".
                                         format(step))
                 continue
-            console_ui.emit_error("Build", "{} failed".format(step))
+            console_ui.emit_error("Build", "{} failed for {}".format(step, spec.pkg_name))
             sys.exit(1)
 
     # Add user patterns - each consecutive package has higher priority than the
