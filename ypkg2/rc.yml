@@ -221,9 +221,7 @@ actions:
         python3_setup
     - python3_install: |
         function python3_install() {
-            # Due to mangaling behaviour of python3_setup
-            # we have to look for the setup.py in a different dir..
-            if [[ -f "$workdir/py3build/setup.py" ]]; then
+            if [[ -f "$workdir/setup.py" ]]; then
                 if [[ -e $PKG_BUILD_DIR/.workdir ]]; then
                     cd $(cat $PKG_BUILD_DIR/.workdir)
                 else
