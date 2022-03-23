@@ -26,7 +26,7 @@ SPEED_FLAGS = "-fno-semantic-interposition -O3 -falign-functions=32"
 # CLI flag to control it. It also does a better job on function alignment.
 SPEED_FLAGS_CLANG = "-O3"
 
-BIND_NOW_FLAGS = ["-Wl,-z,now", "-Wl,-z -Wl,relro", "-Wl,-z -Wl,now"]
+BIND_NOW_FLAGS = ["-Wl,-z,now", "-Wl,-z -Wl,relro", "-Wl,-z -Wl,now", "-fno-plt"]
 
 # Allow turning off the symbolic functions linker flag
 SYMBOLIC_FLAGS = ["-Wl,-Bsymbolic-functions"]

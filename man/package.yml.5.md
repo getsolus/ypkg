@@ -309,7 +309,7 @@ additional functionality.
 
      * `speed`: Optimise this package for speed performance
      * `size`: Optimize the package build solely for size.
-     * `no-bind-now`: Configure the package to disable certain flags, where RELRO is unsupported. The `plt` option must also be enabled with this option.
+     * `no-bind-now`: Configure the package to disable certain flags, where RELRO is unsupported.
      * `no-symbolic`: Disable `-Wl,-Bsymbolic-functions` linker flag
      * `plt`: Allows use of the PLT (procedual lookup table). Removes `-fno-plt` from build flags.
      * `unroll-loops`: Enable `-funroll-loops`. Use this sparingly, only when it provides benefit.
