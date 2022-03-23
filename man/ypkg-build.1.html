@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv='content-type' value='text/html;charset=utf8'>
-  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <meta http-equiv='content-type' content='text/html;charset=utf8'>
+  <meta name='generator' content='Ronn-NG/v0.9.1 (http://github.com/apjanke/ronn-ng/tree/0.9.1)'>
   <title>ypkg-build(1) - Build Solus ypkg files</title>
   <style type='text/css' media='all'>
   /* style: man */
@@ -69,14 +69,15 @@
     <li class='tr'>ypkg-build(1)</li>
   </ol>
 
-  <h2 id="NAME">NAME</h2>
+  
+
+<h2 id="NAME">NAME</h2>
 <p class="man-name">
   <code>ypkg-build</code> - <span class="man-whatis">Build Solus ypkg files</span>
 </p>
-
 <h2 id="SYNOPSIS">SYNOPSIS</h2>
 
-<p><code>ypkg-build &lt;flags> [package.yml]</code></p>
+<p><code>ypkg-build &lt;flags&gt; [package.yml]</code></p>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
@@ -95,32 +96,41 @@ Instead, you should be using <code>solbuild(1)</code> for isolated build environ
 <p>The following options are applicable to <code>ypkg-build(1)</code>.</p>
 
 <ul>
-<li><p><code>-h</code>, <code>--help</code></p>
+  <li>
+    <p><code>-h</code>, <code>--help</code></p>
 
-<p>Print the command line options for <code>ypkg(1)</code> and exit.</p></li>
-<li><p><code>-v</code>, <code>--version</code></p>
+    <p>Print the command line options for <code>ypkg(1)</code> and exit.</p>
+  </li>
+  <li>
+    <p><code>-v</code>, <code>--version</code></p>
 
-<p>Print the <code>ypkg(1)</code> version and exit.</p></li>
-<li><p><code>-n</code>, <code>--no-colors</code></p>
+    <p>Print the <code>ypkg(1)</code> version and exit.</p>
+  </li>
+  <li>
+    <p><code>-n</code>, <code>--no-colors</code></p>
 
-<p>Disable text colourisation in the output from <code>ypkg</code> and all child
-processes.</p></li>
-<li><p><code>-t</code>, <code>--timestamp</code></p>
+    <p>Disable text colourisation in the output from <code>ypkg</code> and all child
+processes.</p>
+  </li>
+  <li>
+    <p><code>-t</code>, <code>--timestamp</code></p>
 
-<p>This argument should be a UNIX timestamp, and will be used to set the file
+    <p>This argument should be a UNIX timestamp, and will be used to set the file
 timestamps inside the final <code>.eopkg</code> archive, as well as the container files
 within that archive.</p>
 
-<p>Using this option helps achieve a level of reproducability in builds, and
+    <p>Using this option helps achieve a level of reproducability in builds, and
 this option is passed by <code>solbuild(1)</code> automatically for ypkg builds. It
 will examine the git history and use the UTC UNIX timestamp for the last
 tag, ensuring the package can be built by any machine using <code>solbuild(1)</code>
-and result in an identical package, byte for byte.</p></li>
-<li><p><code>-D</code>, <code>--output-dir</code></p>
+and result in an identical package, byte for byte.</p>
+  </li>
+  <li>
+    <p><code>-D</code>, <code>--output-dir</code></p>
 
-<p>Set the output directory for <code>ypkg-build(1)</code></p></li>
+    <p>Set the output directory for <code>ypkg-build(1)</code></p>
+  </li>
 </ul>
-
 
 <h2 id="EXIT-STATUS">EXIT STATUS</h2>
 
@@ -129,9 +139,8 @@ and result in an identical package, byte for byte.</p></li>
 <h2 id="COPYRIGHT">COPYRIGHT</h2>
 
 <ul>
-<li>Copyright © 2016-2020 Solus Project</li>
+  <li>Copyright © 2016-2020 Solus Project</li>
 </ul>
-
 
 <p>Released under the terms of the CC-BY-SA-3.0 license</p>
 
@@ -140,24 +149,21 @@ and result in an identical package, byte for byte.</p></li>
 <p><code>solbuild(1)</code>, <code>ypkg-install-deps(1)</code>, <code>ypkg(1)</code>, <code>package.yml(5)</code></p>
 
 <ul>
-<li>https://github.com/getsolus/ypkg</li>
-<li>https://getsol.us/articles/packaging</li>
+  <li>https://github.com/getsolus/ypkg</li>
+  <li>https://getsol.us/articles/packaging</li>
 </ul>
-
 
 <h2 id="NOTES">NOTES</h2>
 
 <p>Creative Commons Attribution-ShareAlike 3.0 Unported</p>
 
 <ul>
-<li>http://creativecommons.org/licenses/by-sa/3.0/</li>
+  <li>http://creativecommons.org/licenses/by-sa/3.0/</li>
 </ul>
-
-
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>September 2020</li>
+    <li class='tc'>March 2022</li>
     <li class='tr'>ypkg-build(1)</li>
   </ol>
 
