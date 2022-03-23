@@ -204,9 +204,11 @@ Valid keys are restricted to:
 .IP "\[ci]" 4
 \fBsize\fR: Optimize the package build solely for size\.
 .IP "\[ci]" 4
-\fBno\-bind\-now\fR: Configure the package to disable certain flags, where RELRO is unsupported\.
+\fBno\-bind\-now\fR: Configure the package to disable certain flags, where RELRO is unsupported\. The \fBplt\fR option must also be enabled with this option\.
 .IP "\[ci]" 4
 \fBno\-symbolic\fR: Disable \fB\-Wl,\-Bsymbolic\-functions\fR linker flag
+.IP "\[ci]" 4
+\fBplt\fR: Allows use of the PLT (procedual lookup table)\. Removes \fB\-fno\-plt\fR from build flags\.
 .IP "\[ci]" 4
 \fBunroll\-loops\fR: Enable \fB\-funroll\-loops\fR\. Use this sparingly, only when it provides benefit\.
 .IP "\[ci]" 4
