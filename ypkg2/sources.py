@@ -202,8 +202,11 @@ class TarSource(YpkgSource):
     def __init__(self, uri, hash):
         YpkgSource.__init__(self)
         self.uri = uri
-        self.filename = os.path.basename(uri)
         self.hash = hash
+        if '#' in uri:
+            self.filename = os.path.basename(uri[uri.index("#")+1:])
+        else:
+            self.filename = os.path.basename(uri)
 
     def __str__(self):
         return "%s (%s)" % (self.uri, self.hash)
