@@ -203,7 +203,7 @@ class TarSource(YpkgSource):
         YpkgSource.__init__(self)
         self.uri = uri
         self.hash = hash
-        if '#' in uri:
+        if '#' in uri: #support URI fragments for renaming sources
             self.filename = os.path.basename(uri[uri.index("#")+1:])
         else:
             self.filename = os.path.basename(uri)
