@@ -34,9 +34,6 @@ SYMBOLIC_FLAGS = ["-Wl,-Bsymbolic-functions"]
 # Remove unsupported linker flag when using gold or lld linkers
 NON_LD_LINKER_FLAGS = ["-Wl,--copy-dt-needed-entries"]
 
-# Allow use of the procedural lookup table
-PLT_FLAGS = ["-fno-plt"]
-
 # Allow optimizing for size
 SIZE_FLAGS = "-Os"
 
@@ -146,8 +143,6 @@ class Flags:
             newflags = Flags.filter_flags(f, BIND_NOW_FLAGS)
         elif opt_type == "no-symbolic":
             newflags = Flags.filter_flags(f, SYMBOLIC_FLAGS)
-        elif opt_type == "plt":
-            newflags = Flags.filter_flags(f, PLT_FLAGS)
         elif opt_type == "thin-lto":
             newflags.extend(THIN_LTO_FLAGS.split(" "))
             if not clang:
