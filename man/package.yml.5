@@ -1,6 +1,6 @@
 .\" generated with Ronn-NG/v0.9.1
 .\" http://github.com/apjanke/ronn-ng/tree/0.9.1
-.TH "PACKAGE\.YML" "5" "March 2022" ""
+.TH "PACKAGE\.YML" "5" "May 2022" ""
 .SH "NAME"
 \fBpackage\.yml\fR \- Solus package build format
 .SH "SYNOPSIS"
@@ -207,8 +207,6 @@ Valid keys are restricted to:
 \fBno\-bind\-now\fR: Configure the package to disable certain flags, where RELRO is unsupported\.
 .IP "\[ci]" 4
 \fBno\-symbolic\fR: Disable \fB\-Wl,\-Bsymbolic\-functions\fR linker flag
-.IP "\[ci]" 4
-\fBplt\fR: Allows use of the PLT (procedual lookup table)\. Removes \fB\-fno\-plt\fR from build flags\.
 .IP "\[ci]" 4
 \fBunroll\-loops\fR: Enable \fB\-funroll\-loops\fR\. Use this sparingly, only when it provides benefit\.
 .IP "\[ci]" 4

@@ -311,7 +311,6 @@ additional functionality.
      * `size`: Optimize the package build solely for size.
      * `no-bind-now`: Configure the package to disable certain flags, where RELRO is unsupported.
      * `no-symbolic`: Disable `-Wl,-Bsymbolic-functions` linker flag
-     * `plt`: Allows use of the PLT (procedual lookup table). Removes `-fno-plt` from build flags.
      * `unroll-loops`: Enable `-funroll-loops`. Use this sparingly, only when it provides benefit.
      * `runpath`: Enable `-Wl,--enable-new-dtags` to make linker use RUNPATH's instead of RPATH's.
      * `avx256`: Disables `-mprefer-vector-width=128` in avx2 builds
