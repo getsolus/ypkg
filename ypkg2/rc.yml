@@ -332,25 +332,47 @@ actions:
         fi
     - python3_avx2_lib_shift: |
         find %installroot%/usr/lib/python%python3_version%/ -name '*.so' -exec sh -c 'mv "$0" "${0%.so}.so.avx2"' {} \;
-    # BOLT Macros
-    ## Instrument file with llvm-bolt
+    ### BOLT Macros
+    # Instrument file with llvm-bolt
     - bolt_instr: |
         binstr(){
             mv ${1} ${1}.orig
-            mkdir -p $workdir/BOLT-profile/final
+            mkdir -p $PKG_BUILD_DIR/BOLT/final
             llvm-bolt ${1}.orig -instrument --instrumentation-file=$workdir/BOLT-profile/$(basename ${1}) --instrumentation-file-append-pid ${2} ${3} ${4} -o ${1}
         }
         binstr
-    ## Instrument file with llvm-bolt
+    # Merge fdata profiles into a single file
     - bolt_merge: |
         bmerge(){
             merge-fdata $workdir/BOLT-profile/$(basename ${1}).*.fdata > $workdir/BOLT-profile/final/$(basename ${1}).fdata
         }
         bmerge
-    ## Apply bolt profile
+    # Collect perf data suitable for the bolt macros and check for LBR/BRS support
+    - bolt_perf: |
+        bperf(){
+            mkdir -p $PKG_BUILD_DIR/BOLT/final
+            if [ -d /sys/kernel/slab/x86_lbr ]; then
+                perf record -e cycles:u -j any,u -o $PKG_BUILD_DIR/BOLT/perf.data -- ${@}
+            else
+                perf record -e cycles:u -o $PKG_BUILD_DIR/BOLT/perf.data -- ${@}
+            fi
+        }
+        bperf
+    # Convert perf data into bolt equivalent
+    - bolt_perf2bolt: |
+        bperf2bolt(){
+            cp ${1} ${1}.orig
+            if [ -d /sys/kernel/slab/x86_lbr ]; then
+                perf2bolt -p $PKG_BUILD_DIR/BOLT/perf.data -o $PKG_BUILD_DIR/BOLT/final/$(basename ${1}).fdata ${1} -ignore-build-id
+            else
+                perf2bolt -p $PKG_BUILD_DIR/BOLT/perf.data -o $PKG_BUILD_DIR/BOLT/final/$(basename ${1}).fdata ${1} -nl -ignore-build-id
+            fi
+        }
+        bperf2bolt
+    # Apply bolt profile
     - bolt_opt: |
         boptim(){
-            llvm-bolt ${1}.orig -o ${1}.bolt -data=$workdir/BOLT-profile/final/$(basename ${1}).fdata -reorder-blocks=cache+ -reorder-functions=hfsort+ -split-functions=3 -split-all-cold -split-eh -dyno-stats -icf=1 -use-gnu-stack -use-old-text ${2} ${3} ${4}
+            llvm-bolt ${1}.orig -o ${1}.bolt -data=$PKG_BUILD_DIR/BOLT/final/$(basename ${1}).fdata -reorder-blocks=cache+ -reorder-functions=hfsort+ -split-functions=3 -split-all-cold -split-eh -dyno-stats -icf=1 -use-gnu-stack -use-old-text ${2} ${3} ${4}
             cp ${1}.bolt ${1}
         }
         boptim
