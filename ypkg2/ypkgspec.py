@@ -98,6 +98,7 @@ class YpkgSpec:
     pkg_extract = True
     pkg_optimize = None
     pkg_libsplit = True
+    pkg_mancomp = True
     pkg_environment = None
 
     # Only used by solbuild
@@ -212,6 +213,7 @@ class YpkgSpec:
             ("autodep", bool),
             ("extract", bool),
             ("libsplit", bool),
+            ("mancomp", bool),
             ("patterns", MultimapFormat(self, self.add_pattern, "main")),
             ("permanent", OneOrMoreString),
             ("builddeps", OneOrMoreString),

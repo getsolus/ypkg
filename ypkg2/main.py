@@ -372,6 +372,18 @@ def build_package(filename, outputDir):
             console_ui.emit_error("Build", "{} failed for {}".format(step, spec.pkg_name))
             sys.exit(1)
 
+    # Compress man pages
+    if os.path.exists("/usr/sbin/compressdoc") and context.spec.pkg_mancomp:
+        compress_man_cmd = "compressdoc --gzip -9 {}/usr/share/man/"
+        try:
+            subprocess.check_call(compress_man_cmd.format(ctx.get_install_dir()), shell=True)
+            console_ui.emit_info("Man", "Compressing man pages with gzip")
+        except Exception as e:
+            console_ui.emit_warning("Man", "Failed to compress man pages")
+            print (e)
+    else:
+        console_ui.emit_warning("Man", "Skipping compression of man pages.")
+
     # Add user patterns - each consecutive package has higher priority than the
     # package before it, ensuring correct levels of control
     gene = PackageGenerator(spec)
