@@ -1,23 +1,17 @@
 name       : nano
-version    : 2.3.2
-release    : 1
-homepage   : http://www.nano-editor.org
+version    : '6.3'
+release    : 134
 source     :
-    - http://www.nano-editor.org/dist/v2.3/nano-2.3.2.tar.gz : ff309248071486445609ad4269b798262a1324d7503dc09dea289f5b60106be8
-license    : GPL-2.0
-summary    : GNU nano is an easy-to-use text editor
-builddeps  :
-    - ncurses-devel
+    - https://www.nano-editor.org/dist/v6/nano-6.3.tar.xz : eb532da4985672730b500f685dbaab885a466d08fbbf7415832b95805e6f8687
+homepage   : https://www.nano-editor.org
+license    : GPL-3.0-or-later
+component  : system.devel
+summary    : Small, friendly text editor inspired by Pico
 description: |
-    GNU nano is an easy-to-use text editor originally designed
-    as a replacement for Pico, the ncurses-based editor from the non-free mailer
-    package Pine (itself now available under the Apache License as Alpine).
+    GNU nano is an easy-to-use text editor originally designed as a replacement for Pico, the ncurses-based editor from the non-free mailer package Pine (itself now available under the Apache License as Alpine).
 setup      : |
-    %apply_patches
-    %reconfigure --enable-utf8
+    %reconfigure --enable-utf8 --docdir=/usr/share/doc/nano
 build      : |
     %make
 install    : |
     %make_install
-    install -d %installroot%/etc
-    install -m 00644 doc/nanorc.sample %installroot%/etc/nanorc

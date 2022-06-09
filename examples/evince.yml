@@ -1,32 +1,32 @@
 name       : evince
-version    : 3.14.1
-release    : 1
+version    : 41.3
+release    : 54
 source     :
-    - http://ftp.gnome.org/pub/gnome/sources/evince/3.14/evince-3.14.1.tar.xz : 13ec728d6957aa18ba21a3a66504dd52b8607596337f30f0908b62b5fcc14507
-homepage   : https://wiki.gnome.org/Apps/Evince
-license    : GPL-2.0
-summary    : GNOME Document Viewer
-clang      : no
-builddeps  :
-    - pkgconfig(gtk+-3.0)
-    - pkgconfig(gsettings-desktop-schemas)
-    - pkgconfig(cairo-pdf)
-    - pkgconfig(libsecret-1)
-    - pkgconfig(poppler-glib)
-    - pkgconfig(libnautilus-extension)
-    - pkgconfig(libtiff-4)
-    - pkgconfig(adwaita-icon-theme)
-    - itstool
+    - https://download.gnome.org/sources/evince/41/evince-41.3.tar.xz : 3346b01f9bdc8f2d5ffea92f110a090c64a3624942b5b543aad4592a9de33bb0
+license    : GPL-2.0-only
+component  : office.viewers
+summary    : GNOME Platform Document Viewer
 description: |
-    Evince is a document viewer for multiple document formats. The goal
-    of evince is to replace the multiple document viewers that exist on
-    the GNOME Desktop with a single simple application.
-    Evince is specifically designed to support the file followin
-    formats: PDF, Postscript, djvu, tiff, dvi, XPS, SyncTex support with
-    gedit, comics books (cbr,cbz,cb7 and cbt).
+    Evince is a document viewer for multiple document formats. The goal of evince is to replace the multiple document viewers that exist on the GNOME Desktop with a single simple application.
+builddeps  :
+    - pkgconfig(adwaita-icon-theme)
+    - pkgconfig(ddjvuapi)
+    - pkgconfig(gnome-desktop-3.0)
+    - pkgconfig(gspell-1)
+    - pkgconfig(gstreamer-video-1.0)
+    - pkgconfig(libdazzle-1.0)
+    - pkgconfig(libgxps)
+    - pkgconfig(libhandy-1)
+    - pkgconfig(libnautilus-extension)
+    - pkgconfig(libsecret-1)
+    - pkgconfig(libspectre)
+    - pkgconfig(libtiff-4)
+    - pkgconfig(poppler-glib)
+    - appstream-glib
+    - itstool
 setup      : |
-    %configure --disable-static
+    %meson_configure -Dgtk_doc=false -Dps=enabled
 build      : |
-    %make
+    %ninja_build
 install    : |
-    %make_install
+    %ninja_install
