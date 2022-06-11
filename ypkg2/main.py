@@ -24,6 +24,7 @@ from . import metadata
 from .dependencies import DependencyResolver
 from . import packager_name, packager_email
 from . import EMUL32PC
+from .ui import humanize
 
 import ypkg2
 
@@ -374,7 +375,6 @@ def build_package(filename, outputDir):
             sys.exit(1)
 
     # Compress manpage files
-    console_ui.emit_info("Man", "Compressing manpages...")
     man_dirs = [
         "{}/usr/share/man".format(ctx.get_install_dir()),
         "{}/usr/man".format(ctx.get_install_dir()),
@@ -383,21 +383,24 @@ def build_package(filename, outputDir):
         if not os.path.exists(dir):
             continue
 
+        console_ui.emit_info("Man", "Compressing manpages in '{}'...".format(dir))
         try:
-            compress_manpages(dir)
-            console_ui.emit_success("Man", "Manpages compressed")
+            (compressed, saved) = compress_manpages(dir)
+            console_ui.emit_success("Man", "Compressed {} file(s), saving {}".format(compressed, humanize(saved)))
         except Exception as e:
             console_ui.emit_warning("Man", "Failed to compress man pages in '{}'".format(dir))
             print(e)
     
     # Now try to compress any info pages
-    console_ui.emit_info("Man", "Compressing info pages...")
-    try:
-        compress_info_pages("{}/usr/share/info".format(ctx.get_install_dir()))
-        console_ui.emit_success("Man", "Info pages compressed")
-    except Exception as e:
-        console_ui.emit_warning("Man", "Failed to compress info pages")
-        print(e)
+    info_dir = "{}/usr/share/info".format(ctx.get_install_dir())
+    if os.path.exists(info_dir):
+        console_ui.emit_info("Man", "Compressing info pages...")
+        try:
+            (compressed, saved) = compress_info_pages(info_dir)
+            console_ui.emit_success("Man", "Compressed {} file(s), saving {}".format(compressed, humanize(saved)))
+        except Exception as e:
+            console_ui.emit_warning("Man", "Failed to compress info pages")
+            print(e)
 
     # Add user patterns - each consecutive package has higher priority than the
     # package before it, ensuring correct levels of control

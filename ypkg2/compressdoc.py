@@ -39,6 +39,8 @@ def compress_gzip(path):
     The original file will be deleted after compression.
     """
 
+    starting_size = os.path.getsize(path)
+
     # Open the file
     in_file = open(path)
 
@@ -55,6 +57,10 @@ def compress_gzip(path):
 
     # Remove the original file
     os.unlink(path)
+
+    # Calculate and return the bytes saved by compression
+    ending_size = os.path.getsize(out_path)
+    return starting_size - ending_size
 
 def update_link(path):
     """Update a symlink to point to the compressed target.
@@ -92,6 +98,9 @@ def compress_dir(path):
     to the new (compressed) target path.
     """
 
+    num_compressed = 0
+    bytes_saved = 0
+
     # Iterate over each file in the directory
     for file in os.listdir(path):
         file_path = os.path.join(path, file)
@@ -104,7 +113,10 @@ def compress_dir(path):
             update_link(file_path)
         elif os.path.isfile(file_path):
             # We have a file, compress it
-            compress_gzip(file_path)
+            bytes_saved += compress_gzip(file_path)
+            num_compressed += 1
+    
+    return (num_compressed, bytes_saved)
 
 def compress_manpages(root):
     """Compresses manpage files recursively from the given root.
@@ -117,6 +129,9 @@ def compress_manpages(root):
     again with the child directory as the new root.
     """
 
+    num_compressed = 0
+    bytes_saved = 0
+
     for dir in os.listdir(root):
         child_path = os.path.join(root, dir)
 
@@ -126,12 +141,18 @@ def compress_manpages(root):
 
         # Recurse into localized manpage dirs
         if not dir.startswith("man"):
-            compress_manpages(child_path)
+            (c, s) = compress_manpages(child_path)
+            num_compressed += c
+            bytes_saved += s
             continue
 
         # This appears to be a manpage dir,
         # so compress everything in it
-        compress_dir(child_path)
+        (c, s) = compress_dir(child_path)
+        num_compressed += c
+        bytes_saved += s
+    
+    return (num_compressed, bytes_saved)
 
 def compress_info_pages(root):
     """Compress info page files in a directory.
@@ -140,6 +161,9 @@ def compress_info_pages(root):
     that is specifically tailored to the structure of the system
     info page directory.
     """
+
+    bytes_saved = 0
+    num_compressed = 0
 
     for child in os.listdir(root):
         path = os.path.join(root, child)
@@ -150,14 +174,19 @@ def compress_info_pages(root):
             if not ".info" in os.path.basename(path):
                 continue
 
-            # Only try to compress the file if it isn't already compressed
+            # Only try to compress the file if it isn"t already compressed
             if is_compressed(path):
                 continue
 
-            compress_gzip(path)
+            bytes_saved += compress_gzip(path)
+            num_compressed += 1
         elif os.path.islink(path):
-            # If it's a symlink, update it
+            # If it"s a symlink, update it
             update_link(path)
         elif os.path.isdir(path):
             # Recurse into nested directories looking for info pages
-            compress_info_pages(path)
+            (c, s) = compress_info_pages(path)
+            num_compressed += c
+            bytes_saved += s
+    
+    return (num_compressed, bytes_saved)
