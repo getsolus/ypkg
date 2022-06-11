@@ -17,7 +17,9 @@ import os
 compressed_exts = [
     ".gz",
     ".bz2",
-    ".zst"
+    ".lz",
+    ".zst",
+    ".xz"
 ]
 
 def is_compressed(path):
