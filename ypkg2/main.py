@@ -13,7 +13,7 @@
 
 from . import console_ui
 from . import remove_prefix
-from .compressdoc import compress_man_dirs
+from .compressdoc import compress_info_pages, compress_manpages
 from .ypkgspec import YpkgSpec
 from .sources import SourceManager
 from .ypkgcontext import YpkgContext
@@ -384,11 +384,20 @@ def build_package(filename, outputDir):
             continue
 
         try:
-            compress_man_dirs(dir)
+            compress_manpages(dir)
             console_ui.emit_success("Man", "Manpages compressed")
         except Exception as e:
             console_ui.emit_warning("Man", "Failed to compress man pages in '{}'".format(dir))
             print(e)
+    
+    # Now try to compress any info pages
+    console_ui.emit_info("Man", "Compressing info pages...")
+    try:
+        compress_info_pages("{}/usr/share/info".format(ctx.get_install_dir()))
+        console_ui.emit_success("Man", "Info pages compressed")
+    except Exception as e:
+        console_ui.emit_warning("Man", "Failed to compress info pages")
+        print(e)
 
     # Add user patterns - each consecutive package has higher priority than the
     # package before it, ensuring correct levels of control

@@ -56,7 +56,30 @@ def compress_gzip(path):
     # Remove the original file
     os.unlink(path)
 
-def compress_all_in_dir(path):
+def update_link(path):
+    """Update a symlink to point to the compressed target.
+    
+    This reads the target path of a symlink, unlinks it, and creates
+    a new link pointing to the target path with `.gz` appended to the end.
+    """
+
+    if not os.path.islink(path):
+        return
+
+    # Get the link target
+    link_target = os.readlink(path)
+    if os.path.islink(link_target):
+        # Skip if this is pointing to another link
+        return
+
+    # Figure out what the compressed target path is
+    new_link = "{}.gz".format(link_target)
+
+    # Re-link to the new target
+    os.unlink(path)
+    os.symlink(new_link, path)
+
+def compress_dir(path):
     """Compress all files in a directory.
     
     This function iterates over all children in the
@@ -78,23 +101,12 @@ def compress_all_in_dir(path):
 
         # Check if the file is a symlink
         if os.path.islink(file_path):
-            # Get the link target
-            link_target = os.readlink(file_path)
-            if os.path.islink(link_target):
-                # Skip if this is pointing to another link
-                continue
-
-            # Figure out what the compressed target path is
-            new_link = "{}.gz".format(link_target)
-
-            # Re-link to the new target
-            os.unlink(file_path)
-            os.symlink(new_link, file_path)
+            update_link(file_path)
         elif os.path.isfile(file_path):
             # We have a file, compress it
             compress_gzip(file_path)
 
-def compress_man_dirs(root):
+def compress_manpages(root):
     """Compresses manpage files recursively from the given root.
     
     This function iterates over all of the directories in the root,
@@ -114,9 +126,38 @@ def compress_man_dirs(root):
 
         # Recurse into localized manpage dirs
         if not dir.startswith("man"):
-            compress_man_dirs(child_path)
+            compress_manpages(child_path)
             continue
 
         # This appears to be a manpage dir,
         # so compress everything in it
-        compress_all_in_dir(child_path)
+        compress_dir(child_path)
+
+def compress_info_pages(root):
+    """Compress info page files in a directory.
+    
+    This is essentially a modified version of `compress_manpages`
+    that is specifically tailored to the structure of the system
+    info page directory.
+    """
+
+    for child in os.listdir(root):
+        path = os.path.join(root, child)
+
+        if os.path.isfile(path):
+            # Compress if the path is an uncompressed file
+            # First, check if it actually looks like an info file
+            if not ".info" in os.path.basename(path):
+                continue
+
+            # Only try to compress the file if it isn't already compressed
+            if is_compressed(path):
+                continue
+
+            compress_gzip(path)
+        elif os.path.islink(path):
+            # If it's a symlink, update it
+            update_link(path)
+        elif os.path.isdir(path):
+            # Recurse into nested directories looking for info pages
+            compress_info_pages(path)
