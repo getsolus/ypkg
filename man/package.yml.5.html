@@ -390,6 +390,16 @@ additional functionality.</p>
     <p>If in doubt, omit this option where possible.</p>
   </li>
   <li>
+    <p><code>mancompress</code> [boolean]</p>
+
+    <p>By default, this key is disabled. Enables compression of man/info pages
+  using gzip at the maximum compression level, to decrease the installed
+  size of the package on disk. Disabled by default as it generally increases the
+  size of eopkg file(s) due to xz having a hard time compressing pre-compressed
+  gzip files. Only enable when it significantly reduces the installed
+  size of a package on disk without sacrificing eopkg size too much.</p>
+  </li>
+  <li>
     <p><code>debug</code> [boolean]</p>
 
     <p>By default, this key is enabled, and as a result <code>ypkg-build(1)</code> will
@@ -647,7 +657,7 @@ builddeps:
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>May 2022</li>
+    <li class='tc'>June 2022</li>
     <li class='tr'>package.yml(5)</li>
   </ol>
 

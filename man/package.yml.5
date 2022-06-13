@@ -1,6 +1,6 @@
 .\" generated with Ronn-NG/v0.9.1
 .\" http://github.com/apjanke/ronn-ng/tree/0.9.1
-.TH "PACKAGE\.YML" "5" "May 2022" ""
+.TH "PACKAGE\.YML" "5" "June 2022" ""
 .SH "NAME"
 \fBpackage\.yml\fR \- Solus package build format
 .SH "SYNOPSIS"
@@ -183,6 +183,10 @@ The Go programming language generates \fB*\.a\fR archive files that under no cir
 By default, this key is enabled, and will result in \fB*\.la\fR libtool files being stripped from the build\. However in some very rare cases these files need to be preserved because they\'re not \fBtrue\fR libtool scripts which led to the creation of successful \fB\.so\fR linkage\.
 .IP
 If in doubt, omit this option where possible\.
+.IP "\[ci]" 4
+\fBmancompress\fR [boolean]
+.IP
+By default, this key is disabled\. Enables compression of man/info pages using gzip at the maximum compression level, to decrease the installed size of the package on disk\. Disabled by default as it generally increases the size of eopkg file(s) due to xz having a hard time compressing pre\-compressed gzip files\. Only enable when it significantly reduces the installed size of a package on disk without sacrificing eopkg size too much\.
 .IP "\[ci]" 4
 \fBdebug\fR [boolean]
 .IP

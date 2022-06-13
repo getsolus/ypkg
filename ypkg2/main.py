@@ -375,32 +375,35 @@ def build_package(filename, outputDir):
             sys.exit(1)
 
     # Compress manpage files
-    man_dirs = [
-        "{}/usr/share/man".format(ctx.get_install_dir()),
-        "{}/usr/man".format(ctx.get_install_dir()),
-    ]
-    for dir in man_dirs:
-        if not os.path.exists(dir):
-            continue
+    # NOTE: Off by default for now due to xz having a hard time furthur compressing gzip files
+    # leading to increased .eopkg sizes
+    if context.spec.pkg_mancompress:
+        man_dirs = [
+            "{}/usr/share/man".format(ctx.get_install_dir()),
+            "{}/usr/man".format(ctx.get_install_dir()),
+        ]
+        for dir in man_dirs:
+            if not os.path.exists(dir):
+                continue
 
-        console_ui.emit_info("Man", "Compressing manpages in '{}'...".format(dir))
-        try:
-            (compressed, saved) = compress_man_pages(dir)
-            console_ui.emit_success("Man", "Compressed {} file(s), saving {}".format(compressed, humanize(saved)))
-        except Exception as e:
-            console_ui.emit_warning("Man", "Failed to compress man pages in '{}'".format(dir))
-            print(e)
+            console_ui.emit_info("Man", "Compressing manpages in '{}'...".format(dir))
+            try:
+                (compressed, saved) = compress_man_pages(dir)
+                console_ui.emit_success("Man", "Compressed {} file(s), saving {}".format(compressed, humanize(saved)))
+            except Exception as e:
+                console_ui.emit_warning("Man", "Failed to compress man pages in '{}'".format(dir))
+                print(e)
     
-    # Now try to compress any info pages
-    info_dir = "{}/usr/share/info".format(ctx.get_install_dir())
-    if os.path.exists(info_dir):
-        console_ui.emit_info("Man", "Compressing info pages...")
-        try:
-            (compressed, saved) = compress_info_pages(info_dir)
-            console_ui.emit_success("Man", "Compressed {} file(s), saving {}".format(compressed, humanize(saved)))
-        except Exception as e:
-            console_ui.emit_warning("Man", "Failed to compress info pages")
-            print(e)
+        # Now try to compress any info pages
+        info_dir = "{}/usr/share/info".format(ctx.get_install_dir())
+        if os.path.exists(info_dir):
+            console_ui.emit_info("Man", "Compressing info pages...")
+            try:
+                (compressed, saved) = compress_info_pages(info_dir)
+                console_ui.emit_success("Man", "Compressed {} file(s), saving {}".format(compressed, humanize(saved)))
+            except Exception as e:
+                console_ui.emit_warning("Man", "Failed to compress info pages")
+                print(e)
 
     # Add user patterns - each consecutive package has higher priority than the
     # package before it, ensuring correct levels of control

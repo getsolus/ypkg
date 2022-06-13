@@ -283,6 +283,15 @@ additional functionality.
 
     If in doubt, omit this option where possible.
 
+* `mancompress` [boolean]
+
+    By default, this key is disabled. Enables compression of man/info pages
+    using gzip at the maximum compression level, to decrease the installed
+    size of the package on disk. Disabled by default as it generally increases the
+    size of eopkg file(s) due to xz having a hard time compressing pre-compressed
+    gzip files. Only enable when it significantly reduces the installed
+    size of a package on disk without sacrificing eopkg size too much.
+
 * `debug` [boolean]
 
     By default, this key is enabled, and as a result `ypkg-build(1)` will
