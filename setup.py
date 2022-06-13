@@ -3,13 +3,13 @@ from setuptools import setup
 
 setup(
     name = "ypkg2",
-    version = "30.0.0",
-    author = "Ikey Doherty",
-    author_email = "ikey@solus-project.com",
+    version = "31.0.0",
+    author = "Solus Developers",
+    author_email = "copyright@getsol.us",
     description = ("Solus YPKG build Tool"),
     license = "GPL-3.0",
     keywords = "example documentation tutorial",
-    url = "https://github.com/solus-project/ypkg",
+    url = "https://github.com/getsolus/ypkg",
     packages=['ypkg2'],
     scripts=['ypkg', 'ypkg-install-deps', 'ypkg-gen-history', 'ypkg-build', 'ybump', 'yupdate'],
     classifiers=[
