@@ -3,14 +3,13 @@
 #
 #  This file is part of ypkg2
 #
-#  Copyright 2015-2020 Solus Project
+#  Copyright 2015-2022 Solus Project
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-
 
 class AnsiColors:
     """ ANSI sequences for color output """
@@ -91,3 +90,24 @@ class YpkgUI:
         else:
             print("{}[{}]{} {}".format(AnsiColors.GREEN, key,
                   AnsiColors.RESET, success))
+
+
+suffixes = ["B", "KB", "MB", "GB", "TB", "PB"]
+
+
+def humanize(nbytes):
+    """
+    Takes a number of bytes and returns a string that
+    is formatted to the biggest unit that makes sense.
+
+    For example, 63,456 bytes would return 63.46 KB.
+    """
+
+    i = 0
+
+    while nbytes >= 1024 and i < len(suffixes)-1:
+        nbytes /= 1024.
+        i += 1
+
+    f = ("%.2f" % nbytes).rstrip("0").rstrip(".")
+    return "{} {}".format(f, suffixes[i])
