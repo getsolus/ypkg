@@ -91,8 +91,18 @@ class YpkgUI:
             print("{}[{}]{} {}".format(AnsiColors.GREEN, key,
                   AnsiColors.RESET, success))
 
+
 suffixes = ["B", "KB", "MB", "GB", "TB", "PB"]
+
+
 def humanize(nbytes):
+    """
+    Takes a number of bytes and returns a string that
+    is formatted to the biggest unit that makes sense.
+
+    For example, 63,456 bytes would return 63.46 KB.
+    """
+
     i = 0
 
     while nbytes >= 1024 and i < len(suffixes)-1:

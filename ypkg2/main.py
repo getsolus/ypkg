@@ -13,7 +13,7 @@
 
 from . import console_ui
 from . import remove_prefix
-from .compressdoc import compress_info_pages, compress_manpages
+from .compressdoc import compress_info_pages, compress_man_pages
 from .ypkgspec import YpkgSpec
 from .sources import SourceManager
 from .ypkgcontext import YpkgContext
@@ -385,7 +385,7 @@ def build_package(filename, outputDir):
 
         console_ui.emit_info("Man", "Compressing manpages in '{}'...".format(dir))
         try:
-            (compressed, saved) = compress_manpages(dir)
+            (compressed, saved) = compress_man_pages(dir)
             console_ui.emit_success("Man", "Compressed {} file(s), saving {}".format(compressed, humanize(saved)))
         except Exception as e:
             console_ui.emit_warning("Man", "Failed to compress man pages in '{}'".format(dir))

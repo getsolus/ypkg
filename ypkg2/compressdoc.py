@@ -22,6 +22,7 @@ compressed_exts = [
     ".xz"
 ]
 
+
 def is_compressed(path):
     """Check if a file is compressed."""
 
@@ -33,9 +34,10 @@ def is_compressed(path):
 
     return False
 
+
 def compress_gzip(path):
     """Compresses a single file with `gzip`.
-    
+
     The original file will be deleted after compression.
     """
 
@@ -46,7 +48,7 @@ def compress_gzip(path):
 
     # Create the file to write to
     out_path = "{}.gz".format(path)
-    out_file = gzip.open(out_path, "wb", 9) # Maximum compression
+    out_file = gzip.open(out_path, "wb", 9)  # Maximum compression
 
     # Write the contents to the compressed file through gzip
     out_file.writelines(in_file)
@@ -62,9 +64,10 @@ def compress_gzip(path):
     ending_size = os.path.getsize(out_path)
     return starting_size - ending_size
 
+
 def update_link(path):
     """Update a symlink to point to the compressed target.
-    
+
     This reads the target path of a symlink, unlinks it, and creates
     a new link pointing to the target path with `.gz` appended to the end.
     """
@@ -85,9 +88,10 @@ def update_link(path):
     os.unlink(path)
     os.symlink(new_link, path)
 
+
 def compress_dir(path):
     """Compress all files in a directory.
-    
+
     This function iterates over all children in the
     given directory. If the file is a regular uncompressed
     file, it will be compressed with `gzip`.
@@ -115,12 +119,13 @@ def compress_dir(path):
             # We have a file, compress it
             bytes_saved += compress_gzip(file_path)
             num_compressed += 1
-    
+
     return (num_compressed, bytes_saved)
 
-def compress_manpages(root):
+
+def compress_man_pages(root):
     """Compresses manpage files recursively from the given root.
-    
+
     This function iterates over all of the directories in the root,
     and compressing the contents of directories if they look like
     manpage directories (the directory name starts with `man`).
@@ -141,7 +146,7 @@ def compress_manpages(root):
 
         # Recurse into localized manpage dirs
         if not dir.startswith("man"):
-            (c, s) = compress_manpages(child_path)
+            (c, s) = compress_man_pages(child_path)
             num_compressed += c
             bytes_saved += s
             continue
@@ -151,12 +156,13 @@ def compress_manpages(root):
         (c, s) = compress_dir(child_path)
         num_compressed += c
         bytes_saved += s
-    
+
     return (num_compressed, bytes_saved)
+
 
 def compress_info_pages(root):
     """Compress info page files in a directory.
-    
+
     This is essentially a modified version of `compress_manpages`
     that is specifically tailored to the structure of the system
     info page directory.
@@ -171,22 +177,22 @@ def compress_info_pages(root):
         if os.path.isfile(path):
             # Compress if the path is an uncompressed file
             # First, check if it actually looks like an info file
-            if not ".info" in os.path.basename(path):
+            if ".info" not in os.path.basename(path):
                 continue
 
-            # Only try to compress the file if it isn"t already compressed
+            # Only try to compress the file if it isn't already compressed
             if is_compressed(path):
                 continue
 
             bytes_saved += compress_gzip(path)
             num_compressed += 1
         elif os.path.islink(path):
-            # If it"s a symlink, update it
+            # If it's a symlink, update it
             update_link(path)
         elif os.path.isdir(path):
             # Recurse into nested directories looking for info pages
             (c, s) = compress_info_pages(path)
             num_compressed += c
             bytes_saved += s
-    
+
     return (num_compressed, bytes_saved)
