@@ -3,7 +3,7 @@
 #
 #  This file is part of ypkg2
 #
-#  Copyright 2015-2020 Solus Project
+#  Copyright 2015-2022 Solus Project
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ from configobj import ConfigObj
 
 def show_version():
     print("Ypkg - Package Build Tool")
-    print("\nCopyright (C) 2015-2018 Ikey Doherty\n")
+    print("\nCopyright (C) 2015-2022 Solus Developers\n")
     print("This program is free software; you are free to redistribute it\n"
           "and/or modify it under the terms of the GNU General Public License"
           "\nas published by the Free Software foundation; either version 3 of"
