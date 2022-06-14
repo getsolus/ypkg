@@ -1,4 +1,4 @@
-#!/bin/true
+    #!/bin/true
 # -*- coding: utf-8 -*-
 #
 #  This file is part of ypkg2
@@ -13,6 +13,7 @@
 
 import gzip
 import os
+import shutil
 
 compressed_exts = [
     ".gz",
@@ -48,14 +49,9 @@ def compress_gzip(path):
 
     # Create the file to write to
     out_path = "{}.gz".format(path)
-    out_file = gzip.open(out_path, "wb", 9)  # Maximum compression
-
-    # Write the contents to the compressed file through gzip
-    out_file.writelines(in_file)
-
-    # Close the files
-    out_file.close()
-    in_file.close()
+    # Open the file
+    with open(path) as in_file, gzip.GzipFile(filename=out_path, mode="wb", compresslevel=9, mtime=0) as out_file:
+        shutil.copyfileobj(in_file, out_file)
 
     # Remove the original file
     os.unlink(path)
