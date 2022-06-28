@@ -338,13 +338,13 @@ actions:
         binstr(){
             mv ${1} ${1}.orig
             mkdir -p $PKG_BUILD_DIR/BOLT/final
-            llvm-bolt ${1}.orig -instrument --instrumentation-file=$workdir/BOLT-profile/$(basename ${1}) --instrumentation-file-append-pid ${2} ${3} ${4} -o ${1}
+            llvm-bolt ${1}.orig -instrument --instrumentation-file=$PKG_BUILD_DIR/BOLT/$(basename ${1}) --instrumentation-file-append-pid ${2} ${3} ${4} -o ${1}
         }
         binstr
     # Merge fdata profiles into a single file
     - bolt_merge: |
         bmerge(){
-            merge-fdata $workdir/BOLT-profile/$(basename ${1}).*.fdata > $workdir/BOLT-profile/final/$(basename ${1}).fdata
+            merge-fdata $PKG_BUILD_DIR/BOLT/$(basename ${1}).*.fdata > $PKG_BUILD_DIR/BOLT/final/$(basename ${1}).fdata
         }
         bmerge
     # Collect perf data suitable for the bolt macros and check for LBR/BRS support
