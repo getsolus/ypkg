@@ -12,19 +12,16 @@ actions:
     - make_install: |
         %make install DESTDIR="%installroot%"
     - cmake: |
-        cmake -DCMAKE_CFLAGS="${CFLAGS}" -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+        cmake -DCMAKE_C_FLAGS="${CFLAGS}" -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
         -DCMAKE_LD_FLAGS="${LDFLAGS}" -DCMAKE_LIB_SUFFIX="%LIBSUFFIX%" \
+        -DCMAKE_C_COMPILER="${CC}" -DCMAKE_CXX_COMPILER="${CXX}" \
         -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=%PREFIX%
     - cmake_ninja: |
-        function cmake_ninja() {
-            mkdir solusBuildDir && pushd solusBuildDir
-            cmake -G Ninja .. \
-            -DCMAKE_CFLAGS="${CFLAGS}" -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
-            -DCMAKE_LD_FLAGS="${LDFLAGS}" -DCMAKE_LIB_SUFFIX="%LIBSUFFIX%" \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=%PREFIX% $* || exit 1
-            popd
-        }
-        cmake_ninja
+        cmake -G Ninja . -B solusBuildDir \
+        -DCMAKE_C_FLAGS="${CFLAGS}" -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+        -DCMAKE_LD_FLAGS="${LDFLAGS}" -DCMAKE_LIB_SUFFIX="%LIBSUFFIX%" \
+        -DCMAKE_C_COMPILER="${CC}" -DCMAKE_CXX_COMPILER="${CXX}" \
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=%PREFIX%
     - meson_configure: |
         CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" LDFLAGS="${LDFLAGS}" meson --prefix %PREFIX% --buildtype=plain --libdir="lib%LIBSUFFIX%" --libexecdir="lib%LIBSUFFIX%/%PKGNAME%" --sysconfdir=/etc --localstatedir=/var solusBuildDir
     - ninja_build: &ninja_build |
