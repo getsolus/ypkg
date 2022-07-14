@@ -23,6 +23,7 @@ parser.add_argument("version", type=str, help="new version of package")
 parser.add_argument("url", type=str, help="url to new package version")
 parser.add_argument("--tag-prefix", type=str, help="git version tag prefix [default: v]", default="v")
 parser.add_argument("--yml", type=str, help="path to package yml config [default: ./package.yml]", default="package.yml")
+parser.add_argument("-nb", nargs='?', help="Don't bump the release number [default: True]", default=True)
 
 def usage(msg=None, ex=1):
     if msg:
@@ -72,7 +73,8 @@ if __name__ == "__main__":
         data = ruamel.yaml.round_trip_load(infile)
     data['source'] = sources = []
     sources.append(source)
-    data['release'] += 1
+    if args.nb is not None:
+        data['release'] += 1
     data['version'] = newversion
 
     try:
