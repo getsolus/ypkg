@@ -80,6 +80,9 @@ EMIT_RELOCS = "-Wl,--emit-relocs"
 # BOLT: Don't do this gcc optimization for bolt
 NO_REORDER_BLOCKS_PARTITIONS = "-fno-reorder-blocks-and-partition"
 
+# Compile with polly (llvm toolchain only)
+POLLY = "-mllvm -polly -mllvm -polly-vectorizer=stripmine"
+
 # AVX2
 AVX2_ARCH = "haswell"
 AVX2_TUNE = "haswell"
@@ -161,6 +164,12 @@ class Flags:
             newflags.extend(NO_REORDER_BLOCKS_PARTITIONS.split(" "))
         elif opt_type == "emit-relocs":
             newflags.extend(EMIT_RELOCS.split(" "))
+        elif opt_type == "polly":
+            if clang:
+                newflags.extend(POLLY.split(" "))
+            else:
+                console_ui.emit_warning("Flags", "Optimization only supported with clang: {}".
+                                        format(opt_type))
         else:
             console_ui.emit_warning("Flags", "Unknown optimization: {}".
                                     format(opt_type))
