@@ -24,6 +24,9 @@ parser.add_argument("url", type=str, help="url to new package version")
 parser.add_argument("--tag-prefix", type=str, help="git version tag prefix [default: v]", default="v")
 parser.add_argument("--yml", type=str, help="path to package yml config [default: ./package.yml]", default="package.yml")
 parser.add_argument("-nb", nargs='?', help="Don't bump the release number [default: True]", default=True)
+parser.add_argument("--cache", nargs='?', help="Cache the tarball in the solbuild cache to avoid redownloading [default: False]", default=False)
+
+cleanup = True
 
 def usage(msg=None, ex=1):
     if msg:
@@ -33,7 +36,6 @@ def usage(msg=None, ex=1):
     sys.exit(ex)
 
 def shasum(url):
-    fname = os.path.basename(url)
     try:
         r = os.system("wget \"%s\"" % url)
     except:
@@ -43,9 +45,27 @@ def shasum(url):
         print("Failed to download file")
         sys.exit(1)
 
-    sha256 = subprocess.check_output(["sha256sum",  fname]).split()[0].strip()
-    os.unlink(fname)
+    sha256 = subprocess.check_output(["sha256sum", filename]).split()[0].strip()
     return sha256
+
+def cache_tarball_to_solbuild(filename, sha256sum):
+
+    solbuildcacheloc = "/var/lib/solbuild/sources/{}".format(sha256sum)
+    finalloc = "{}/{}".format(solbuildcacheloc, filename)
+    if not os.path.exists(finalloc):
+        try:
+            print "Caching tarball in the solbuild cache"
+            # having to invoke sudo is annoying, could add a pkexec script to make it 'nicer'
+            r = subprocess.check_output("sudo mkdir -p {}".format(solbuildcacheloc), shell=True)
+            r = subprocess.check_output("sudo mv {} {}".format(filename, finalloc), shell=True)
+        except Exception as e:
+            print("Error moving tarball to solbuild cache")
+            print(e)
+            sys.exit(1)
+        return True
+    else:
+        print "Tarball already exists in solbuild cache"
+        return False
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -64,8 +84,10 @@ if __name__ == "__main__":
         sys.exit(1)
 
     url = args.url
+    filename = os.path.basename(url)
+    sha256sum = shasum(url)
     if not url.startswith("git|"):
-        source = {url: shasum(url)}
+        source = {url: sha256sum}
     else:
         source = {url: args.tag_prefix + newversion}
 
@@ -86,3 +108,15 @@ if __name__ == "__main__":
         print("Error writing file, may need to reset it.")
         print(e)
         sys.exit(1)
+
+    # Attempt to cache to solbuild if set
+    if args.cache is not False and not url.startswith("git|"):
+        if cache_tarball_to_solbuild(filename, sha256sum):
+            cleanup = False
+
+# Cleanup on exit
+import atexit
+@atexit.register
+def cleanuponexit():
+    if cleanup is not False:
+        os.unlink(filename)
