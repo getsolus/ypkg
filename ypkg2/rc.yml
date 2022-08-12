@@ -342,28 +342,6 @@ actions:
             merge-fdata $PKG_BUILD_DIR/BOLT/$(basename ${1}).*.fdata > $PKG_BUILD_DIR/BOLT/final/$(basename ${1}).fdata
         }
         bmerge
-    # Collect perf data suitable for the bolt macros and check for LBR/BRS support
-    - bolt_perf: |
-        bperf(){
-            mkdir -p $PKG_BUILD_DIR/BOLT/final
-            if [ -d /sys/kernel/slab/x86_lbr ]; then
-                perf record -e cycles:u -j any,u -o $PKG_BUILD_DIR/BOLT/perf.data -- ${@}
-            else
-                perf record -e cycles:u -o $PKG_BUILD_DIR/BOLT/perf.data -- ${@}
-            fi
-        }
-        bperf
-    # Convert perf data into bolt equivalent
-    - bolt_perf2bolt: |
-        bperf2bolt(){
-            cp ${1} ${1}.orig
-            if [ -d /sys/kernel/slab/x86_lbr ]; then
-                perf2bolt -p $PKG_BUILD_DIR/BOLT/perf.data -o $PKG_BUILD_DIR/BOLT/final/$(basename ${1}).fdata ${1} -ignore-build-id
-            else
-                perf2bolt -p $PKG_BUILD_DIR/BOLT/perf.data -o $PKG_BUILD_DIR/BOLT/final/$(basename ${1}).fdata ${1} -nl -ignore-build-id
-            fi
-        }
-        bperf2bolt
     # Apply bolt profile
     - bolt_opt: |
         boptim(){
