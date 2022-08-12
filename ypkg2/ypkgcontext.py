@@ -40,9 +40,8 @@ SIZE_FLAGS = "-Os"
 # Unfortunately clang's LLVMGold will not accept -Os and is broken by design
 SIZE_FLAGS_CLANG = "-O2"
 
-# Allow optimizing for lto
-LTO_FLAGS = "-flto=%YJOBS%"
-LTO_FLAGS_CLANG = "-flto"
+# Allow optimizing for LTO
+LTO_FLAGS = "-flto=auto"
 
 # Allow optimizing for thin-lto
 THIN_LTO_FLAGS = "-flto=thin"
@@ -134,10 +133,7 @@ class Flags:
                 else:
                     newflags.extend(SIZE_FLAGS.split(" "))
         elif opt_type == "lto":
-            if clang:
-                newflags.extend(LTO_FLAGS_CLANG.split(" "))
-            else:
-                newflags.extend(LTO_FLAGS.split(" "))
+            newflags.extend(LTO_FLAGS.split(" "))
         elif opt_type == "unroll-loops":
             newflags.extend(UNROLL_LOOPS_FLAGS.split(" "))
         elif opt_type == "runpath":
