@@ -33,6 +33,7 @@ import argparse
 import os
 import shutil
 import tempfile
+import time
 import subprocess
 from configobj import ConfigObj
 
@@ -367,9 +368,13 @@ def build_package(filename, outputDir):
 
             console_ui.emit_info("Build", "Running step: {}".format(step))
 
+            start_time = time.time()
+
             if execute_step(context, r_step, step, work_dir):
                 console_ui.emit_success("Build", "{} successful".
                                         format(step))
+                time_taken = time.time() - start_time
+                console_ui.emit_info("Build", "{}, took {}s to complete".format(step, time_taken))
                 continue
             console_ui.emit_error("Build", "{} failed for {}".format(step, spec.pkg_name))
             sys.exit(1)
