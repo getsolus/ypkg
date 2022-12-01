@@ -198,7 +198,9 @@ class PackageGenerator:
         self.add_pattern("/usr/lib/debug/", "dbginfo", priority=DBG)
         self.add_pattern("/usr/lib32/debug/", "32bit-dbginfo", priority=DBG)
 
-        self.add_pattern("/usr/share/gtk-doc/html/", "docs")
+        # Docs subpackage
+        self.add_pattern("/usr/share/gtk-doc/html/", "docs") # gtk-doc
+        self.add_pattern("/usr/share/doc", "docs") # gi-docgen and others
 
         # cmake stuffs
         self.add_pattern("/usr/share/cmake/", "devel")
