@@ -400,6 +400,15 @@ additional functionality.</p>
   size of a package on disk without sacrificing eopkg size too much.</p>
   </li>
   <li>
+    <p><code>fatfakeroot</code> [boolean]</p>
+
+    <p>By default, this key is disabled. By default, fakeroot is only enabled for the
+  "install" and "check" steps due to it's massive performance overhead. Enabling,
+  this key will enable fakeroot for all build stages. You may want to enable this
+  if you are experiencing strange "Permission Denied" errors in the "build" stage,
+  or when rebuilding a reverse dependency against a package.</p>
+  </li>
+  <li>
     <p><code>debug</code> [boolean]</p>
 
     <p>By default, this key is enabled, and as a result <code>ypkg-build(1)</code> will
@@ -657,7 +666,7 @@ builddeps:
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>June 2022</li>
+    <li class='tc'>July 2023</li>
     <li class='tr'>package.yml(5)</li>
   </ol>
 
