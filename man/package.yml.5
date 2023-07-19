@@ -1,6 +1,6 @@
 .\" generated with Ronn-NG/v0.9.1
 .\" http://github.com/apjanke/ronn-ng/tree/0.9.1
-.TH "PACKAGE\.YML" "5" "June 2022" ""
+.TH "PACKAGE\.YML" "5" "July 2023" ""
 .SH "NAME"
 \fBpackage\.yml\fR \- Solus package build format
 .SH "SYNOPSIS"
@@ -187,6 +187,10 @@ If in doubt, omit this option where possible\.
 \fBmancompress\fR [boolean]
 .IP
 By default, this key is disabled\. Enables compression of man/info pages using gzip at the maximum compression level, to decrease the installed size of the package on disk\. Disabled by default as it generally increases the size of eopkg file(s) due to xz having a hard time compressing pre\-compressed gzip files\. Only enable when it significantly reduces the installed size of a package on disk without sacrificing eopkg size too much\.
+.IP "\[ci]" 4
+\fBfatfakeroot\fR [boolean]
+.IP
+By default, this key is disabled\. By default, fakeroot is only enabled for the "install" and "check" steps due to it\'s massive performance overhead\. Enabling, this key will enable fakeroot for all build stages\. You may want to enable this if you are experiencing strange "Permission Denied" errors in the "build" stage, or when rebuilding a reverse dependency against a package\.
 .IP "\[ci]" 4
 \fBdebug\fR [boolean]
 .IP

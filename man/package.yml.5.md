@@ -292,6 +292,14 @@ additional functionality.
     gzip files. Only enable when it significantly reduces the installed
     size of a package on disk without sacrificing eopkg size too much.
 
+* `fatfakeroot` [boolean]
+
+    By default, this key is disabled. By default, fakeroot is only enabled for the
+    "install" and "check" steps due to it's massive performance overhead. Enabling,
+    this key will enable fakeroot for all build stages. You may want to enable this
+    if you are experiencing strange "Permission Denied" errors in the "build" stage,
+    or when rebuilding a reverse dependency against a package.
+
 * `debug` [boolean]
 
     By default, this key is enabled, and as a result `ypkg-build(1)` will
