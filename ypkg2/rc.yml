@@ -21,7 +21,7 @@ actions:
         -DCMAKE_LD_FLAGS="${LDFLAGS}" -DCMAKE_LIB_SUFFIX="%LIBSUFFIX%" \
         -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=%PREFIX%
     - meson_configure: |
-        CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" LDFLAGS="${LDFLAGS}" meson --prefix %PREFIX% --buildtype=plain --libdir="lib%LIBSUFFIX%" --libexecdir="lib%LIBSUFFIX%/%PKGNAME%" --sysconfdir=/etc --localstatedir=/var solusBuildDir
+        CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" LDFLAGS="${LDFLAGS}" meson setup --prefix %PREFIX% --buildtype=plain --libdir="lib%LIBSUFFIX%" --libexecdir="lib%LIBSUFFIX%/%PKGNAME%" --sysconfdir=/etc --localstatedir=/var solusBuildDir
     - ninja_build: &ninja_build |
         ninja %JOBS% -C solusBuildDir
     - ninja_install: &ninja_install |
