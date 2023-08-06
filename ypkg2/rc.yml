@@ -351,9 +351,18 @@ actions:
         boptim
 defines:
     - CONFOPTS: |
-        --prefix=%PREFIX% --build=%HOST% --libdir=%libdir% --mandir=/usr/share/man \
-        --infodir=/usr/share/info --datadir=/usr/share --sysconfdir=/etc \
-        --localstatedir=/var --libexecdir=%libdir%/%PKGNAME%
+        --prefix=%PREFIX% \
+        --build=%HOST% \
+        --bindir=/usr/bin \
+        --sbindir=/usr/sbin \
+        --libdir=%libdir% \
+        --mandir=/usr/share/man \
+        --infodir=/usr/share/info \
+        --datadir=/usr/share \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --runstatedir=/run \
+        --libexecdir=%libdir%/%PKGNAME%
     # Inspired by the RPM guys :]
     - perl_privlib: |
         $(eval `perl -V:installprivlib`; echo $installprivlib)
