@@ -30,12 +30,12 @@ import ypkg2
 
 import sys
 import argparse
+import ConfigParser
 import os
 import shutil
 import tempfile
 import time
 import subprocess
-from configobj import ConfigObj
 
 
 def show_version():
@@ -205,9 +205,10 @@ def build_package(filename, outputDir):
         if not os.path.exists(fpath):
             continue
         try:
-            c = ConfigObj(fpath)
-            pname = c["Packager"]["Name"]
-            pemail = c["Packager"]["Email"]
+            c = ConfigParser.ConfigParser()
+            c.readfp(open(fpath))
+            pname = c.get("Packager", "Name")
+            pemail = c.get("Packager", "Email")
 
             packager_name = pname
             packager_email = pemail
