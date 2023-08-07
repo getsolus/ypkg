@@ -34,8 +34,10 @@ import ConfigParser
 import os
 import shutil
 import tempfile
-import time
 import subprocess
+
+from timeit import default_timer as timer
+from datetime import timedelta
 
 
 def show_version():
@@ -374,13 +376,12 @@ def build_package(filename, outputDir):
 
             console_ui.emit_info("Build", "Running step: {}".format(step))
 
-            start_time = time.time()
+            start_time = timer()
 
             if execute_step(context, r_step, step, work_dir):
-                console_ui.emit_success("Build", "{} successful".
-                                        format(step))
-                time_taken = time.time() - start_time
-                console_ui.emit_info("Build", "{}, took {}s to complete".format(step, time_taken))
+                end_time = timer()
+                console_ui.emit_success("Build", "{} successful ({})".
+                                        format(step, timedelta(seconds=end_time-start_time)))
                 continue
             console_ui.emit_error("Build", "{} failed for {}".format(step, spec.pkg_name))
             sys.exit(1)
