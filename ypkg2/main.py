@@ -30,12 +30,14 @@ import ypkg2
 
 import sys
 import argparse
+import ConfigParser
 import os
 import shutil
 import tempfile
-import time
 import subprocess
-from configobj import ConfigObj
+
+from timeit import default_timer as timer
+from datetime import timedelta
 
 
 def show_version():
@@ -148,6 +150,11 @@ def execute_step(context, step, step_n, work_dir):
     if context.avx2 and step_n == "install":
         endScript = "%avx2_lib_shift"
 
+    # Generally, we only want fakeroot for the install and check steps due
+    # to the massive performance overhead unless fatfakeroot is requested.
+    if not step_n in ["install", "check"] and not context.spec.pkg_fatfakeroot:
+        script.define_unexport("LD_PRELOAD")
+
     exports = script.emit_exports()
 
     # Run via bash with enable and error
@@ -200,9 +207,10 @@ def build_package(filename, outputDir):
         if not os.path.exists(fpath):
             continue
         try:
-            c = ConfigObj(fpath)
-            pname = c["Packager"]["Name"]
-            pemail = c["Packager"]["Email"]
+            c = ConfigParser.ConfigParser()
+            c.readfp(open(fpath))
+            pname = c.get("Packager", "Name")
+            pemail = c.get("Packager", "Email")
 
             packager_name = pname
             packager_email = pemail
@@ -368,13 +376,12 @@ def build_package(filename, outputDir):
 
             console_ui.emit_info("Build", "Running step: {}".format(step))
 
-            start_time = time.time()
+            start_time = timer()
 
             if execute_step(context, r_step, step, work_dir):
-                console_ui.emit_success("Build", "{} successful".
-                                        format(step))
-                time_taken = time.time() - start_time
-                console_ui.emit_info("Build", "{}, took {}s to complete".format(step, time_taken))
+                end_time = timer()
+                console_ui.emit_success("Build", "{} successful ({})".
+                                        format(step, timedelta(seconds=end_time-start_time)))
                 continue
             console_ui.emit_error("Build", "{} failed for {}".format(step, spec.pkg_name))
             sys.exit(1)

@@ -204,7 +204,8 @@ class PackageGenerator:
         self.add_pattern("/usr/share/cmake/", "devel")
         self.add_pattern("/usr/lib64/cmake/", "devel")
         self.add_pattern("/usr/lib/cmake/", "devel")
-        self.add_pattern("/usr/lib32/cmake/", "32bit-devel")
+        self.add_pattern("/usr/lib32/cmake/", "32bit-devel",
+                         priority=PRIORITY_DEFAULT+1)
 
         # Haskell
         self.add_pattern("/usr/lib64/ghc-*/*/*.a", "devel")
