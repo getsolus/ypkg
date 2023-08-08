@@ -76,10 +76,8 @@ actions:
                                            --libsubdir="\$compiler/\$pkgid" \
                                            --sysconfdir=/etc \
                                            --disable-tests \
-                                           --enable-executable-dynamic \
-                                           --enable-shared \
                                            -O2 \
-                                           --ghc-options="-fPIC -H128m" \
+                                           --ghc-options="-H128m" \
                                            "$@"
         }
         haskell_configure
@@ -97,7 +95,7 @@ actions:
         function cabal_configure() {
             export GHCV=$(ghc --numeric-version)
             cabal update
-            cabal build %JOBS% --only-dependencies --disable-tests -O2 --ghc-options="-fPIC -H128m %JOBS%" "$@"
+            cabal build %JOBS% --only-dependencies --disable-tests -O2 --ghc-options="-H128m %JOBS%" "$@"
             %haskell_configure --disable-executable-dynamic \
                                --package-db=$HOME/.cabal/store/ghc-$GHCV/package.db \
                                "$@"
