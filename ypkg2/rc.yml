@@ -77,7 +77,6 @@ actions:
                                            --sysconfdir=/etc \
                                            --disable-tests \
                                            -O2 \
-                                           --ghc-options="-H128m" \
                                            "$@"
         }
         haskell_configure
