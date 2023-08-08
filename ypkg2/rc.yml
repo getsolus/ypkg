@@ -64,7 +64,6 @@ actions:
         }
         apply_patches
     # Make life easier with Haskell/Cabal
-    # And yes, %JOBS% needs to be specified two times.
     - haskell_configure: |
         function haskell_configure() {
             if [[ ! -e Setup.hs ]] && [[ ! -e Setup.lhs ]]; then
@@ -72,27 +71,25 @@ actions:
                 echo "import Distribution.Simple" > Setup.hs
                 echo "main = defaultMain" >> Setup.hs
             fi
-            runhaskell Setup.*hs configure --prefix=%PREFIX% \
+            runhaskell Setup configure --prefix=%PREFIX% \
                                            --libdir=%libdir% \
                                            --libsubdir="\$compiler/\$pkgid" \
                                            --sysconfdir=/etc \
                                            --disable-tests \
-                                           --disable-executable-static \
                                            --enable-executable-dynamic \
                                            --enable-shared \
-                                           --disable-static \
                                            -O2 \
-                                           --ghc-options="-fPIC -H128m %JOBS%" \
+                                           --ghc-options="-fPIC -H128m" \
                                            "$@"
         }
         haskell_configure
     - haskell_build: |
-        runhaskell Setup.*hs build %JOBS%
+        runhaskell Setup build %JOBS%
     - haskell_install: |
-        runhaskell Setup.*hs copy --destdir=$installdir
+        runhaskell Setup copy --destdir=$installdir
     - haskell_register: |
         export GHCV=$(ghc --numeric-version)
-        runhaskell Setup.*hs register --gen-pkg-config=$package-$version.conf
+        runhaskell Setup register --gen-pkg-config=$package-$version.conf
         install -D -m 00644 $package-$version.conf $installdir%libdir%/ghc-$GHCV/package.conf.d/$package-$version.conf
     # Configures a Cabal project that requires online dependencies, like a
     # Cargo-style build
