@@ -103,10 +103,10 @@ actions:
                                "$@"
         }
         cabal_configure
-    # TODO: remove after all Haskell packages have been migrated
-    - cabal_build: *haskell_build
-    - cabal_install: *haskell_install
-    - cabal_register: *haskell_register
+    # # TODO: remove after all Haskell packages have been migrated
+    # - cabal_build: *haskell_build
+    # - cabal_install: *haskell_install
+    # - cabal_register: *haskell_register
     # Make life easier with Perl
     - perl_setup: |
         function perl_setup() {
