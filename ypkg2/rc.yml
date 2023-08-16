@@ -72,12 +72,11 @@ actions:
                 echo "main = defaultMain" >> Setup.hs
             fi
             runhaskell Setup configure --prefix=%PREFIX% \
-                                           --libdir=%libdir% \
-                                           --libsubdir="\$compiler/\$pkgid" \
-                                           --sysconfdir=/etc \
-                                           --disable-tests \
-                                           -O2 \
-                                           "$@"
+                                       --libdir=%libdir% \
+                                       --sysconfdir=/etc \
+                                       --disable-tests \
+                                       -O2 \
+                                       "$@"
         }
         haskell_configure
     - haskell_build: |
