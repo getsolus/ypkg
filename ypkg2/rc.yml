@@ -76,7 +76,7 @@ actions:
                                        --libdir=%libdir% \
                                        --libsubdir="\$compiler/\$pkgid" \
                                        --libexecdir="%libdir%/\$compiler/\$pkgid" \
-                                       --dynlibdir=%libdir% \ 
+                                       --dynlibdir=%libdir% \
                                        --datadir=/usr/share \
                                        --datasubdir=%PKGNAME% \
                                        --docdir="/usr/share/doc/%PKGNAME%" \
