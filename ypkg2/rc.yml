@@ -75,8 +75,8 @@ actions:
             runhaskell Setup configure --prefix=%PREFIX% \
                                        --libdir=%libdir% \
                                        --libsubdir="\$compiler/\$pkgid" \
-                                       --libexecdir="%libdir%/\$compiler/\$pkgid" \
-                                       --dynlibdir=%libdir% \
+                                       --libexecdir=%libdir%/%PKGNAME% \
+                                       --dynlibdir="%libdir%/\$compiler/\$pkgid" \
                                        --datadir=/usr/share \
                                        --datasubdir=%PKGNAME% \
                                        --docdir="/usr/share/doc/%PKGNAME%" \
