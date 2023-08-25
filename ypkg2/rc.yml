@@ -74,12 +74,12 @@ actions:
             export GHCV=$(ghc --numeric-version)
             runhaskell Setup configure --prefix=%PREFIX% \
                                        --libdir=%libdir% \
-                                       --libsubdir='$compiler/$pkgid' \
-                                       --libexecdir='%libdir%/$compiler/$pkgid' \
+                                       --libsubdir="\$compiler/\$pkgid" \
+                                       --libexecdir="%libdir%/\$compiler/\$pkgid" \
                                        --dynlibdir=%libdir% \ 
                                        --datadir=/usr/share \
                                        --datasubdir=%PKGNAME% \
-                                       --docdir='/usr/share/doc/%PKGNAME%' \
+                                       --docdir="/usr/share/doc/%PKGNAME%" \
                                        --sysconfdir=/etc \
                                        --disable-tests \
                                        --enable-executable-dynamic \
