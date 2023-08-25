@@ -75,10 +75,12 @@ actions:
             runhaskell Setup configure --prefix=%PREFIX% \
                                        --libdir=%libdir% \
                                        --libsubdir='$compiler/$pkgid' \
-                                       --sysconfdir=/etc \
+                                       --libexecdir='%libdir%/$compiler/$pkgid' \
+                                       --dynlibdir=%libdir% \ 
                                        --datadir=/usr/share \
-                                       --datasubdir='$pkg' \
-                                       --docdir='/usr/share/doc/$pkg' \
+                                       --datasubdir=%PKGNAME% \
+                                       --docdir='/usr/share/doc/%PKGNAME%' \
+                                       --sysconfdir=/etc \
                                        --disable-tests \
                                        --enable-executable-dynamic \
                                        --enable-shared \
