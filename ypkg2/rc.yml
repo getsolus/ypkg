@@ -43,6 +43,17 @@ actions:
             popd
         }
         generate_cache
+    - qml6_cache: |
+        function generate_qt6_cache() {
+            pushd $installdir
+            find . -type f -name "*.qml" -print0 | while IFS= read -r -d '' i; do
+                if ! [ -a "${i}"c ]; then
+                    qmlcachegen-qt6 -o "${i}"c "${i}" $*
+                fi
+            done
+            popd
+        }
+        generate_qt6_cache
     - patch: |
         patch -t -E --no-backup-if-mismatch -f
     # Only works if the user has a series file. They can provide the name to
