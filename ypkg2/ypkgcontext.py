@@ -69,6 +69,10 @@ RUNPATH_FLAGS = "-Wl,--enable-new-dtags"
 PGO_GEN_FLAGS = "-fprofile-generate -fprofile-dir=\"{}\" "
 PGO_USE_FLAGS = "-fprofile-use -fprofile-dir=\"{}\" -fprofile-correction"
 
+# Frame Pointer flags used for making profiling more useful at a slight hit to performance
+# See https://fedoraproject.org/wiki/Changes/fno-omit-frame-pointer
+FRAME_POINTER_FLAGS = ["-fno-omit-frame-pointer", "-mno-omit-leaf-frame-pointer"]
+
 # Clang can handle parameters to the args unlike GCC
 PGO_GEN_FLAGS_CLANG = "-fprofile-generate=\"{}/default-%m.profraw\""
 PGO_USE_FLAGS_CLANG = "-fprofile-use=\"{}/default.profdata\""
@@ -140,6 +144,8 @@ class Flags:
             newflags.extend(RUNPATH_FLAGS.split(" "))
         elif opt_type == "no-bind-now":
             newflags = Flags.filter_flags(f, BIND_NOW_FLAGS)
+        elif opt_type == "no-frame-pointer":
+            newflags = Flags.filter_flags(f, FRAME_POINTER_FLAGS)
         elif opt_type == "no-symbolic":
             newflags = Flags.filter_flags(f, SYMBOLIC_FLAGS)
         elif opt_type == "thin-lto":
