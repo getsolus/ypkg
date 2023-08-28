@@ -90,7 +90,7 @@ actions:
         haskell_configure
     - haskell_build: &haskell_build |
         runhaskell Setup build %JOBS%
-    - haskell_install: &haskelll_install |
+    - haskell_install: &haskell_install |
         runhaskell Setup copy --destdir=$installdir
     - haskell_register: &haskell_register |
         export GHCV=$(ghc --numeric-version)
