@@ -327,6 +327,7 @@ additional functionality.
      * `speed`: Optimise this package for speed performance
      * `size`: Optimize the package build solely for size.
      * `no-bind-now`: Configure the package to disable certain flags, where RELRO is unsupported.
+     * `no-frame-pointer`: Disable `-fno-omit-frame-pointer` and `-mno-omit-leaf-frame-pointer` compiler flags
      * `no-symbolic`: Disable `-Wl,-Bsymbolic-functions` linker flag
      * `unroll-loops`: Enable `-funroll-loops`. Use this sparingly, only when it provides benefit.
      * `runpath`: Enable `-Wl,--enable-new-dtags` to make linker use RUNPATH's instead of RPATH's.
