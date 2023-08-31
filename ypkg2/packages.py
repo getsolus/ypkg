@@ -158,8 +158,6 @@ class PackageGenerator:
         self.add_pattern("/usr/lib32/", "32bit")
         self.add_pattern("/usr/lib32/lib*.so.*", "32bit",
                          priority=PRIORITY_DEFAULT+1)
-        self.add_pattern("/usr/lib32/glibc-hwcaps/x86-64-v3/*.so*", "32bit",
-                         priority=PRIORITY_DEFAULT+1)
 
         self.add_pattern("/usr/share/locale", "main")
         self.add_pattern("/usr/share/doc", "main")
