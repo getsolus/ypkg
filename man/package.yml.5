@@ -1,6 +1,6 @@
 .\" generated with Ronn-NG/v0.9.1
 .\" http://github.com/apjanke/ronn-ng/tree/0.9.1
-.TH "PACKAGE\.YML" "5" "July 2023" ""
+.TH "PACKAGE\.YML" "5" "August 2023" ""
 .SH "NAME"
 \fBpackage\.yml\fR \- Solus package build format
 .SH "SYNOPSIS"
@@ -200,9 +200,11 @@ In the majority of cases, this is the desired behaviour in full build environmen
 .IP "\[ci]" 4
 \fBavx2\fR [boolean]
 .IP
-If set, the package will be rebuilt again specifically to enable libraries to be optimised to use \fBAdvanced Vector Extensions\fR\.
+If set, the package will be rebuilt again with the \fBx86\-64\-v3\fR microarchitecture to enable libraries to be optimised to use newer hardware instructions such as \fBAdvanced Vector Extensions\fR\. From baseline (\fBx86\-64\fR) to v3 (\fBx86\-64\-v3\fR) it allows the compiler to use additional instructions such as, but not limited to; SSE4\.2, SSSE3, POPCNT, CMPXCHG16B, MOVBE and AVX2\.
 .IP
-The build will be configured with a library directory suffix of \fBhaswell\fR, i\.e\. \fB/usr/lib64/haswell\fR or \fB/usr/lib32/haswell\fR\. These libraries will be automatically loaded on the Solus installation if the hardware support is present\.
+The build will be configured to make use of the glibc HWCaps (hardware capabilities) feature, by placing the libraries into the library directory suffix of \fBglibc\-hwcaps/x86\-64\-v3\fR i\.e\. \fB/usr/lib64/glibc\-hwcaps/x86\-64\-v3\fR\.
+.IP
+These libraries will be automatically loaded on the Solus installation if the hardware supports the \fBx86\-64\-v3\fR microarchitecture\.
 .IP "\[ci]" 4
 \fBoptimize\fR [list]
 .IP
@@ -213,6 +215,8 @@ Valid keys are restricted to:
 \fBsize\fR: Optimize the package build solely for size\.
 .IP "\[ci]" 4
 \fBno\-bind\-now\fR: Configure the package to disable certain flags, where RELRO is unsupported\.
+.IP "\[ci]" 4
+\fBno\-frame\-pointer\fR: Disable \fB\-fno\-omit\-frame\-pointer\fR and \fB\-mno\-omit\-leaf\-frame\-pointer\fR compiler flags
 .IP "\[ci]" 4
 \fBno\-symbolic\fR: Disable \fB\-Wl,\-Bsymbolic\-functions\fR linker flag
 .IP "\[ci]" 4
