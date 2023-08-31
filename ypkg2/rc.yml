@@ -332,9 +332,9 @@ actions:
         fi
     - avx2_lib_shift: |
         if [ -d "%installroot%/%libdir%" ]; then
-          install -dm00755 $PKG_BUILD_DIR/haswell
-          mv %installroot%/%libdir%/* $PKG_BUILD_DIR/haswell
-          mv $PKG_BUILD_DIR/haswell %installroot%/%libdir%/
+          install -dm00755 $PKG_BUILD_DIR/glibc-hwcaps/x86-64-v3
+          mv %installroot%/%libdir%/* $PKG_BUILD_DIR/glibc-hwcaps/x86-64-v3
+          mv $PKG_BUILD_DIR/glibc-hwcaps %installroot%/%libdir%/
         fi
     - python3_avx2_lib_shift: |
         find %installroot%/usr/lib/python%python3_version%/ -name '*.so' -exec sh -c 'mv "$0" "${0%.so}.so.avx2"' {} \;

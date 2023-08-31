@@ -87,7 +87,7 @@ NO_REORDER_BLOCKS_PARTITIONS = "-fno-reorder-blocks-and-partition"
 POLLY = "-mllvm -polly -mllvm -polly-vectorizer=stripmine"
 
 # AVX2
-AVX2_ARCH = "haswell"
+AVX2_ARCH = "x86-64-v3"
 AVX2_TUNE = "haswell"
 AVX2_FLAGS = "-mprefer-vector-width=128"
 
