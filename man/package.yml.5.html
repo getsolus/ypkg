@@ -422,13 +422,17 @@ additional functionality.</p>
   <li>
     <p><code>avx2</code> [boolean]</p>
 
-    <p>If set, the package will be rebuilt again specifically to enable libraries
-  to be optimised to use <strong>Advanced Vector Extensions</strong>.</p>
+    <p>If set, the package will be rebuilt again with the <code>x86-64-v3</code> microarchitecture to enable
+  libraries to be optimised to use newer hardware instructions such as <strong>Advanced Vector Extensions</strong>.
+  From baseline (<code>x86-64</code>) to v3 (<code>x86-64-v3</code>) it allows the compiler to use additional instructions such as,
+  but not limited to; SSE4.2, SSSE3, POPCNT, CMPXCHG16B, MOVBE and AVX2.</p>
 
-    <p>The build will be configured with a library directory suffix of <code>haswell</code>,
-  i.e. <code>/usr/lib64/haswell</code> or <code>/usr/lib32/haswell</code>. These libraries will be
-  automatically loaded on the Solus installation if the hardware support
-  is present.</p>
+    <p>The build will be configured to make use of the glibc HWCaps (hardware capabilities) feature, by
+  placing the libraries into the library directory suffix of <code>glibc-hwcaps/x86-64-v3</code>
+  i.e. <code>/usr/lib64/glibc-hwcaps/x86-64-v3</code>.</p>
+
+    <p>These libraries will be automatically loaded on the Solus installation if the hardware supports the <code>x86-64-v3</code>
+  microarchitecture.</p>
   </li>
   <li>
     <p><code>optimize</code> [list]</p>
@@ -668,7 +672,7 @@ builddeps:
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>July 2023</li>
+    <li class='tc'>August 2023</li>
     <li class='tr'>package.yml(5)</li>
   </ol>
 

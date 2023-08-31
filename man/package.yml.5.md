@@ -312,13 +312,17 @@ additional functionality.
 
 * `avx2` [boolean]
 
-    If set, the package will be rebuilt again specifically to enable libraries
-    to be optimised to use **Advanced Vector Extensions**.
+    If set, the package will be rebuilt again with the `x86-64-v3` microarchitecture to enable
+    libraries to be optimised to use newer hardware instructions such as **Advanced Vector Extensions**.
+    From baseline (`x86-64`) to v3 (`x86-64-v3`) it allows the compiler to use additional instructions such as,
+    but not limited to; SSE4.2, SSSE3, POPCNT, CMPXCHG16B, MOVBE and AVX2.
 
-    The build will be configured with a library directory suffix of `haswell`,
-    i.e. `/usr/lib64/haswell` or `/usr/lib32/haswell`. These libraries will be
-    automatically loaded on the Solus installation if the hardware support
-    is present.
+    The build will be configured to make use of the Glibc HWCaps (hardware capabilities) feature, by
+    placing the libraries into the library directory suffix of `glibc-hwcaps/x86-64-v3`
+    i.e. `/usr/lib64/glibc-hwcaps/x86-64-v3`.
+
+    These libraries will be automatically loaded on the Solus installation if the hardware supports the `x86-64-v3`
+    microarchitecture.
 
 * `optimize` [list]
 
