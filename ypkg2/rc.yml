@@ -74,27 +74,57 @@ actions:
             done < $srs
         }
         apply_patches
-    # Make life easier with Haskell
-    - cabal_configure: |
+    # Make life easier with Haskell/Cabal
+    - haskell_configure: &haskell_configure |
+        function haskell_configure() {
+            if [[ ! -e Setup.hs ]] && [[ ! -e Setup.lhs ]]; then
+                echo "No Setup.hs file found, creating our own..."
+                echo "import Distribution.Simple" > Setup.hs
+                echo "main = defaultMain" >> Setup.hs
+            fi
+            export GHCV=$(ghc --numeric-version)
+            runhaskell Setup configure --prefix=%PREFIX% \
+                                       --libdir=%libdir% \
+                                       --libsubdir="\$compiler/\$pkgid" \
+                                       --libexecdir=%libdir%/%PKGNAME% \
+                                       --dynlibdir="%libdir%/\$compiler/\$pkgid" \
+                                       --datadir=/usr/share \
+                                       --datasubdir=%PKGNAME% \
+                                       --docdir="/usr/share/doc/%PKGNAME%" \
+                                       --sysconfdir=/etc \
+                                       --disable-tests \
+                                       --enable-executable-dynamic \
+                                       --enable-shared \
+                                       -O2 \
+                                       "$@"
+        }
+        haskell_configure
+    - haskell_build: &haskell_build |
+        runhaskell Setup build %JOBS%
+    - haskell_install: &haskell_install |
+        runhaskell Setup copy --destdir=$installdir
+    - haskell_register: &haskell_register |
         export GHCV=$(ghc --numeric-version)
-        mkdir -p ~/.ghc/%ARCH%-linux-$GHCV/package.conf.d
-        cp /usr/lib%LIBSUFFIX%/ghc-$GHCV/package.conf.d/* ~/.ghc/%ARCH%-linux-$GHCV/package.conf.d
-        ghc-pkg recache --user
-        cabal configure --prefix=%PREFIX% \
-                        --libdir=%libdir% \
-                        --libsubdir="\$compiler/\$pkgid" \
-                        --sysconfdir=/etc \
-                        --enable-executable-dynamic \
-                        --enable-shared \
-                        --ghc-options="-O2 -fPIC"
-    - cabal_build: |
-        cabal build %JOBS%
-    - cabal_install: |
-        cabal copy --destdir=$installdir
-    - cabal_register: |
-        export GHCV=$(ghc --numeric-version)
-        cabal register --gen-pkg-config=$package-$version.conf
+        runhaskell Setup register --gen-pkg-config=$package-$version.conf
         install -D -m 00644 $package-$version.conf $installdir%libdir%/ghc-$GHCV/package.conf.d/$package-$version.conf
+    - haskell_check: |
+        runhaskell Setup test %JOBS%
+    # Configures a Cabal project that requires online dependencies, like a
+    # Cargo-style build
+    - cabal_configure: |
+        function cabal_configure() {
+            export GHCV=$(ghc --numeric-version)
+            cabal update
+            cabal build %JOBS% --only-dependencies --disable-tests -O2 --ghc-options="-H128m %JOBS%" "$@"
+            %haskell_configure --disable-executable-dynamic \
+                               --package-db=$HOME/.cabal/store/ghc-$GHCV/package.db \
+                               "$@"
+        }
+        cabal_configure
+    # # TODO: remove after all Haskell packages have been migrated
+    - cabal_build: *haskell_build
+    - cabal_install: *haskell_install
+    - cabal_register: *haskell_register
     # Make life easier with Perl
     - perl_setup: |
         function perl_setup() {
