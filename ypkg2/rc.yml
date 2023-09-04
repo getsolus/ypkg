@@ -108,7 +108,7 @@ actions:
         runhaskell Setup register --gen-pkg-config=$package-$version.conf
         install -D -m 00644 $package-$version.conf $installdir%libdir%/ghc-$GHCV/package.conf.d/$package-$version.conf
     - haskell_check: |
-        runhaskell Setup test %JOBS%
+        runhaskell Setup test
     # Configures a Cabal project that requires online dependencies, like a
     # Cargo-style build
     - cabal_configure: |
