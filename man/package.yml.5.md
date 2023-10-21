@@ -145,6 +145,22 @@ additional functionality.
     It is not required to list any package here that exists in the `system.base`
     or `system.devel` component.
 
+* `checkdeps` [list]
+
+    Specifies the build and/or run dependencies required to build and/or run
+    the tests of
+    this package in an isolated environment (`solbuild(1)`).
+
+    You may use full package names here, though it is preferable to use the
+    `pkg-config(1)` names.
+
+    `ypkg-build(1)` understands pkgconfig dependencies denoted inside either
+    the `pkgconfig($name)` identifier, or `pkgconfig32($name)` for emul32
+    build dependencies.
+
+    It is not required to list any package here that exists in the `system.base`
+    or `system.devel` component.
+
 * `clang` [boolean]
 
     Set this key to `yes` to force building this package with the `clang`
