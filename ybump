@@ -26,12 +26,15 @@ if __name__ == "__main__":
         usage()
 
     with open(sys.argv[1]) as fp:
+        lines = fp.readlines()
+        fp.seek(0)
         data = ruamel.yaml.round_trip_load(fp)
     data['release'] += 1
+    maxwidth = len(max(lines, key=len))
     try:
         with open(sys.argv[1], 'w') as fp:
             ruamel.yaml.round_trip_dump(
-                data, fp, indent=4, block_seq_indent=4, width=200,
+                data, fp, indent=4, block_seq_indent=4, width=maxwidth,
                 top_level_colon_align=True, prefix_colon=' ')
     except Exception as e:
         print("Error writing file, may need to reset it.")

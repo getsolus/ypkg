@@ -92,17 +92,20 @@ if __name__ == "__main__":
         source = {url: args.tag_prefix + newversion}
 
     with open(ymlfile, "r") as infile:
+        lines = infile.readlines()
+        infile.seek(0)
         data = ruamel.yaml.round_trip_load(infile)
     data['source'] = sources = []
     sources.append(source)
     if args.nb is not None:
         data['release'] += 1
     data['version'] = newversion
+    maxwidth = len(max(lines, key=len))
 
     try:
         with open(ymlfile, 'w') as fp:
             ruamel.yaml.round_trip_dump(
-                data, fp, indent=4, block_seq_indent=4, width=200,
+                data, fp, indent=4, block_seq_indent=4, width=maxwidth,
                 top_level_colon_align=True, prefix_colon=' ')
     except Exception as e:
         print("Error writing file, may need to reset it.")
