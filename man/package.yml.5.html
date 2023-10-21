@@ -239,6 +239,23 @@ additional functionality.</p>
   or <code>system.devel</code> component.</p>
   </li>
   <li>
+    <p><code>checkdeps</code> [list]</p>
+
+    <p>Specifies the build and/or run dependencies required to build and/or run
+  the tests of
+  this package in an isolated environment (<code>solbuild(1)</code>).</p>
+
+    <p>You may use full package names here, though it is preferable to use the
+  <code>pkg-config(1)</code> names.</p>
+
+    <p><code>ypkg-build(1)</code> understands pkgconfig dependencies denoted inside either
+  the <code>pkgconfig($name)</code> identifier, or <code>pkgconfig32($name)</code> for emul32
+  build dependencies.</p>
+
+    <p>It is not required to list any package here that exists in the <code>system.base</code>
+  or <code>system.devel</code> component.</p>
+  </li>
+  <li>
     <p><code>clang</code> [boolean]</p>
 
     <p>Set this key to <code>yes</code> to force building this package with the <code>clang</code>
@@ -427,7 +444,7 @@ additional functionality.</p>
   From baseline (<code>x86-64</code>) to v3 (<code>x86-64-v3</code>) it allows the compiler to use additional instructions such as,
   but not limited to; SSE4.2, SSSE3, POPCNT, CMPXCHG16B, MOVBE and AVX2.</p>
 
-    <p>The build will be configured to make use of the glibc HWCaps (hardware capabilities) feature, by
+    <p>The build will be configured to make use of the Glibc HWCaps (hardware capabilities) feature, by
   placing the libraries into the library directory suffix of <code>glibc-hwcaps/x86-64-v3</code>
   i.e. <code>/usr/lib64/glibc-hwcaps/x86-64-v3</code>.</p>
 
@@ -672,7 +689,7 @@ builddeps:
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>August 2023</li>
+    <li class='tc'>October 2023</li>
     <li class='tr'>package.yml(5)</li>
   </ol>
 

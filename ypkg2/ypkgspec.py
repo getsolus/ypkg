@@ -107,6 +107,7 @@ class YpkgSpec:
 
     # Dependencies
     pkg_builddeps = None
+    pkg_checkdeps = None
 
     mandatory_tokens = None
     optional_tokens = None
@@ -219,6 +220,7 @@ class YpkgSpec:
             ("patterns", MultimapFormat(self, self.add_pattern, "main")),
             ("permanent", OneOrMoreString),
             ("builddeps", OneOrMoreString),
+            ("checkdeps", OneOrMoreString),
             ("rundeps", MultimapFormat(self, self.add_rundep, "main")),
             ("component", MultimapFormat(self, self.add_component, "main")),
             ("conflicts", MultimapFormat(self, self.add_conflict, "main")),

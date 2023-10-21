@@ -83,6 +83,19 @@ def main():
             if not idb.has_package(dep):
                 ndeps.add(dep)
 
+    if spec.pkg_checkdeps:
+        for dep in spec.pkg_checkdeps:
+            em32 = pkgconfig32_dep.match(dep)
+            if em32:
+                pc32deps.add(em32.group(1))
+                continue
+            em = pkgconfig_dep.match(dep)
+            if em:
+                pcdeps.add(em.group(1))
+                continue
+            if not idb.has_package(dep):
+                ndeps.add(dep)
+
     # Get the global known pkgconfig providers
     pkgConfigs, pkgConfigs32 = pdb.get_pkgconfig_providers()
 
