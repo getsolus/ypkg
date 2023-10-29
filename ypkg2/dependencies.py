@@ -259,7 +259,7 @@ class DependencyResolver:
                 continue
             tgtPkg = self.gene.packages[packageName]
 
-            # Yes, it's a set, but i  dont want the ui emission spam
+            # Yes, it's a set, but we don't want the ui emission spam
             if prov in tgtPkg.depend_packages:
                 continue
             # Forbid circular dependencies
@@ -350,7 +350,7 @@ class DependencyResolver:
         if not r:
             r = self.get_kernel_external(info, info.dep_kernel)
             if not r:
-                print("Fatal: Unknown kernel: {}".format(sym))
+                print("Fatal: Unknown kernel: {}".format(info.dep_kernel))
                 return
         # Don't self depend
         if pkgName == r:
