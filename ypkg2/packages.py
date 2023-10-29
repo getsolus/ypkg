@@ -225,6 +225,18 @@ class PackageGenerator:
         self.add_pattern("/usr/share/man/man3", "devel",
                          priority=PRIORITY_DEFAULT+1)
 
+        # These files are used by qt5/kf5 builds
+        self.add_pattern("/usr/lib/libQt5*.prl", "devel")
+        self.add_pattern("/usr/lib64/libQt5*.prl", "devel")
+        self.add_pattern("/usr/lib/qt5/mkspecs/modules/qt_*.pri", "devel")
+        self.add_pattern("/usr/lib64/qt5/mkspecs/modules/qt_*.pri", "devel")
+
+        # These files are used by qt6/kf6 builds
+        self.add_pattern("/usr/lib/libQt6*.prl", "devel")
+        self.add_pattern("/usr/lib64/libQt6*.prl", "devel")
+        self.add_pattern("/usr/lib/qt6/mkspecs/modules/qt_*.pri", "devel")
+        self.add_pattern("/usr/lib64/qt6/mkspecs/modules/qt_*.pri", "devel")
+
     def add_file(self, path):
         """ Add a file path to the owned list and place it into the correct
             package (main or named subpackage) according to the highest found
