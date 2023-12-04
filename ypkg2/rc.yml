@@ -1,6 +1,9 @@
 actions:
     - configure: |
         ./configure %CONFOPTS%
+    # Some day enough programs will be updated that we don't need this. Some day.
+    - configure_no_runstatedir: |
+        ./configure $(sed 's|--runstatedir=/run||g' <<< "%CONFOPTS%")
     - reconfigure: |
         autoreconf -vfi
         %configure
