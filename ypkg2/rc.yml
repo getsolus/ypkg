@@ -359,6 +359,24 @@ actions:
         ./waf build --jobs="%YJOBS%"
     - waf_install: |
         ./waf install --jobs="%YJOBS%" --destdir="%installroot%"
+    - cargo_fetch: |
+        cargo fetch -v --locked
+    - cargo_build: |
+        cargo build -v -j "%YJOBS%" --frozen --release \
+            --config profile.release.debug=\"full\" \
+            --config profile.release.split-debuginfo=\"off\" \
+            --config profile.release.strip=\"none\"
+    - cargo_install: |
+        cargo_install(){
+            if [ $# -eq 1 ]; then
+                install -Dm00755 target/release/"$1" $installdir/usr/bin/"$1"
+            else
+                install -Dm00755 target/release/"$package" $installdir/usr/bin/"$package"
+            fi
+        }
+        cargo_install
+    - cargo_test: |
+        cargo test -v -j "%YJOBS%" --frozen --release --workspace
     - llvm_profile_merge: |
         if [[ -d "$YPKG_PGO_DIR" ]]; then
             pushd "$YPKG_PGO_DIR"
