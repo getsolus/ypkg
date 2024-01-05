@@ -55,7 +55,7 @@ actions:
             pushd $installdir
             find . -type f -name "*.qml" -print0 | while IFS= read -r -d '' i; do
                 if ! [ -a "${i}"c ]; then
-                    qmlcachegen-qt6 -o "${i}"c "${i}" $*
+                    qmlcachegen6 -o "${i}"c "${i}" $*
                 fi
             done
             popd
