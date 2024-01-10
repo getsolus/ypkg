@@ -131,7 +131,7 @@ def execute_step(context, step, step_n, work_dir):
     endScript = None
 
     # Allow GCC and such to pick up on our timestamp
-    script.define_export("SOURCE_DATA_EPOCH",
+    script.define_export("SOURCE_DATE_EPOCH",
                          "{}".format(metadata.history_timestamp))
 
     # Handle the anal nature of llvm profiling
