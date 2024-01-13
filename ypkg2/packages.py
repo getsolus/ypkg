@@ -220,6 +220,10 @@ class PackageGenerator:
                          priority=PRIORITY_DEFAULT+1)
         self.add_pattern("/usr/share/qt5/doc/*.tags", "devel",
                          priority=PRIORITY_DEFAULT+1)
+        self.add_pattern("/usr/share/doc/qt6/*.qch", "devel",
+                         priority=PRIORITY_DEFAULT+1)
+        self.add_pattern("/usr/share/doc/qt6/*.tags", "devel",
+                         priority=PRIORITY_DEFAULT+1)
 
         # This is almost always man files for api functions
         self.add_pattern("/usr/share/man/man3", "devel",

@@ -26,7 +26,9 @@ actions:
     - cmake_kf6: |
         %cmake_ninja -DCMAKE_INSTALL_LIBEXECDIR_kf6:PATH=%libdir%/kf6 \
                      -DKDE_INSTALL_LIBEXECDIR:PATH=%libdir%/kf6 \
-                     -DKDE_INSTALL_USE_QT_SYS_PATHS:BOOL=ON
+                     -DKDE_INSTALL_USE_QT_SYS_PATHS:BOOL=ON \
+                     -DBUILD_QCH=ON \
+                     -DBUILD_TESTING=OFF
     - meson_configure: |
         CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" LDFLAGS="${LDFLAGS}" meson setup --prefix %PREFIX% --buildtype=plain --libdir="lib%LIBSUFFIX%" --libexecdir="lib%LIBSUFFIX%/%PKGNAME%" --sysconfdir=/etc --localstatedir=/var solusBuildDir
     - ninja_build: &ninja_build |
