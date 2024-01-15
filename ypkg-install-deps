@@ -23,7 +23,9 @@ import sys
 import os
 import subprocess
 import argparse
-
+import Queue
+import json
+from collections import OrderedDict
 
 def main():
     spec = YpkgSpec()
@@ -37,6 +39,10 @@ def main():
                         "i.e. no prompt", action="store_true")
     parser.add_argument("-D", "--output-dir", type=str,
                         help="Ignored in ypkg-install-deps")
+    parser.add_argument("--dry-run", help="Don't install anyting",
+                        action="store_true")
+    parser.add_argument("--json", help="Dump json info of all packages that should be "
+                        "installed when building package", action="store_true")
     # Main file
     parser.add_argument("filename", help="Path to the ypkg YAML file")
 
@@ -47,6 +53,9 @@ def main():
     # Show version
     if args.version:
         show_version()
+    # Disallow logging if outputting json
+    if args.json:
+        console_ui.quiet = True
 
     # Grab filename
     if not args.filename:
@@ -61,6 +70,7 @@ def main():
     pc32deps = set()
     pcdeps = set()
     ndeps = set()
+    full_deps = set()
 
     idb = InstallDB()
     pdb = PackageDB()
@@ -80,6 +90,7 @@ def main():
             if em:
                 pcdeps.add(em.group(1))
                 continue
+            full_deps.add(dep)
             if not idb.has_package(dep):
                 ndeps.add(dep)
 
@@ -93,6 +104,7 @@ def main():
             if em:
                 pcdeps.add(em.group(1))
                 continue
+            full_deps.add(dep)
             if not idb.has_package(dep):
                 ndeps.add(dep)
 
@@ -127,6 +139,7 @@ def main():
             console_ui.emit_error("BuildDep", "pkgconfig32({}) build dep "
                                   "doesn't exist in the repository.".format(i))
             sys.exit(1)
+
         if not idb.has_package(pkg.name):
             ndeps.add(pkg.name)
 
@@ -148,10 +161,12 @@ def main():
                                   " does not exist in the repository.".
                                   format(i))
             sys.exit(1)
+
+        full_deps.add(pkg.name)
         if not idb.has_package(pkg.name):
             ndeps.add(pkg.name)
 
-    if len(ndeps) < 1:
+    if len(ndeps) < 1 and not args.json:
         console_ui.emit_success("BuildDep", "All build deps satisfied")
         sys.exit(0)
 
@@ -172,13 +187,56 @@ def main():
                               format(" ".join(invalid)))
         sys.exit(1)
 
-    console_ui.emit_info("BuildDep", "Requesting installation of: {}".
-                         format(", ".join(ndeps)))
-    try:
-        subprocess.check_call(cmd, shell=True)
-    except Exception as e:
-        console_ui.emit_error("BuildDep", "Failed to install build deps")
-        sys.exit(1)
+    if not args.dry_run:
+        console_ui.emit_info("BuildDep", "Requesting installation of: {}".
+                             format(", ".join(ndeps)))
+        try:
+            subprocess.check_call(cmd, shell=True)
+        except Exception as e:
+            console_ui.emit_error("BuildDep", "Failed to install build deps")
+            sys.exit(1)
+    elif args.json:
+        json_pkgs = []
+        queue = Queue.Queue()
+        for dep in full_deps:
+            queue.put(dep)
+
+        while not queue.empty():
+            dep = queue.get()
+            dpkg = pdb.get_package(dep)
+            if not dpkg:
+                console_ui.emit_error("JSON", "Unknown build dep: {}".format(dep))
+                sys.exit(1)
+
+            json_pkgs.append({key: getattr(dpkg, key) for key in ["name", "version", "release", "packageHash"]})
+            for ddep in dpkg.runtimeDependencies():
+                if not ddep.satisfied_by_repo():
+                    console_ui.emit_error("JSON",
+                        "%s depends on %s but latter is not satisfied" % (dep, ddep.name()))
+                    sys.exit(1)
+
+                if ddep.name() in full_deps:
+                    continue
+                queue.put(ddep.name())
+                full_deps.add(ddep.name())
+
+        for ipkg in idb.list_installed():
+            if ipkg in full_deps:
+                continue
+
+            pkg = pdb.get_package(ipkg)
+            if not pkg:
+                console_ui.emit_error("JSON", "why is %s installed but doesn't exist in package db?" % ipkg)
+                sys.exit(1)
+            json_pkgs.append(
+                OrderedDict([(key, getattr(pkg, key)) for key in ["name",
+                                                                  "version",
+                                                                  "release",
+                                                                  "packageHash"]]))
+
+        json_pkgs = sorted(json_pkgs, key=lambda j: j["name"])
+        print(json.dumps(json_pkgs))
+
 
     sys.exit(0)
 
