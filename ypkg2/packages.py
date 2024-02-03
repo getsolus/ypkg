@@ -181,8 +181,6 @@ class PackageGenerator:
         self.add_pattern("/usr/lib64/pkgconfig/*.pc", "devel")
         self.add_pattern("/usr/share/pkgconfig/*.pc", "devel")
         self.add_pattern("/usr/include/", "devel")
-        self.add_pattern("/usr/share/man3/", "devel",
-                         priority=PRIORITY_DEFAULT+1)
         self.add_pattern("/usr/share/man", "main")
         self.add_pattern("/usr/share/aclocal/*.m4", "devel")
         self.add_pattern("/usr/share/aclocal/*.ac", "devel")
