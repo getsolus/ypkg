@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 #  ybump.py
@@ -18,7 +18,7 @@ def usage(msg=None, ex=1):
     if msg:
         print(msg)
     else:
-        print("Usage: %s file.yml" % sys.argv[0])
+        print(("Usage: %s file.yml" % sys.argv[0]))
     sys.exit(ex)
 
 if __name__ == "__main__":

@@ -126,14 +126,14 @@ def main():
     # check git exists
     fp = os.path.join(wdir, ".git")
     if not os.path.exists(fp):
-        print("Debug: Skipping non git tree: {}".format(wdir))
+        print(("Debug: Skipping non git tree: {}".format(wdir)))
         sys.exit(0)
 
     outputDir = wdir
     if args.output_dir:
         od = args.output_dir
         if not os.path.exists(args.output_dir):
-            print("{} does not exist".format(od))
+            print(("{} does not exist".format(od)))
             sys.exit(1)
         outputDir = od
     outputDir = os.path.abspath(outputDir)
@@ -166,7 +166,7 @@ def main():
         com = i[1]
         spec = i[0]
         update = pisi.specfile.Update()
-        update.name = unicode(com.name)
+        update.name = str(com.name)
         update.email = com.email
         update.version = spec.pkg_version
         update.release = str(spec.pkg_release)

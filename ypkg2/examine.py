@@ -125,11 +125,11 @@ class FileReport:
                                     " path: {}".format(file))
             return
 
-        for line in output.split("\n"):
+        for line in output.split("\n".encode('utf-8')):
             line = line.strip()
 
             # Match rpath
-            r = r_path.match(line)
+            r = r_path.match(str(line))
             if r:
                 if self.rpaths is None:
                     self.rpaths = set()
@@ -137,7 +137,7 @@ class FileReport:
                 continue
 
             # Match direct needed dependency
-            m = shared_lib.match(line)
+            m = shared_lib.match(str(line))
             if m:
                 if self.symbol_deps is None:
                     self.symbol_deps = set()
@@ -146,7 +146,7 @@ class FileReport:
 
             # Check the soname for this binary file
             if check_soname:
-                so = r_soname.match(line)
+                so = r_soname.match(str(line))
                 if so:
                     self.soname = so.group(1)
 
@@ -381,7 +381,7 @@ def store_debug(context, pretty, file, magic_string):
     # Account for race condition in directory creation
     dirs = os.path.dirname(did_full)
     try:
-        os.makedirs(dirs, mode=00755)
+        os.makedirs(dirs, mode=0o0755)
     except Exception as e:
         pass
     if not os.path.exists(dirs):

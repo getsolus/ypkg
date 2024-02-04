@@ -49,8 +49,9 @@ def compress_gzip(path):
 
     # Create the file to write to
     out_path = "{}.gz".format(path)
+
     # Open the file
-    with open(path) as in_file, gzip.GzipFile(filename=out_path, mode="wb", compresslevel=9, mtime=0) as out_file:
+    with open(path, "rb") as in_file, gzip.GzipFile(filename=out_path, mode="wb", compresslevel=9, mtime=0) as out_file:
         shutil.copyfileobj(in_file, out_file)
 
     # Remove the original file
