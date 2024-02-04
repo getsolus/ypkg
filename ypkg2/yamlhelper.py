@@ -38,7 +38,7 @@ class MultimapFormat:
     def __init__(self, ref_object, ref_function, ref_default):
         self.ref_object = ref_object
         self.ref_function = ref_function
-        self.ref_default = unicode(ref_default)
+        self.ref_default = str(ref_default)
 
 
 def _insert_helper(mapping, key, value):
@@ -51,15 +51,15 @@ def _insert_helper(mapping, key, value):
 def get_key_value_mapping(data, t):
     mapping = OrderedDict()
 
-    dicts = filter(lambda s: isinstance(s, dict), data)
-    no_keys = filter(lambda s: type(s) not in iterable_types, data)
+    dicts = [s for s in data if isinstance(s, dict)]
+    no_keys = [s for s in data if type(s) not in iterable_types]
 
     for key in no_keys:
         _insert_helper(mapping, t.ref_default, key)
 
     # Explicit key: to value mapping
     for mapp in dicts:
-        keys = mapp.keys()
+        keys = list(mapp.keys())
         if len(keys) > 1:
             console_ui.emit_error("YAML",
                                   "Encountered multiple keys")
@@ -68,22 +68,22 @@ def get_key_value_mapping(data, t):
         val = mapp[key]
 
         if isinstance(val, list):
-            bad = filter(lambda s: type(s) in iterable_types, val)
+            bad = [s for s in val if type(s) in iterable_types]
             if len(bad) > 0:
                 console_ui.emit_error("YAML",
                                       "Multimap does not support inception...")
                 return None
             for item in val:
-                _insert_helper(mapping, key, unicode(item))
+                _insert_helper(mapping, key, str(item))
             continue
         elif type(val) in iterable_types:
             # Illegal to have a secondary layer here!!
             console_ui.emit_error("YAML", "Expected a value here")
-            print("Erronous line: {}".format(str(mapp)))
+            print(("Erronous line: {}".format(str(mapp))))
             return None
         else:
             # This is key->value mapping
-            _insert_helper(mapping, key, unicode(val))
+            _insert_helper(mapping, key, str(val))
 
     return mapping
 
@@ -98,17 +98,17 @@ def assertMultimap(ymlFile, key, t):
 
     val = ymlFile[key]
     if type(val) not in iterable_types:
-        mapping = get_key_value_mapping([unicode(val)], t)
+        mapping = get_key_value_mapping([str(val)], t)
     else:
         mapping = get_key_value_mapping(ymlFile[key], t)
 
     if mapping is None:
         return False
 
-    for key in mapping.keys():
+    for key in list(mapping.keys()):
         dat = mapping[key]
         for val in dat:
-            t.ref_function(unicode(key), unicode(val))
+            t.ref_function(str(key), str(val))
 
     return True
 
@@ -129,7 +129,7 @@ def assertGetType(ymlFile, key, t):
 
     if t == OneOrMoreString:
         ret = list()
-        if val_type == str or val_type == unicode:
+        if val_type == str or val_type == str:
             ret.append(val)
             return ret
         if val_type != list:
@@ -149,9 +149,9 @@ def assertGetType(ymlFile, key, t):
     if t == str:
         if type(val) not in iterable_types:
             val = str(val)
-    elif t == unicode:
+    elif t == str:
         if type(val) not in iterable_types:
-            val = unicode(val)
+            val = str(val)
 
     if not isinstance(val, t):
         j = t.__name__

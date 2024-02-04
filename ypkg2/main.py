@@ -30,7 +30,7 @@ import ypkg2
 
 import sys
 import argparse
-import ConfigParser
+import configparser
 import os
 import shutil
 import tempfile
@@ -175,7 +175,7 @@ def execute_step(context, step, step_n, work_dir):
     output = script.escape_string(full_text)
 
     with tempfile.NamedTemporaryFile(prefix="ypkg-%s" % step_n) as script_ex:
-        script_ex.write(output)
+        script_ex.write(output.encode('utf-8'))
         script_ex.flush()
 
         cmd = ["/bin/bash", "--norc", "--noprofile", script_ex.name]
@@ -207,7 +207,7 @@ def build_package(filename, outputDir):
         if not os.path.exists(fpath):
             continue
         try:
-            c = ConfigParser.ConfigParser()
+            c = configparser.ConfigParser()
             c.readfp(open(fpath))
             pname = c.get("Packager", "Name")
             pemail = c.get("Packager", "Email")
@@ -225,8 +225,8 @@ def build_package(filename, outputDir):
         packager_name = ypkg2.packager_name
         packager_email = ypkg2.packager_email
         console_ui.emit_warning("Config", "Using default packager values")
-        print("  Name: {}".format(packager_name))
-        print("  Email: {}".format(packager_email))
+        print(("  Name: {}".format(packager_name)))
+        print(("  Email: {}".format(packager_email)))
 
     spec.packager_name = packager_name
     spec.packager_email = packager_email
@@ -350,7 +350,7 @@ def build_package(filename, outputDir):
                 if spec.step_profile:
                     try:
                         if not os.path.exists(context.get_pgo_dir()):
-                            os.makedirs(context.get_pgo_dir(), 00755)
+                            os.makedirs(context.get_pgo_dir(), 0o0755)
                     except Exception as e:
                         console_ui.emit_error("Source", "Error creating dir")
                         print(e)
@@ -359,7 +359,7 @@ def build_package(filename, outputDir):
             work_dir = manager.get_working_dir(context)
             if not os.path.exists(work_dir):
                 try:
-                    os.makedirs(work_dir, mode=00755)
+                    os.makedirs(work_dir, mode=0o0755)
                 except Exception as e:
                     console_ui.emit_error("Source", "Error creating directory")
                     print(e)
@@ -445,7 +445,7 @@ def build_package(filename, outputDir):
 
     if not os.path.exists(ctx.get_packaging_dir()):
         try:
-            os.makedirs(ctx.get_packaging_dir(), mode=00755)
+            os.makedirs(ctx.get_packaging_dir(), mode=0o0755)
         except Exception as e:
             console_ui.emit_error("Package", "Failed to create pkg dir")
             print(e)
@@ -457,7 +457,7 @@ def build_package(filename, outputDir):
     if spec.get_component("main") == "kernel.image":
         exa.can_kernel = False
 
-    exaResults = exa.examine_packages(ctx, gene.packages.values())
+    exaResults = exa.examine_packages(ctx, list(gene.packages.values()))
     if exaResults is None:
         console_ui.emit_error("Package", "Failed to correctly examine all "
                               "packages.")
@@ -487,8 +487,8 @@ def build_package(filename, outputDir):
     if len(gene.packages) == 0:
         console_ui.emit_error("Package", "No resulting packages found")
         w = "https://solus-project.com/articles/packaging/"
-        print("Ensure your files end up in $installdir. Did you mean to "
-              "use %make_install?\n\nPlease see the help center: {}".format(w))
+        print(("Ensure your files end up in $installdir. Did you mean to "
+              "use %make_install?\n\nPlease see the help center: {}".format(w)))
         sys.exit(1)
 
     gene.emit_packages()

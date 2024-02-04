@@ -99,7 +99,7 @@ class GitSource(YpkgSource):
         # Ensure source dir exists
         if not os.path.exists(source_dir):
             try:
-                os.makedirs(source_dir, mode=00755)
+                os.makedirs(source_dir, mode=0o0755)
             except Exception as e:
                 console_ui.emit_error("Source", "Cannot create sources "
                                       "directory: {}".format(e))
@@ -114,7 +114,7 @@ class GitSource(YpkgSource):
         except Exception as e:
             console_ui.emit_error("Git", "Failed to fetch {}".format(
                                   self.uri))
-            print("Error follows: {}".format(e))
+            print(("Error follows: {}".format(e)))
             return False
 
         console_ui.emit_info("Git", "Checking out: {}".format(self.tag))
@@ -173,7 +173,7 @@ class GitSource(YpkgSource):
 
         if not os.path.exists(context.get_build_dir()):
             try:
-                os.makedirs(context.get_build_dir(), mode=00755)
+                os.makedirs(context.get_build_dir(), mode=0o0755)
             except Exception as e:
                 console_ui.emit_error("Source", "Cannot create sources "
                                       "directory: {}".format(e))
@@ -222,7 +222,7 @@ class TarSource(YpkgSource):
         # Ensure source dir exists
         if not os.path.exists(source_dir):
             try:
-                os.makedirs(source_dir, mode=00755)
+                os.makedirs(source_dir, mode=0o0755)
             except Exception as e:
                 console_ui.emit_error("Source", "Cannot create sources "
                                       "directory: {}".format(e))
@@ -237,7 +237,7 @@ class TarSource(YpkgSource):
         except Exception as e:
             console_ui.emit_error("Source", "Failed to fetch {}".format(
                                   self.uri))
-            print("Error follows: {}".format(e))
+            print(("Error follows: {}".format(e)))
             return False
 
         return True
@@ -247,15 +247,15 @@ class TarSource(YpkgSource):
 
         hash = None
 
-        with open(bpath, "r") as inp:
+        with open(bpath, "rb") as inp:
             h = hashlib.sha256()
             h.update(inp.read())
             hash = h.hexdigest()
         if hash != self.hash:
             console_ui.emit_error("Source", "Incorrect hash for {}".
                                   format(self.filename))
-            print("Found hash    : {}".format(hash))
-            print("Expected hash : {}".format(self.hash))
+            print(("Found hash    : {}".format(hash)))
+            print(("Expected hash : {}".format(self.hash)))
             return False
         return True
 
@@ -308,7 +308,7 @@ class TarSource(YpkgSource):
 
         if not os.path.exists(context.get_build_dir()):
             try:
-                os.makedirs(context.get_build_dir(), mode=00755)
+                os.makedirs(context.get_build_dir(), mode=0o0755)
             except Exception as e:
                 console_ui.emit_error("Source", "Failed to construct build "
                                       "directory")
@@ -351,16 +351,16 @@ class SourceManager:
                 console_ui.emit_error("SOURCE",
                                       "Source lines must be of 'key : value' "
                                       "mapping type")
-                print("Erronous line: {}".format(str(source)))
+                print(("Erronous line: {}".format(str(source))))
                 return False
 
-            if len(source.keys()) != 1:
+            if len(list(source.keys())) != 1:
                 console_ui.emit_error("SOURCE",
                                       "Encountered too many keys in source")
-                print("Erronous source: {}".format(str(source)))
+                print(("Erronous source: {}".format(str(source))))
                 return False
 
-            uri = source.keys()[0]
+            uri = list(source.keys())[0]
             hash = source[uri]
             # Check if its a namespaced support type
             if "|" in uri:

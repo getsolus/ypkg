@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 #  This file is part of ypkg2
@@ -55,7 +55,7 @@ def main():
 
     args = " ".join(sys.argv[1:])
     vargs = sys.argv[1:]
-    cargs = " ".join(filter(lambda x: x != "-f" and x != "--force", vargs))
+    cargs = " ".join([x for x in vargs if x != "-f" and x != "--force"])
     try:
         subprocess.check_call("ypkg-install-deps {}".format(args), shell=True)
         if needFakeroot:

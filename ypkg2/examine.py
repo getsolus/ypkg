@@ -119,7 +119,7 @@ class FileReport:
     def scan_binary(self, file, check_soname=False):
         cmd = "LC_ALL=C /usr/bin/readelf -d \"{}\"".format(file)
         try:
-            output = subprocess.check_output(cmd, shell=True)
+            output = subprocess.check_output(cmd, shell=True).decode()
         except Exception as e:
             console_ui.emit_warning("File", "Failed to scan binary deps for"
                                     " path: {}".format(file))
@@ -184,7 +184,7 @@ class FileReport:
         for cmd in cmds:
             try:
                 out = subprocess.check_output(cmd.format(sub, file),
-                                              shell=True)
+                                              shell=True).decode()
             except Exception as e:
                 print(e)
                 continue
@@ -381,7 +381,7 @@ def store_debug(context, pretty, file, magic_string):
     # Account for race condition in directory creation
     dirs = os.path.dirname(did_full)
     try:
-        os.makedirs(dirs, mode=00755)
+        os.makedirs(dirs, mode=0o0755)
     except Exception as e:
         pass
     if not os.path.exists(dirs):

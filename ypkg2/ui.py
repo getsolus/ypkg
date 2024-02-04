@@ -62,34 +62,34 @@ class YpkgUI:
     def emit_error(self, key, error):
         """ Report an error to the user """
         if not self.allow_colors:
-            print("[{}] {}".format(key, error))
+            print(("[{}] {}".format(key, error)))
         else:
-            print("{}[{}]{} {}{}{}".format(AnsiColors.RED, key,
-                  AnsiColors.RESET, AnsiColors.BOLD, error, AnsiColors.RESET))
+            print(("{}[{}]{} {}{}{}".format(AnsiColors.RED, key,
+                  AnsiColors.RESET, AnsiColors.BOLD, error, AnsiColors.RESET)))
 
     def emit_warning(self, key, warn):
         """ Report a warning to the user """
         if not self.allow_colors:
-            print("[{}] {}".format(key, warn))
+            print(("[{}] {}".format(key, warn)))
         else:
-            print("{}[{}]{} {}{}{}".format(AnsiColors.YELLOW, key,
-                  AnsiColors.RESET, AnsiColors.BOLD, warn, AnsiColors.RESET))
+            print(("{}[{}]{} {}{}{}".format(AnsiColors.YELLOW, key,
+                  AnsiColors.RESET, AnsiColors.BOLD, warn, AnsiColors.RESET)))
 
     def emit_info(self, key, info):
         """ Report information to the user """
         if not self.allow_colors:
-            print("[{}] {}".format(key, info))
+            print(("[{}] {}".format(key, info)))
         else:
-            print("{}[{}]{} {}".format(AnsiColors.BLUE, key,
-                  AnsiColors.RESET, info))
+            print(("{}[{}]{} {}".format(AnsiColors.BLUE, key,
+                  AnsiColors.RESET, info)))
 
     def emit_success(self, key, success):
         """ Report success to the user """
         if not self.allow_colors:
-            print("[{}] {}".format(key, success))
+            print(("[{}] {}".format(key, success)))
         else:
-            print("{}[{}]{} {}".format(AnsiColors.GREEN, key,
-                  AnsiColors.RESET, success))
+            print(("{}[{}]{} {}".format(AnsiColors.GREEN, key,
+                  AnsiColors.RESET, success)))
 
 
 suffixes = ["B", "KB", "MB", "GB", "TB", "PB"]

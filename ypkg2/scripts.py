@@ -87,7 +87,7 @@ class ScriptGenerator:
                     console_ui.emit_error("rc.yml",
                                           "Expected key:value mapping in list")
                     return
-                keys = item.keys()
+                keys = list(item.keys())
                 if len(keys) > 1:
                     console_ui.emit_error("rc.yml",
                                           "Expected one key in key:value")
@@ -98,9 +98,9 @@ class ScriptGenerator:
                     value = value[:-1]
                 value = value.strip()
                 if section == "defines":
-                    self.define_macro(key, unicode(value))
+                    self.define_macro(key, str(value))
                 else:
-                    self.define_action_macro(key, unicode(value))
+                    self.define_action_macro(key, str(value))
 
     def init_default_macros(self):
 
@@ -202,7 +202,7 @@ class ScriptGenerator:
         for key in self.exports:
             ret.append("export {}=\"{}\"".format(key, self.exports[key]))
 
-        unset_line = "unset {} || :".format(" ".join(self.unexports.keys()))
+        unset_line = "unset {} || :".format(" ".join(list(self.unexports.keys())))
         ret.append(unset_line)
         return ret
 
@@ -219,7 +219,7 @@ class ScriptGenerator:
 
         tmp_name = "%"
         tmp_idx = 0
-        for i in xrange(offset+1, len(line)):
+        for i in range(offset+1, len(line)):
             if line[i] == "%":
                 tmp_name += "%"
                 break

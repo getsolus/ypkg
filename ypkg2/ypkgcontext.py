@@ -113,7 +113,7 @@ class Flags:
     @staticmethod
     def filter_flags(f, filters):
         """ Filter the flags from this set """
-        nflags = filter(lambda s: s not in filters, f)
+        nflags = [s for s in f if s not in filters]
         return nflags
 
     @staticmethod
