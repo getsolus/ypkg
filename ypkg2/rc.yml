@@ -399,6 +399,16 @@ actions:
             cp ${1}.bolt ${1}
         }
         boptim
+    # Check for broken symlinks, turn from error into warning by setting SYMLINK_WARN
+    - symlink_check: |
+        if [[ -n "$(find $installdir -xtype l)" ]]; then
+            echo "Broken symlinks found! See above."
+            if [[ -z "$SYMLINK_WARN" ]]; then
+                exit 1;
+            fi
+        else
+            echo "No broken symlinks found.";
+        fi
 defines:
     - CONFOPTS: |
         --prefix=%PREFIX% \
