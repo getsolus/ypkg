@@ -1,0 +1,3 @@
+PyYaml
+lxml
+python-magic
