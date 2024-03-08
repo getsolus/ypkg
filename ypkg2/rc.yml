@@ -137,19 +137,19 @@ actions:
     # Make life easier with Perl
     - perl_setup: |
         function perl_setup() {
-            if [[ -e Build.PL ]]; then
-                perl Build.PL installdirs=vendor create_packlist=0 $* || exit 1
-            else
+            if [[ -e Makefile.PL ]]; then
                 perl Makefile.PL PREFIX=%PREFIX% INSTALLDIRS=vendor DESTDIR="%installroot%" $* || exit
+            else
+                perl Build.PL installdirs=vendor create_packlist=0 $* || exit 1
             fi
         }
         perl_setup
     - perl_build: |
         function perl_build() {
-            if [[ -e Build.PL ]]; then
-                perl Build installdirs=vendor create_packlist=0 $* || exit 1
-            else
+            if [[ -e Makefile.PL ]]; then
                 %make $* || exit 1
+            else
+                perl Build installdirs=vendor create_packlist=0 $* || exit 1
             fi
         }
         perl_build
@@ -157,10 +157,10 @@ actions:
     # and these macros explicitly use vendor libs
     - perl_install: |
         function perl_install() {
-            if [[ -e Build.PL ]]; then
-                perl Build destdir="%installroot%" install $* || exit 1
-            else
+            if [[ -e Makefile.PL ]]; then
                 %make_install $* || exit 1
+            else
+                perl Build destdir="%installroot%" install $* || exit 1
             fi
             priv_lib="%perl_privlib%"
             if [[ -e "$installdir/$priv_lib" ]]; then
