@@ -226,6 +226,8 @@ def metadata_from_package(context, package, files):
         meta.package.partOf = str(component)
     for license in spec.pkg_license:
         meta.package.license.append(str(license))
+    print(">>> metadata.py/metadata_from_package/spec.pkg_license: ", spec.pkg_license)
+    print(">>> metadata.py/metadata_from_package/meta.package.license: ", meta.package.license)
 
     # TODO: Add everything else...
     meta.source.version = spec.pkg_version
@@ -474,6 +476,7 @@ def write_spec(context, gene, outputDir):
     spec.source.homepage = context.spec.pkg_homepage
     spec.source.packager = pkg_main.source.packager
     spec.source.license = pkg_main.package.license
+    print(">>> metadata.py/write_spec: ", pkg_main.package.license)
     spec.source.partOf = pkg_main.package.partOf
     spec.source.buildDependencies = list()
 
