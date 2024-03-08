@@ -34,7 +34,7 @@ TEST_PKGS=(
 
 function run_tests () {
     echo -e "\nRunning ypkg release test builds ...\n"
-    time {
+    {
         for p in ${TEST_PKGS[@]}; do
             time fakeroot ./ypkg-build ${SOLUSREPO}/packages/${p}/package.yml
         done
@@ -42,11 +42,13 @@ function run_tests () {
     echo -e "\nFinished running ypkg release test builds.\n"
 }
 
-check_solus_repo
-prepare_venv
-run_tests
-show_git_refs
-unset SOLUSREPO
-unset TEST_PKGS
-deactivate
-echo -e "\nExited ypkg_test_venv venv.\n"
+time {
+    check_solus_repo
+    prepare_venv
+    run_tests
+    show_git_refs
+    unset SOLUSREPO
+    unset TEST_PKGS
+    deactivate
+    echo -e "\nExited ypkg_test_venv venv.\n"
+}
