@@ -4,7 +4,7 @@
 
 SOLUSREPO="$1"
 
-function check_solusrepo () {
+function check_solus_repo () {
     # the first argument should be the solus packages repo git root path
     if [[ -z "${SOLUSREPO}" ]]; then
         echo -e "\n  Please run $0 with the path to the root of the solus packages repo.\n" && exit 1
@@ -42,6 +42,7 @@ function run_tests () {
     echo -e "\nFinished running ypkg release test builds.\n"
 }
 
+check_solus_repo
 prepare_venv
 run_tests
 show_git_refs
