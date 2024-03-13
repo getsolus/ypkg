@@ -209,7 +209,7 @@ class PackageGenerator:
         # Vala..
         self.add_pattern("/usr/share/vala*/vapi/*", "devel")
 
-        # KDE developer documentation
+        # Qt/KDE developer documentation
         self.add_pattern("/usr/share/doc/qt5/*.qch", "devel",
                          priority=PRIORITY_DEFAULT+1)
         self.add_pattern("/usr/share/doc/qt5/*.tags", "devel",
@@ -222,6 +222,12 @@ class PackageGenerator:
                          priority=PRIORITY_DEFAULT+1)
         self.add_pattern("/usr/share/doc/qt6/*.tags", "devel",
                          priority=PRIORITY_DEFAULT+1)
+
+        # Plugins for qt5/qt6 designer
+        self.add_pattern("/usr/lib/qt5/plugins/designer/*.so", "devel")
+        self.add_pattern("/usr/lib64/qt5/plugins/designer/*.so", "devel")
+        self.add_pattern("/usr/lib/qt6/plugins/designer/*.so", "devel")
+        self.add_pattern("/usr/lib64/qt6/plugins/designer/*.so", "devel")
 
         # This is almost always man files for api functions
         self.add_pattern("/usr/share/man/man3", "devel",
