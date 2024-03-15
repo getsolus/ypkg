@@ -30,7 +30,16 @@ if __name__ == "__main__":
         fp.seek(0)
         data = ruamel.yaml.round_trip_load(fp)
     data['release'] += 1
+    builddeps = data.get("builddeps")
     maxwidth = len(max(lines, key=len))
+
+    if builddeps:
+        a = sorted(filter(lambda entry: entry.startswith("pkgconfig("), builddeps))
+        b = sorted(filter(lambda entry: not entry.startswith("pkgconfig("), builddeps))
+        sorted_builddeps = a + b
+        if builddeps != sorted_builddeps:
+            data["builddeps"] = sorted_builddeps
+
     try:
         with open(sys.argv[1], 'w') as fp:
             ruamel.yaml.round_trip_dump(

@@ -100,7 +100,15 @@ if __name__ == "__main__":
     if args.nb is not None:
         data['release'] += 1
     data['version'] = newversion
+    builddeps = data.get("builddeps")
     maxwidth = len(max(lines, key=len))
+
+    if builddeps:
+        a = sorted(filter(lambda entry: entry.startswith("pkgconfig("), builddeps))
+        b = sorted(filter(lambda entry: not entry.startswith("pkgconfig("), builddeps))
+        sorted_builddeps = a + b
+        if builddeps != sorted_builddeps:
+            data["builddeps"] = sorted_builddeps
 
     try:
         with open(ymlfile, 'w') as fp:
