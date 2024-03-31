@@ -22,6 +22,8 @@ from pisi.db.installdb import InstallDB
 import stat
 import subprocess
 from collections import OrderedDict
+from timeit import default_timer as timer
+from datetime import timedelta
 import datetime
 import calendar
 import sys
@@ -386,13 +388,17 @@ def create_eopkg(context, gene, package, outputDir):
     """ Do the hard work and write the package out """
     global history_timestamp
 
+    start_time = timer()
+
     name = construct_package_name(context, package)
     fpath = os.path.join(outputDir, name)
 
     if os.path.abspath(os.path.dirname(fpath)) == os.path.abspath(os.getcwd()):
-        console_ui.emit_info("Package", "Creating {} ...".format(name))
+        package_name = name
     else:
-        console_ui.emit_info("Package", "Creating {} ...".format(fpath))
+        package_name = fpath
+
+    console_ui.emit_info("Package", "Creating {} ...".format(package_name))
 
     # Grab Files XML
     pdir = context.get_packaging_dir()
@@ -446,6 +452,9 @@ def create_eopkg(context, gene, package, outputDir):
         console_ui.emit_error("Build", "Failed to emit package: {}".
                               format(e))
         sys.exit(1)
+
+    end_time = timer()
+    console_ui.emit_info("Package", "{} took {} to emit".format(name, timedelta(seconds=end_time-start_time)))
 
 
 def write_spec(context, gene, outputDir):
