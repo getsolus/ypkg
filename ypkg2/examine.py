@@ -310,7 +310,7 @@ def get_debug_path(context, file, magic_string):
     """ Grab the NT_GNU_BUILD_ID """
     cmd = "LC_ALL=C readelf -n \"{}\"".format(file)
     try:
-        lines = subprocess.check_output(cmd, shell=True)
+        lines = subprocess.check_output(cmd, shell=True).decode()
     except Exception as e:
         return None
 
