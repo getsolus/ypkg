@@ -148,7 +148,7 @@ def create_files_xml(context, package):
                                         permanent=permanent, size=fsize,
                                         hash=hash, uid=str(st.st_uid),
                                         gid=str(st.st_gid),
-                                        mode=oct(stat.S_IMODE(st.st_mode)))
+                                        mode=str(oct(stat.S_IMODE(st.st_mode))).replace("0o", "0"))
         files.append(file_info)
 
     fpath = os.path.join(context.get_packaging_dir(), "files.xml")
