@@ -185,9 +185,10 @@ class PackageGenerator:
         self.add_pattern("/usr/share/aclocal/*.m4", "devel")
         self.add_pattern("/usr/share/aclocal/*.ac", "devel")
 
-        self.add_pattern("/usr/lib32/lib*.a", "32bit-devel")
-        self.add_pattern("/usr/lib32/pkgconfig/*.pc", "32bit-devel")
-        self.add_pattern("/usr/lib32/lib*.so.*", "32bit")
+        self.add_pattern("/usr/lib32/lib*.a", "32bit-devel",
+                        priority=PRIORITY_DEFAULT+1)
+        self.add_pattern("/usr/lib32/pkgconfig/*.pc", "32bit-devel",
+                         priority=PRIORITY_DEFAULT+1)
 
         # Debug infos get highest priority. you don't override these guys.
         self.add_pattern("/usr/lib64/debug/", "dbginfo", priority=DBG)
