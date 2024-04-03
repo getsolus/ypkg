@@ -10,17 +10,29 @@ This will update the ypkg/master and eopkg/python3 branches to their newest comm
 
 ## Manual testing
 
-Start by running `./set_up_ypkg_test_venv.sh` to prepare a stand-alone python3 venv that links to the ../eopkg/pisi module.
+Start by running `./prepare_ypkg_test_venv.sh` to prepare a stand-alone python3 venv that links to the ../eopkg/pisi module.
 
 and follow the instructions it prints out to activate the isolated ypkg_test_venv.
 
-Note that `set_up_ypkg_test_venv.sh` will reset the venv each time it is run.
+Note that `prepare_ypkg_test_venv.sh` will reset the venv each time it is run.
 
-### Run a build
+### Run a simple build
 
 To run a manual package build, run:
 
     time fakeroot ./ypkg-build <path to package.yml under test>
+
+### Run a more complicated build with dependencies
+
+To run a manual package build with dependencies, run:
+
+    ./ypkg-install-deps package.yml
+    time fakeroot ./ypkg-build package.yml
+
+### Remove manually installed dependencies from the step above
+
+Check the eopkg history with `eopkg history`, then find the transaction index of the operation before the operation
+that installed the dependencies and run `eopkg history -t <the transaction>`
 
 ### Exit testing venv
 
