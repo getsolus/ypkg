@@ -11,4 +11,4 @@ prepare_venv
 # show useful next steps re. testing
 help
 
-echo "\nNote that the ypkg_test_venv venv is currently active.\n"
+echo -e "\nNote that the ypkg_test_venv venv is currently active.\n"
