@@ -422,7 +422,7 @@ def create_eopkg(context, gene, package, outputDir):
     pkg.add_metadata_xml(os.path.join(pdir, "metadata.xml"))
     pkg.add_files_xml(os.path.join(pdir, "files.xml"))
 
-    for finfo in pkg.files.list:
+    for finfo in files.list:
         # old eopkg trick to ensure the file names are all valid
         orgname = os.path.join(context.get_install_dir(), finfo.path)
         orgname = orgname.encode('utf-8').decode('utf-8').encode("latin1")
