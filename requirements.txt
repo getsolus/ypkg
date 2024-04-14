@@ -1,4 +1,2 @@
 PyYaml
-iksemel
-lxml
 python-magic

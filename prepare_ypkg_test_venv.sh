@@ -10,5 +10,3 @@ prepare_venv
 
 # show useful next steps re. testing
 help
-
-echo -e "\nNote that the ypkg_test_venv venv is currently active.\n"

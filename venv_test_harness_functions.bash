@@ -20,6 +20,13 @@ function prepare_venv () {
     ln -srv ../eopkg/pisi ypkg_test_venv/lib/python3.11/site-packages/
     source ypkg_test_venv/bin/activate
     python3 -m pip install -r requirements.txt
+    install_solus_prereq_pkgs
+}
+
+function install_solus_prereq_pkgs () {
+    # we are currently carrying a patch to iksemel that has not yet been upstreamed
+    sudo eopkg it iksemel
+    ln -srv /usr/lib/python3.11/site-packages/iksemel.cpython-311-x86_64-linux-gnu.so ypkg_test_venv/lib/python3.11/site-packages/
 }
 
 function help () {
