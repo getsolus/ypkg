@@ -13,10 +13,10 @@
 
 import argparse
 import sys
-import ruamel.yaml
 import os
 import subprocess
 import pisi.version
+from ruamel.yaml import YAML
 
 parser = argparse.ArgumentParser()
 parser.add_argument("version", type=str, help="new version of package")
@@ -94,7 +94,8 @@ if __name__ == "__main__":
     with open(ymlfile, "r") as infile:
         lines = infile.readlines()
         infile.seek(0)
-        data = ruamel.yaml.round_trip_load(infile)
+        yaml = YAML()
+        data = yaml.load(infile)
     data['source'] = sources = []
     sources.append(source)
     if args.nb is not None:
@@ -104,9 +105,11 @@ if __name__ == "__main__":
 
     try:
         with open(ymlfile, 'w') as fp:
-            ruamel.yaml.round_trip_dump(
-                data, fp, indent=4, block_seq_indent=4, width=maxwidth,
-                top_level_colon_align=True, prefix_colon=' ')
+            yaml.indent(mapping=4, sequence=4, offset=4)
+            yaml.top_level_colon_align = True
+            yaml.prefix_colon = ' '
+            yaml.width = maxwidth
+            yaml.dump(data, fp)
     except Exception as e:
         print("Error writing file, may need to reset it.")
         print(e)
