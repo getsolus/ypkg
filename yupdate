@@ -18,6 +18,13 @@ import subprocess
 import pisi.version
 from ruamel.yaml import YAML
 
+## The YAML 1.2 spec technically does not allow key names to be greater than 128 characters. This is problematic for us
+## as we use the source URI as the key in ypkg, causing the infamous splitting of long source names and causing lines
+## to start with `- ?`. Override this limit in ruamel to allow us to continue to mangle the YAML spec in this way.
+## 32x the limit oughta be enough for anyone, right?
+from ruamel.yaml.emitter import Emitter
+Emitter.MAX_SIMPLE_KEY_LENGTH = 4096
+
 parser = argparse.ArgumentParser()
 parser.add_argument("version", type=str, help="new version of package")
 parser.add_argument("url", type=str, help="url to new package version")
