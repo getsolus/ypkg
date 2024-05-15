@@ -11,7 +11,7 @@
 #  (at your option) any later version.
 #
 import sys
-import ruamel.yaml
+from ruamel.yaml import YAML
 
 
 def usage(msg=None, ex=1):
@@ -28,14 +28,17 @@ if __name__ == "__main__":
     with open(sys.argv[1]) as fp:
         lines = fp.readlines()
         fp.seek(0)
-        data = ruamel.yaml.round_trip_load(fp)
+        yaml = YAML()
+        data = yaml.load(fp)
     data['release'] += 1
     maxwidth = len(max(lines, key=len))
     try:
         with open(sys.argv[1], 'w') as fp:
-            ruamel.yaml.round_trip_dump(
-                data, fp, indent=4, block_seq_indent=4, width=maxwidth,
-                top_level_colon_align=True, prefix_colon=' ')
+            yaml.indent(mapping=4, sequence=4, offset=4)
+            yaml.top_level_colon_align = True
+            yaml.prefix_colon = ' '
+            yaml.width = maxwidth
+            yaml.dump(data, fp)
     except Exception as e:
         print("Error writing file, may need to reset it.")
         print(e)
