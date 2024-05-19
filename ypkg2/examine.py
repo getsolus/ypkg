@@ -293,7 +293,7 @@ def strip_file(context, pretty, file, magic_string, mode=None):
     elif mode == "ko":
         flags = "-g --strip-unneeded"
     elif mode == "ar":
-        flags = "--strip-debug"
+        flags = "--strip-debug -p -R .gnu.lto_* -R .gnu.debuglto_* -R .llvm.lto -N __gnu_lto_v1"
         if context.spec.pkg_clang:
             cmd = "{} llvm-objcopy {} \"{}\""
     try:
