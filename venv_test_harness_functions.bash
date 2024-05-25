@@ -35,7 +35,7 @@ function help () {
     1. To activate the newly prepared ypkg_test_venv, execute:
 
         source ypkg_test_venv/bin/activate /
-        source ypkg_test_venv/bin/activat.fish / 
+        source ypkg_test_venv/bin/activate.fish / 
         source ypkg_test_venv/bin/activate.zsh
 
       ... depending on which shell you use.
