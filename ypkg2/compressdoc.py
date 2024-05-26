@@ -46,6 +46,9 @@ def compress_zstd(path):
     # Open the file
     in_file = open(path)
 
+    # Capture the mtime of the file so we can re-apply it to the compressed version (for reproducibility)
+    in_time = os.path.getmtime(path)
+
     # Create the file to write to
     out_path = "{}.zst".format(path)
 
@@ -53,6 +56,9 @@ def compress_zstd(path):
     cctx = zstd.ZstdCompressor(level=19)
     with open(path, "rb") as in_file, open(out_path, "wb") as out_file:
         cctx.copy_stream(in_file, out_file)
+
+    # Restore the mtime
+    os.utime(out_path, (in_time, in_time))
 
     # Remove the original file
     os.unlink(path)
