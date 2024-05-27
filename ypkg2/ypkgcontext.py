@@ -41,10 +41,10 @@ SIZE_FLAGS = "-Os"
 SIZE_FLAGS_CLANG = "-O2"
 
 # Allow optimizing for LTO
-LTO_FLAGS = "-flto=auto"
+LTO_FLAGS = "-flto=auto -ffat-lto-objects"
 
 # Allow optimizing for thin-lto
-THIN_LTO_FLAGS = "-flto=thin"
+THIN_LTO_FLAGS = "-flto=thin -ffat-lto-objects"
 
 # Allow optimizing for ICF all (identical code folding)
 ICF_ALL_FLAGS = "-Wl,--icf=all"
