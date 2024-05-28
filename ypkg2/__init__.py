@@ -34,6 +34,14 @@ def readlink(path):
     return os.path.normpath(os.readlink(path))
 
 
+def is_rootlessmode():
+    if "FAKED_MODE" in os.environ:
+        return True
+    if "ROOTLESSKIT_PARENT_EUID" in os.environ:
+        return True
+    return False
+
+
 pkgconfig32_dep = re.compile("^pkgconfig32\((.*)\)$")
 pkgconfig_dep = re.compile("^pkgconfig\((.*)\)$")
 

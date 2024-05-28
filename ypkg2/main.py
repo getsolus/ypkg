@@ -12,6 +12,7 @@
 #
 
 from . import console_ui
+from . import is_rootlessmode
 from . import remove_prefix
 from .compressdoc import compress_info_pages, compress_man_pages
 from .ypkgspec import YpkgSpec
@@ -48,7 +49,6 @@ def show_version():
           "\nas published by the Free Software foundation; either version 3 of"
           "\nthe License, or (at your option) any later version.")
     sys.exit(0)
-
 
 def main():
     parser = argparse.ArgumentParser(description="Ypkg Package Build Tool")
@@ -93,17 +93,15 @@ def main():
         sys.exit(1)
 
     # Test who we are
-    if os.geteuid() == 0:
-        if "FAKED_MODE" not in os.environ:
-            console_ui.emit_warning("Warning", "ypkg-build should be run via "
-                                    "fakeroot, not as real root user")
+    if os.geteuid() == 0 and is_rootlessmode() is True:
+        console_ui.emit_warning("Warning", "ypkg-build should be run via "
+                                "fakeroot, not as real root user")
     else:
         console_ui.emit_error("Fail", "ypkg-build must be run with fakeroot, "
                               "or as the root user (not recommended)")
         sys.exit(1)
 
     build_package(args.filename, outputDir)
-
 
 def clean_build_dirs(context):
     if os.path.exists(context.get_build_dir()):
