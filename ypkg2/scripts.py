@@ -122,6 +122,7 @@ class ScriptGenerator:
         self.define_macro("CFLAGS", " ".join(self.context.build.cflags))
         self.define_macro("CXXFLAGS", " ".join(self.context.build.cxxflags))
         self.define_macro("LDFLAGS", " ".join(self.context.build.ldflags))
+        self.define_macro("RUSTFLAGS", " ".join(self.context.build.rustflags))
 
         self.define_macro("HOST", self.context.build.host)
         self.define_macro("ARCH", self.context.build.arch)
@@ -146,6 +147,7 @@ class ScriptGenerator:
         self.define_export("CFLAGS", " ".join(self.context.build.cflags))
         self.define_export("CXXFLAGS", " ".join(self.context.build.cxxflags))
         self.define_export("LDFLAGS", " ".join(self.context.build.ldflags))
+        self.define_export("RUSTFLAGS", " ".join(self.context.build.rustflags))
         self.define_export("FFLAGS", " ".join(self.context.build.cxxflags))
         self.define_export("FCFLAGS", " ".join(self.context.build.cxxflags))
         self.define_export("PATH", self.context.get_path())

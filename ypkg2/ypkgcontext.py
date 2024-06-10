@@ -71,7 +71,8 @@ PGO_USE_FLAGS = "-fprofile-use -fprofile-dir=\"{}\" -fprofile-correction"
 
 # Frame Pointer flags used for making profiling more useful at a slight hit to performance
 # See https://fedoraproject.org/wiki/Changes/fno-omit-frame-pointer
-FRAME_POINTER_FLAGS = ["-fno-omit-frame-pointer", "-mno-omit-leaf-frame-pointer"]
+FRAME_POINTER_FLAGS = ["-fno-omit-frame-pointer", "-mno-omit-leaf-frame-pointer",
+                       "-Cforce-frame-pointers"] # The equivalent Rust flag
 
 # Clang can handle parameters to the args unlike GCC
 PGO_GEN_FLAGS_CLANG = "-fprofile-generate=\"{}/default-%m.profraw\""
@@ -97,6 +98,7 @@ class Flags:
     C = 0
     CXX = 1
     LD = 2
+    RUST = 3
 
     @staticmethod
     def get_desc(f):
@@ -107,6 +109,8 @@ class Flags:
             return "CXXFLAGS"
         elif f == Flags.LD:
             return "LDFLAGS"
+        elif f == Flags.RUST:
+            return "RUSTFLAGS"
         else:
             return "UNKNOWN_FLAG_SET_CHECK_IT"
 
@@ -204,6 +208,7 @@ class BuildConfig:
     cflags = None
     cxxflags = None
     ldflags = None
+    rustflags = None
 
     cc = None
     cxx = None
@@ -220,6 +225,8 @@ class BuildConfig:
             return self.cxxflags
         if t == Flags.LD:
             return self.ldflags
+        if t == Flags.RUST:
+            return self.rustflags
         return set([])
 
 
@@ -358,6 +365,7 @@ class YpkgContext:
         self.build.cflags = list(conf.values.build.cflags.split(" "))
         self.build.cxxflags = list(conf.values.build.cxxflags.split(" "))
         self.build.ldflags = list(conf.values.build.ldflags.split(" "))
+        self.build.rustflags = list(conf.values.build.rustflags.split(" "))
         if conf.values.build.buildhelper:
             self.build.ccache = "ccache" in conf.values.build.buildhelper
         else:
@@ -425,6 +433,10 @@ class YpkgContext:
                                                         opt,
                                                         self.spec.pkg_clang)
                 self.build.cxxflags = Flags.optimize_flags(self.build.cxxflags,
+                                                        opt,
+                                                        self.spec.pkg_clang)
+                if opt == "no-frame-pointer":
+                    self.build.rustflags = Flags.optimize_flags(self.build.rustflags,
                                                         opt,
                                                         self.spec.pkg_clang)
             if opt == "no-bind-now" or opt == "no-symbolic" \
