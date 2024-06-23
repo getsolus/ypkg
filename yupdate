@@ -103,8 +103,7 @@ if __name__ == "__main__":
         infile.seek(0)
         yaml = YAML()
         data = yaml.load(infile)
-    data['source'] = sources = []
-    sources.append(source)
+    data['source'][0] = source
     if args.nb is not None:
         data['release'] += 1
     data['version'] = newversion
