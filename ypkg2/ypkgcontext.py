@@ -66,17 +66,21 @@ UNROLL_LOOPS_FLAGS = "-funroll-loops"
 RUNPATH_FLAGS = "-Wl,--enable-new-dtags"
 
 # GCC PGO flags
-PGO_GEN_FLAGS = "-fprofile-generate -fprofile-dir=\"{}\" "
+PGO_GEN_FLAGS = "-fprofile-generate -fprofile-dir=\"{}\""
 PGO_USE_FLAGS = "-fprofile-use -fprofile-dir=\"{}\" -fprofile-correction"
+
+# Clang can handle parameters to the args unlike GCC
+PGO_GEN_FLAGS_CLANG = "-fprofile-generate=\"{}/default-%m.profraw\""
+PGO_USE_FLAGS_CLANG = "-fprofile-use=\"{}/default.profdata\""
+
+# Rust PGO flags
+PGO_GEN_FLAGS_RUST = "-Cprofile-generate=\"{}\""
+PGO_USE_FLAGS_RUST = "-Cprofile-use=\"{}/default.profdata\" -Cllvm-args=-pgo-warn-missing-function"
 
 # Frame Pointer flags used for making profiling more useful at a slight hit to performance
 # See https://fedoraproject.org/wiki/Changes/fno-omit-frame-pointer
 FRAME_POINTER_FLAGS = ["-fno-omit-frame-pointer", "-mno-omit-leaf-frame-pointer",
                        "-Cforce-frame-pointers"] # The equivalent Rust flag
-
-# Clang can handle parameters to the args unlike GCC
-PGO_GEN_FLAGS_CLANG = "-fprofile-generate=\"{}/default-%m.profraw\""
-PGO_USE_FLAGS_CLANG = "-fprofile-use=\"{}/default.profdata\""
 
 # BOLT: Emit relocations for bolt
 EMIT_RELOCS = "-Wl,--emit-relocs"
@@ -184,17 +188,33 @@ class Flags:
 
     @staticmethod
     def pgo_gen_flags(f, d, clang=False):
-        """ Update flags with PGO generator flags """
+        """ Update C/CXX flags with PGO generator flags """
         r = list(f)
         flagSet = PGO_GEN_FLAGS if not clang else PGO_GEN_FLAGS_CLANG
         r.extend((flagSet.format(d).split(" ")))
         return r
 
     @staticmethod
+    def pgo_gen_flags_rust(f, d):
+        """ Update RUSTFLAGS with PGO generator flags """
+        r = list(f)
+        flagSet = PGO_GEN_FLAGS_RUST
+        r.extend((flagSet.format(d).split(" ")))
+        return r
+
+    @staticmethod
     def pgo_use_flags(f, d, clang=False):
-        """ Update flags with PGO use flags """
+        """ Update C/CXX flags with PGO use flags """
         r = list(f)
         flagSet = PGO_USE_FLAGS if not clang else PGO_USE_FLAGS_CLANG
+        r.extend((flagSet.format(d).split(" ")))
+        return r
+
+    @staticmethod
+    def pgo_use_flags_rust(f, d):
+        """ Update RUSTFLAGS with PGO use flags """
+        r = list(f)
+        flagSet = PGO_USE_FLAGS_RUST
         r.extend((flagSet.format(d).split(" ")))
         return r
 
@@ -496,6 +516,8 @@ class YpkgContext:
         self.build.ldflags = Flags.pgo_gen_flags(self.build.ldflags,
                                                   pgo_dir,
                                                   self.spec.pkg_clang)
+        self.build.rustflags = Flags.pgo_gen_flags_rust(self.build.rustflags,
+                                                    pgo_dir)
 
     def enable_pgo_use(self):
         """ Enable PGO use step """
@@ -507,6 +529,8 @@ class YpkgContext:
         self.build.cxxflags = Flags.pgo_use_flags(self.build.cxxflags,
                                                   pgo_dir,
                                                   self.spec.pkg_clang)
+        self.build.rustflags = Flags.pgo_use_flags_rust(self.build.rustflags,
+                                                    pgo_dir)
 
     def clean_pgo(self):
         suffixes = ["pgo", "pgo-avx2", "pgo-32", "pgo-32-avx2"]

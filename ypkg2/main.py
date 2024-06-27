@@ -400,7 +400,7 @@ def build_package(filename, outputDir):
             except Exception as e:
                 console_ui.emit_warning("Man", "Failed to compress man pages in '{}'".format(dir))
                 print(e)
-    
+
         # Now try to compress any info pages
         info_dir = "{}/usr/share/info".format(ctx.get_install_dir())
         if os.path.exists(info_dir):
