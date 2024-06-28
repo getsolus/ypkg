@@ -185,6 +185,14 @@ class ScriptGenerator:
             if self.context.build.ccache and self.spec.pkg_ccache:
                 self.define_export("RUSTC_WRAPPER", "/usr/bin/sccache")
 
+        # Source archives often have the version string as part of the file name which results in the version string
+        # being part of the workdir path. Since ccache uses the file path as part of the cache key this can result in
+        # very low cache hit rates when upgrading versions if the build references files via absolute paths. Luckily
+        # ccache allows us to set the base_dir to avoid this problem which we can set as an environmental variable.
+        # Ref: https://ccache.dev/manual/4.10.html#_compiling_in_different_directories
+        if self.context.build.ccache and self.spec.pkg_ccache:
+            self.define_export("CCACHE_BASEDIR", "%workdir%")
+
         if not console_ui.allow_colors:
             self.define_export("TERM", "dumb")
 
