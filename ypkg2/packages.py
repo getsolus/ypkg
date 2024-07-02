@@ -210,6 +210,9 @@ class PackageGenerator:
         # Vala..
         self.add_pattern("/usr/share/vala*/vapi/*", "devel")
 
+        # GIR bindings for gobject
+        self.add_pattern("/usr/share/gir-1.0/*.gir", "devel")
+
         # Qt/KDE developer documentation
         self.add_pattern("/usr/share/doc/qt5/*.qch", "devel",
                          priority=PRIORITY_DEFAULT+1)
