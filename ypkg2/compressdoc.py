@@ -11,9 +11,8 @@
 #  (at your option) any later version.
 #
 
-import gzip
 import os
-import shutil
+import zstandard as zstd
 
 compressed_exts = [
     ".gz",
@@ -36,8 +35,8 @@ def is_compressed(path):
     return False
 
 
-def compress_gzip(path):
-    """Compresses a single file with `gzip`.
+def compress_zstd(path):
+    """Compresses a single file with `zstd`.
 
     The original file will be deleted after compression.
     """
@@ -47,12 +46,19 @@ def compress_gzip(path):
     # Open the file
     in_file = open(path)
 
+    # Capture the mtime of the file so we can re-apply it to the compressed version (for reproducibility)
+    in_time = os.path.getmtime(path)
+
     # Create the file to write to
-    out_path = "{}.gz".format(path)
+    out_path = "{}.zst".format(path)
 
     # Open the file
-    with open(path, "rb") as in_file, gzip.GzipFile(filename=out_path, mode="wb", compresslevel=9, mtime=0) as out_file:
-        shutil.copyfileobj(in_file, out_file)
+    cctx = zstd.ZstdCompressor(level=19)
+    with open(path, "rb") as in_file, open(out_path, "wb") as out_file:
+        cctx.copy_stream(in_file, out_file)
+
+    # Restore the mtime
+    os.utime(out_path, (in_time, in_time))
 
     # Remove the original file
     os.unlink(path)
@@ -66,7 +72,7 @@ def update_link(path):
     """Update a symlink to point to the compressed target.
 
     This reads the target path of a symlink, unlinks it, and creates
-    a new link pointing to the target path with `.gz` appended to the end.
+    a new link pointing to the target path with `.zst` appended to the end.
     """
 
     if not os.path.islink(path):
@@ -79,7 +85,7 @@ def update_link(path):
         return
 
     # Figure out what the compressed target path is
-    new_link = "{}.gz".format(link_target)
+    new_link = "{}.zst".format(link_target)
 
     # Re-link to the new target
     os.unlink(path)
@@ -91,7 +97,7 @@ def compress_dir(path):
 
     This function iterates over all children in the
     given directory. If the file is a regular uncompressed
-    file, it will be compressed with `gzip`.
+    file, it will be compressed with `zstd`.
 
     Files that are already compressed will be ignored.
 
@@ -114,10 +120,10 @@ def compress_dir(path):
             update_link(file_path)
         elif os.path.isfile(file_path):
             # We have a file, compress it
-            bytes_saved += compress_gzip(file_path)
+            bytes_saved += compress_zstd(file_path)
             num_compressed += 1
 
-    return (num_compressed, bytes_saved)
+    return num_compressed, bytes_saved
 
 
 def compress_man_pages(root):
@@ -154,7 +160,7 @@ def compress_man_pages(root):
         num_compressed += c
         bytes_saved += s
 
-    return (num_compressed, bytes_saved)
+    return num_compressed, bytes_saved
 
 
 def compress_info_pages(root):
@@ -181,7 +187,7 @@ def compress_info_pages(root):
             if is_compressed(path):
                 continue
 
-            bytes_saved += compress_gzip(path)
+            bytes_saved += compress_zstd(path)
             num_compressed += 1
         elif os.path.islink(path):
             # If it's a symlink, update it
@@ -192,4 +198,4 @@ def compress_info_pages(root):
             num_compressed += c
             bytes_saved += s
 
-    return (num_compressed, bytes_saved)
+    return num_compressed, bytes_saved
