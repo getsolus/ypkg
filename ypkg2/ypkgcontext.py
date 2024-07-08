@@ -12,6 +12,7 @@
 #
 
 from . import console_ui
+from . import is_rootlessmode
 
 import pisi.config
 import os
@@ -273,7 +274,7 @@ class YpkgContext:
         self.avx2 = avx2
         self.build = BuildConfig()
         self.init_config()
-        if os.geteuid() == 0 and "FAKED_MODE" not in os.environ:
+        if is_rootlessmode() is False and os.geteuid() == 0:
             self.is_root = True
 
     def get_path(self):
