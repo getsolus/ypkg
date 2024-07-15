@@ -368,8 +368,10 @@ actions:
             --config profile.release.strip=\"none\"
     - cargo_install: |
         cargo_install(){
-            if [ $# -eq 1 ]; then
-                install -Dm00755 target/release/"$1" $installdir/usr/bin/"$1"
+            if [ $# -gt 0 ]; then
+                for binary in "$@"; do
+                    install -Dm00755 target/release/"$binary" $installdir/usr/bin/"$binary"
+                done
             else
                 install -Dm00755 target/release/"$package" $installdir/usr/bin/"$package"
             fi
