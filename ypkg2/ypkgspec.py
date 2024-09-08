@@ -92,7 +92,6 @@ class YpkgSpec:
     pkg_strip = True
     pkg_lastrip = True
     pkg_mancompress = False
-    pkg_fatfakeroot = False
     pkg_ccache = True
     pkg_emul32 = False
     pkg_avx2 = False
@@ -209,7 +208,6 @@ class YpkgSpec:
             ("strip", bool),
             ("lastrip", bool),
             ("mancompress", bool),
-            ("fatfakeroot", bool),
             ("ccache", bool),
             ("emul32", bool),
             ("networking", bool),
