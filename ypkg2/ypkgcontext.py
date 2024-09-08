@@ -304,12 +304,14 @@ class YpkgContext:
 
     def get_sources_directory(self):
         """ Get the configured source directory for fetching sources to """
-        if self.is_root:
+        if self.is_root and self.spec.build_dir is None:
             return self.global_archive_dir
         return os.path.join(self.get_build_prefix(), "sources")
 
     def get_build_prefix(self):
         """ Get the build prefix used by ypkg """
+        if self.spec.build_dir is not None:
+            return self.spec.build_dir
         if self.is_root:
             return "/var/ypkg-root"
         return "{}/YPKG".format(os.path.expanduser("~"))
