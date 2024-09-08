@@ -1,6 +1,6 @@
 package.yml(5) -- Solus package build format
 ==========================================
-    
+
 ## SYNOPSIS
 
     The Solus package build format, with YAML syntax.
@@ -307,14 +307,6 @@ additional functionality.
     size of eopkg file(s) due to xz having a hard time compressing pre-compressed
     gzip files. Only enable when it significantly reduces the installed
     size of a package on disk without sacrificing eopkg size too much.
-
-* `fatfakeroot` [boolean]
-
-    By default, this key is disabled. By default, fakeroot is only enabled for the
-    "install" and "check" steps due to it's massive performance overhead. Enabling,
-    this key will enable fakeroot for all build stages. You may want to enable this
-    if you are experiencing strange "Permission Denied" errors in the "build" stage,
-    or when rebuilding a reverse dependency against a package.
 
 * `debug` [boolean]
 
