@@ -150,9 +150,10 @@ def execute_step(context, step, step_n, work_dir):
     if context.avx2 and step_n == "install":
         endScript = "%avx2_lib_shift"
 
-    # Generally, we only want fakeroot for the install and check steps due
-    # to the massive performance overhead unless fatfakeroot is requested.
-    if not step_n in ["install", "check"] and not context.spec.pkg_fatfakeroot:
+    # We only want fakeroot for the install and check steps due
+    # to massive performance overhead.
+    # This is a quick n' dirty way of achieving that
+    if not step_n in ["install", "check"]:
         script.define_unexport("LD_PRELOAD")
 
     exports = script.emit_exports()
