@@ -1,6 +1,6 @@
-.\" generated with Ronn-NG/v0.9.1
-.\" http://github.com/apjanke/ronn-ng/tree/0.9.1
-.TH "YPKG\-INSTALL\-DEPS" "1" "October 2023" ""
+.\" generated with Ronn-NG/v0.10.1
+.\" http://github.com/apjanke/ronn-ng/tree/0.10.1
+.TH "YPKG\-INSTALL\-DEPS" "1" "September 2024" ""
 .SH "NAME"
 \fBypkg\-install\-deps\fR \- Install build dependencies
 .SH "SYNOPSIS"
@@ -9,23 +9,23 @@
 \fBypkg\-install\-deps\fR will install all of the build dependencies listed in the given \fBpackage\.yml(5)\fR file\. Note that resolution of \fBpkgconfig\fR and \fBpkgconfig32\fR dependencies is handled automatically\.
 .SH "OPTIONS"
 The following options are applicable to \fBypkg\-install\-deps(1)\fR\.
-.IP "\[ci]" 4
+.IP "\(bu" 4
 \fB\-h\fR, \fB\-\-help\fR
 .IP
 Print the command line options for \fBypkg(1)\fR and exit\.
-.IP "\[ci]" 4
+.IP "\(bu" 4
 \fB\-v\fR, \fB\-\-version\fR
 .IP
 Print the \fBypkg(1)\fR version and exit\.
-.IP "\[ci]" 4
+.IP "\(bu" 4
 \fB\-n\fR, \fB\-\-no\-colors\fR
 .IP
 Disable text colourisation in the output from \fBypkg\fR and all child processes\.
-.IP "\[ci]" 4
+.IP "\(bu" 4
 \fB\-D\fR, \fB\-\-output\-dir\fR
 .IP
 This option is ignored by \fBypkg\-install\-deps(1)\fR\. It is provided simply for compatibility in scripting to allow \fBypkg(1)\fR to pass arguments forward for the duration of the session\.
-.IP "\[ci]" 4
+.IP "\(bu" 4
 \fB\-f\fR, \fB\-\-force\fR
 .IP
 Force the installation of package dependencies, which will bypass any prompting by ypkg\. The default behaviour is to prompt before installing packages\.
@@ -33,21 +33,21 @@ Force the installation of package dependencies, which will bypass any prompting 
 .SH "EXIT STATUS"
 On success, 0 is returned\. A non\-zero return code signals a failure\.
 .SH "COPYRIGHT"
-.IP "\[ci]" 4
+.IP "\(bu" 4
 Copyright \(co 2016\-2020 Solus Project
 .IP "" 0
 .P
 Released under the terms of the CC\-BY\-SA\-3\.0 license
 .SH "SEE ALSO"
 \fBsolbuild(1)\fR, \fBypkg(1)\fR \fBypkg\-build(1)\fR, \fBpackage\.yml(5)\fR
-.IP "\[ci]" 4
+.IP "\(bu" 4
 https://github\.com/getsolus/ypkg
-.IP "\[ci]" 4
+.IP "\(bu" 4
 https://getsol\.us/articles/packaging
 .IP "" 0
 .SH "NOTES"
 Creative Commons Attribution\-ShareAlike 3\.0 Unported
-.IP "\[ci]" 4
+.IP "\(bu" 4
 http://creativecommons\.org/licenses/by\-sa/3\.0/
 .IP "" 0
 
