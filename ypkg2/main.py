@@ -60,6 +60,8 @@ def main():
                         type=int, default=-1)
     parser.add_argument("-D", "--output-dir", type=str,
                         help="Set the output directory for resulting files")
+    parser.add_argument("-B", "--build-dir", type=str,
+                        help="Set the base directory for performing the build")
     # Main file
     parser.add_argument("filename", help="Path to the ypkg YAML file to build",
                         nargs='?')
@@ -84,6 +86,11 @@ def main():
         outputDir = od
     outputDir = os.path.abspath(outputDir)
 
+    if args.build_dir:
+        buildDir = os.path.abspath(args.build_dir)
+    else:
+        buildDir = None
+
     # Grab filename
     if not args.filename:
         console_ui.emit_error("Error",
@@ -102,7 +109,7 @@ def main():
                               "or as the root user (not recommended)")
         sys.exit(1)
 
-    build_package(args.filename, outputDir)
+    build_package(args.filename, outputDir, buildDir)
 
 
 def clean_build_dirs(context):
@@ -184,7 +191,7 @@ def execute_step(context, step, step_n, work_dir):
     return True
 
 
-def build_package(filename, outputDir):
+def build_package(filename, outputDir, buildDir=None):
     """ Will in future be moved to a separate part of the module """
     spec = YpkgSpec()
     if not spec.load_from_path(filename):
@@ -225,6 +232,7 @@ def build_package(filename, outputDir):
 
     spec.packager_name = packager_name
     spec.packager_email = packager_email
+    spec.build_dir = buildDir
     # Try to load history
     dirn = os.path.dirname(filename)
     hist = os.path.join(dirn, "history.xml")
