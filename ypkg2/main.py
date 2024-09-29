@@ -489,7 +489,7 @@ def build_package(filename, outputDir, buildDir=None):
 
     if len(gene.packages) == 0:
         console_ui.emit_error("Package", "No resulting packages found")
-        w = "https://solus-project.com/articles/packaging/"
+        w = "https://help.getsol.us/docs/packaging"
         print(("Ensure your files end up in $installdir. Did you mean to "
               "use %make_install?\n\nPlease see the help center: {}".format(w)))
         sys.exit(1)
