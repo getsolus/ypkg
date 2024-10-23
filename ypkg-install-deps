@@ -37,6 +37,8 @@ def main():
                         "i.e. no prompt", action="store_true")
     parser.add_argument("-D", "--output-dir", type=str,
                         help="Ignored in ypkg-install-deps")
+    parser.add_argument("-e", "--eopkg-cmd", type=str, default="eopkg.py3",
+                        help="Defaults to 'eopkg.py3'")
     # Main file
     parser.add_argument("filename", help="Path to the ypkg YAML file")
 
@@ -156,9 +158,9 @@ def main():
         sys.exit(0)
 
     if os.geteuid() != 0:
-        cmd = "sudo eopkg install {}".format(" ".join(ndeps))
+        cmd = "sudo {} install {}".format(args.eopkg_cmd, " ".join(ndeps))
     else:
-        cmd = "eopkg install {}".format(" ".join(ndeps))
+        cmd = "{} install {}".format(args.eopkg_cmd, " ".join(ndeps))
 
     if args.force:
         cmd += " --yes-all"
