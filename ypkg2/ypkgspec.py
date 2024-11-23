@@ -283,7 +283,10 @@ class YpkgSpec:
             extras.extend(["glibc-32bit-devel", "libgcc-32bit",
                            "libstdc++-32bit", "fakeroot-32bit"])
         if self.pkg_clang:
-            extras.extend(["llvm-clang", "llvm-clang-devel"])
+            if self.pkg_emul32:
+                extras.extend(["clang-32bit"])
+            else:
+                extras.extend(["clang"])
         if self.pkg_optimize:
             if "thin-lto" or "icf-safe" or "icf-all" in self.pkg_optimize and not self.pkg_clang:
                 extras.extend(["binutils-gold"])
