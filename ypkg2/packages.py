@@ -252,6 +252,7 @@ class PackageGenerator:
         self.add_pattern("/usr/lib64/qt6/metatypes/qt*metatypes.json", "devel")
         self.add_pattern("/usr/lib/qt6/modules/*.json", "devel")
         self.add_pattern("/usr/lib64/qt6/modules/*.json", "devel")
+        self.add_pattern("/usr/lib64/qt6/sbom", "devel")
 
     def add_file(self, path):
         """ Add a file path to the owned list and place it into the correct
