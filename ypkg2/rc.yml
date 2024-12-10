@@ -171,14 +171,14 @@ actions:
     - python_setup: |
         function python_setup() {
             if [[ -e $PKG_BUILD_DIR/.workdir ]]; then
-                cd $(cat $PKG_BUILD_DIR/.workdir)
+                cd "$(cat $PKG_BUILD_DIR/.workdir)"
             else
-                echo $workdir > $PKG_BUILD_DIR/.workdir
+                echo "$workdir" > $PKG_BUILD_DIR/.workdir
             fi
 
-            instdir=`basename $PWD`
+            instdir=`basename "$PWD"`
             pushd ..
-                cp -a $instdir py2build && pushd py2build
+                cp -a "$instdir" py2build && pushd py2build
                     python2.7 setup.py build $* || exit
                 popd
             popd
@@ -187,15 +187,15 @@ actions:
     - python_install: |
         function python_install() {
             if [[ -e $PKG_BUILD_DIR/.workdir ]]; then
-                cd $(cat $PKG_BUILD_DIR/.workdir)
+                cd "$(cat $PKG_BUILD_DIR/.workdir)"
             else
-                echo $workdir > $PKG_BUILD_DIR/.workdir
+                echo "$workdir" > $PKG_BUILD_DIR/.workdir
             fi
 
-            instdir=`basename $PWD`
+            instdir=`basename "$PWD"`
             pushd ..
                 if [[ ! -d py2build ]]; then
-                    cp -a $instdir py2build
+                    cp -a "$instdir" py2build
                 fi
                 pushd py2build
                     python2.7 setup.py install --root="%installroot%" $* || exit
@@ -210,7 +210,7 @@ actions:
             fi
 
             if [[ -z $PYTHONPATH ]]; then
-                export PYTHONPATH=%installroot%/usr/lib/python%python2_version%/site-packages:$PWD
+                export PYTHONPATH=%installroot%/usr/lib/python%python2_version%/site-packages:"$PWD"
                 if [[ -d build/lib ]]; then
                     PYTHONPATH+=/build/lib
                 fi
@@ -246,14 +246,14 @@ actions:
     - python3_setup: |
         function python3_setup() {
                 if [[ -e $PKG_BUILD_DIR/.workdir ]]; then
-                    cd $(cat $PKG_BUILD_DIR/.workdir)
+                    cd "$(cat $PKG_BUILD_DIR/.workdir)"
                 else
-                    echo $workdir > $PKG_BUILD_DIR/.workdir
+                    echo "$workdir" > $PKG_BUILD_DIR/.workdir
                 fi
 
-                instdir=`basename $PWD`
+                instdir=`basename "$PWD"`
                 pushd ..
-                    cp -a $instdir py3build && pushd py3build
+                    cp -a "$instdir" py3build && pushd py3build
                         if [[ -f "setup.py" ]]; then
                             python3 setup.py build $* || exit
                         else
@@ -267,15 +267,15 @@ actions:
     - python3_install: |
         function python3_install() {
                 if [[ -e $PKG_BUILD_DIR/.workdir ]]; then
-                    cd $(cat $PKG_BUILD_DIR/.workdir)
+                    cd "$(cat $PKG_BUILD_DIR/.workdir)"
                 else
-                    echo $workdir > $PKG_BUILD_DIR/.workdir
+                    echo "$workdir" > $PKG_BUILD_DIR/.workdir
                 fi
 
-                instdir=`basename $PWD`
+                instdir=`basename "$PWD"`
                 pushd ..
                     if [[ ! -d py3build ]]; then
-                        cp -a $instdir py3build
+                        cp -a "$instdir" py3build
                     fi
                     pushd py3build
                         if [[ -f "setup.py" ]]; then
@@ -295,7 +295,7 @@ actions:
             fi
 
             if [[ -z $PYTHONPATH ]]; then
-                export PYTHONPATH=%installroot%/usr/lib/python%python3_version%/site-packages:$PWD
+                export PYTHONPATH=%installroot%/usr/lib/python%python3_version%/site-packages:"$PWD"
                 if [[ -d build/lib ]]; then
                     PYTHONPATH+=/build/lib
                 fi
