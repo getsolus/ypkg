@@ -417,7 +417,6 @@ actions:
         boptim(){
             llvm-bolt ${1}.orig -o ${1}.bolt -data=$PKG_BUILD_DIR/BOLT/final/$(basename ${1}).fdata \
                 -update-debug-sections \
-                -deterministic-debuginfo \
                 -reorder-blocks=ext-tsp \
                 -reorder-functions=hfsort+ \
                 -split-functions \
