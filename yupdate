@@ -12,16 +12,24 @@
 #
 
 import argparse
-import sys
+import atexit
+import hashlib
+import io
 import os
-import subprocess
 import pisi.version
+import signal
+import sys
+import subprocess
+import urllib.parse
+import urllib.request
 from ruamel.yaml import YAML
 
-## The YAML 1.2 spec technically does not allow key names to be greater than 128 characters. This is problematic for us
-## as we use the source URI as the key in ypkg, causing the infamous splitting of long source names and causing lines
-## to start with `- ?`. Override this limit in ruamel to allow us to continue to mangle the YAML spec in this way.
-## 32x the limit oughta be enough for anyone, right?
+# The YAML 1.2 spec technically does not allow key names to be greater than 128
+# characters. This is problematic for us as we use the source URI as the key
+# in ypkg, causing the infamous splitting of long source names and causing
+# lines to start with `- ?`. Override this limit in ruamel to allow us to
+# continue to mangle the YAML spec in this way. 32x the limit oughta be enough
+# for anyone, right?
 from ruamel.yaml.emitter import Emitter
 Emitter.MAX_SIMPLE_KEY_LENGTH = 4096
 
@@ -35,6 +43,13 @@ parser.add_argument("--cache", nargs='?', help="Cache the tarball in the solbuil
 
 cleanup = True
 
+
+def signal_handler(sig, frame):
+    if cleanup is not False:
+        os.unlink(filename)
+    sys.exit(130)
+
+
 def usage(msg=None, ex=1):
     if msg:
         print(msg)
@@ -42,18 +57,45 @@ def usage(msg=None, ex=1):
         parser.print_help()
     sys.exit(ex)
 
-def shasum(url):
-    try:
-        r = os.system("wget \"%s\"" % url)
-    except:
-        print("Failed to download file")
-        sys.exit(1)
-    if r != 0:
-        print("Failed to download file")
-        sys.exit(1)
 
-    sha256 = subprocess.check_output(["sha256sum", filename]).split()[0].strip()
-    return sha256.decode('utf-8')
+def download_file(url):
+    try:
+        with urllib.request.urlopen(url) as resp:
+            with open(filename, 'wb') as f:
+                file_size = None
+                meta_length = resp.getheader('content-length')
+                if meta_length:
+                    file_size = int(meta_length)
+                print(f"Downloading: {url} Bytes: {file_size}", end="\r")
+
+                file_size_dl = 0
+                percent = 0
+                block_sz = 8192
+                while True:
+                    buffer = resp.read(block_sz)
+                    if not buffer:
+                        break
+
+                    file_size_dl += len(buffer)
+                    f.write(buffer)
+
+                    status = "{}".format(file_size_dl)
+                    if file_size:
+                        percent = "[{0:6.2f}%]".format(file_size_dl * 100 / file_size)
+                    print(f"Downloading: {url} Bytes: {status}/{file_size} {percent}", end="\r", flush=True)
+                print()
+    except Exception as e:
+        print("Failed to download file")
+        print(e)
+        return False
+
+    return True
+
+
+def shasum(filename) -> str:
+    with open(filename, 'rb', buffering=0) as f:
+        return hashlib.file_digest(f, 'sha256').hexdigest()
+
 
 def cache_tarball_to_solbuild(filename, sha256sum):
 
@@ -74,7 +116,11 @@ def cache_tarball_to_solbuild(filename, sha256sum):
         print("Tarball already exists in solbuild cache")
         return False
 
+
 if __name__ == "__main__":
+
+    signal.signal(signal.SIGINT, signal_handler)
+
     args = parser.parse_args()
 
     ymlfile = args.yml
@@ -92,7 +138,9 @@ if __name__ == "__main__":
 
     url = args.url
     filename = os.path.basename(url)
-    sha256sum = shasum(url)
+    if not download_file(url):
+        sys.exit(1)
+    sha256sum = shasum(filename)
     if not url.startswith("git|"):
         source = {url: sha256sum}
     else:
@@ -126,8 +174,7 @@ if __name__ == "__main__":
         if cache_tarball_to_solbuild(filename, sha256sum):
             cleanup = False
 
-# Cleanup on exit
-import atexit
+
 @atexit.register
 def cleanuponexit():
     if cleanup is not False:
