@@ -37,7 +37,16 @@ if __name__ == "__main__":
         yaml = YAML()
         data = yaml.load(fp)
     data['release'] += 1
+    builddeps = data.get("builddeps")
     maxwidth = len(max(lines, key=len))
+
+    if builddeps:
+        a = sorted(filter(lambda entry: entry.startswith("pkgconfig("), builddeps))
+        b = sorted(filter(lambda entry: not entry.startswith("pkgconfig("), builddeps))
+        sorted_builddeps = a + b
+        if builddeps != sorted_builddeps:
+            data["builddeps"] = sorted_builddeps
+
     try:
         with open(sys.argv[1], 'w') as fp:
             yaml.indent(mapping=4, sequence=4, offset=4)
