@@ -32,6 +32,7 @@ v_pie = re.compile(r".*ELF (64|32)\-bit LSB pie executable,")
 v_rel = re.compile(r".*ELF (64|32)\-bit LSB relocatable,")
 shared_lib = re.compile(r".*Shared library: \[(.*)\].*")
 r_path = re.compile(r".*Library rpath: \[(.*)\].*")
+run_path = re.compile(r".*Library runpath: \[(.*)\].*")
 r_soname = re.compile(r".*Library soname: \[(.*)\].*")
 
 global_xattrs = dict()
@@ -139,6 +140,14 @@ class FileReport:
                 if self.rpaths is None:
                     self.rpaths = set()
                 self.rpaths.update(r.group(1).split(":"))
+                continue
+
+            # Also check runpath
+            r2 = run_path.match(line)
+            if r2:
+                if self.rpaths is None:
+                    self.rpaths = set()
+                self.rpaths.update(r2.group(1).split(":"))
                 continue
 
             # Match direct needed dependency
