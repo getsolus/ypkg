@@ -254,11 +254,12 @@ actions:
                 instdir=`basename "$PWD"`
                 pushd ..
                     cp -a "$instdir" py3build && pushd py3build
-                        if [[ -f "setup.py" ]]; then
-                            python3 setup.py build $* || exit
-                        else
-                            echo "No setup.py file found, assuming project is PEP517 compatibile"
+                        if [[ -f "pyproject.toml" ]]; then
                             python3 -m build --wheel --no-isolation
+
+                        else
+                            echo "No pyproject.toml file found, assuming project isn't PEP517 compatibile"
+                            python3 setup.py build $* || exit
                         fi
                     popd
                 popd
@@ -278,11 +279,12 @@ actions:
                         cp -a "$instdir" py3build
                     fi
                     pushd py3build
-                        if [[ -f "setup.py" ]]; then
-                            python3 setup.py install --root="%installroot%" $* || exit
-                        else
-                            echo "No setup.py file found, installing for PEP 517"
+                        if [[ -f "pyproject.toml" ]]; then
                             python3 -m installer --destdir=%installroot% dist/*.whl
+
+                        else
+                            echo "No pyproject.toml file found, installing setuptools"
+                            python3 setup.py install --root="%installroot%" $* || exit
                         fi
                     popd
                 popd
