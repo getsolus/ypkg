@@ -245,67 +245,33 @@ actions:
         python_compile
     - python3_setup: |
         function python3_setup() {
-                if [[ -e $PKG_BUILD_DIR/.workdir ]]; then
-                    cd "$(cat $PKG_BUILD_DIR/.workdir)"
-                else
-                    echo "$workdir" > $PKG_BUILD_DIR/.workdir
-                fi
-
-                instdir=`basename "$PWD"`
-                pushd ..
-                    cp -a "$instdir" py3build && pushd py3build
-                        if [[ -f "pyproject.toml" ]]; then
-                            python3 -m build --wheel --no-isolation
-
-                        else
-                            echo "No pyproject.toml file found, assuming project isn't PEP517 compatibile"
-                            python3 setup.py build $* || exit
-                        fi
-                    popd
-                popd
+            if [[ -f "pyproject.toml" ]]; then
+                python3 -m build --wheel --no-isolation $*
+            else
+                echo "No pyproject.toml file found, assuming project isn't PEP517 compatibile"
+                python3 setup.py build $* || exit
+            fi
         }
         python3_setup
     - python3_install: |
         function python3_install() {
-                if [[ -e $PKG_BUILD_DIR/.workdir ]]; then
-                    cd "$(cat $PKG_BUILD_DIR/.workdir)"
-                else
-                    echo "$workdir" > $PKG_BUILD_DIR/.workdir
-                fi
-
-                instdir=`basename "$PWD"`
-                pushd ..
-                    if [[ ! -d py3build ]]; then
-                        cp -a "$instdir" py3build
-                    fi
-                    pushd py3build
-                        if [[ -f "pyproject.toml" ]]; then
-                            python3 -m installer --destdir=%installroot% dist/*.whl
-
-                        else
-                            echo "No pyproject.toml file found, installing setuptools"
-                            python3 setup.py install --root="%installroot%" $* || exit
-                        fi
-                    popd
-                popd
+            if [[ -f "pyproject.toml" ]]; then
+                python3 -m installer --destdir=%installroot% dist/*.whl $*
+            else
+                echo "No pyproject.toml file found, installing setuptools"
+                python3 setup.py install --root="%installroot%" $* || exit
+            fi
         }
         python3_install
     - python3_test: |
         function python3_test() {
-            if [[ -d py3build ]]; then
-                cd py3build
-            fi
-
             if [[ -z $PYTHONPATH ]]; then
                 export PYTHONPATH=%installroot%/usr/lib/python%python3_version%/site-packages:"$PWD"
-                if [[ -d build/lib ]]; then
-                    PYTHONPATH+=/build/lib
-                fi
                 local do_unset=true
             fi
 
             if [[ -z $1 ]]; then
-                python3 setup.py test || exit 1
+                python3 -m unittest discover
             elif [[ $1 =~ .*\.py$ ]] || [[ $1 == \-* ]]; then
                 python3 "$@" || exit 1
             else
@@ -314,10 +280,6 @@ actions:
 
             if [[ $do_unset ]]; then
                 unset PYTHONPATH
-            fi
-
-            if [[ -d ../py3build ]]; then
-                cd ..
             fi
         }
         python3_test
