@@ -398,8 +398,6 @@ def create_eopkg(context, gene, package, outputDir):
     """ Do the hard work and write the package out """
     global history_timestamp
 
-    start_time = timer()
-
     name = construct_package_name(context, package)
     fpath = os.path.join(outputDir, name)
 
@@ -462,9 +460,6 @@ def create_eopkg(context, gene, package, outputDir):
         console_ui.emit_error("Build", "Failed to emit package: {}".
                               format(e))
         sys.exit(1)
-
-    end_time = timer()
-    console_ui.emit_info("Package", "{} took {} to emit".format(name, timedelta(seconds=end_time-start_time)))
 
 
 def write_spec(context, gene, outputDir):

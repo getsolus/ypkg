@@ -38,6 +38,7 @@ import subprocess
 
 from timeit import default_timer as timer
 from datetime import timedelta
+from concurrent.futures import ThreadPoolExecutor
 
 
 def show_version():
@@ -496,6 +497,7 @@ def build_package(filename, outputDir, buildDir=None):
 
     gene.emit_packages()
     # TODO: Ensure main is always first
+    package_tasks = []
     for package in sorted(gene.packages):
         pkg = gene.packages[package]
         files = sorted(pkg.emit_files())
@@ -503,7 +505,13 @@ def build_package(filename, outputDir, buildDir=None):
             console_ui.emit_info("Package", "Skipping empty package: {}".
                                  format(package))
             continue
+        package_tasks.append(pkg)
+
+    def executor_create_eopkg(pkg):
         metadata.create_eopkg(ctx, gene, pkg, outputDir)
+
+    with ThreadPoolExecutor() as executor:
+        executor.map(executor_create_eopkg, package_tasks)
 
     # Write out the final pspec
     metadata.write_spec(ctx, gene, outputDir)
