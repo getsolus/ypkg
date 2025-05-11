@@ -256,7 +256,7 @@ actions:
     - python3_install: |
         function python3_install() {
             if [[ -f "pyproject.toml" || -f "setup.cfg" ]]; then
-                python3 -m installer --destdir=%installroot% dist/*.whl $*
+                python3 -m installer --destdir=%installroot% dist/*.whl --overwrite-existing $*
             else
                 echo "No pyproject.toml file found, installing setuptools"
                 python3 setup.py install --root="%installroot%" $* || exit
