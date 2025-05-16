@@ -1,0 +1,36 @@
+actions:
+    - configure: |
+        ./configure %CONFOPTS%
+
+    # Some day enough programs will be updated that we don't need this. Some day.
+    - configure_no_runstatedir: |
+        ./configure $(sed 's|--runstatedir=/run||g' <<< "%CONFOPTS%")
+
+    - reconfigure: |
+        autoreconf -vfi
+        %configure
+
+    - autogen: |
+        ./autogen.sh %CONFOPTS%
+        %configure
+
+    - make: |
+        make %JOBS%
+
+    - make_install: |
+        %make install DESTDIR="%installroot%"
+
+defines:
+    - CONFOPTS: |
+        --prefix=%PREFIX% \
+        --build=%HOST% \
+        --bindir=/usr/bin \
+        --sbindir=/usr/sbin \
+        --libdir=%libdir% \
+        --mandir=/usr/share/man \
+        --infodir=/usr/share/info \
+        --datadir=/usr/share \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --runstatedir=/run \
+        --libexecdir=%libdir%/%PKGNAME%

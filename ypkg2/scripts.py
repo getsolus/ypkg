@@ -14,6 +14,7 @@
 from . import console_ui
 
 from collections import OrderedDict
+import glob
 import re
 import os
 
@@ -61,46 +62,58 @@ class ScriptGenerator:
         """ Ensure key is unexported from shell script """
         self.unexports[key] = (None,)
 
-    def load_system_macros(self):
-        path = os.path.join(os.path.dirname(__file__), "rc.yml")
 
-        try:
-            f = open(path, "r")
+    def load_macros(self, file_path):
+        """ Load a set of macros from a file """
+        with open(file_path, "r") as f:
             yamlData = yaml_load(f, Loader=Loader)
-            f.close()
-        except Exception as e:
-            console_ui.emit_error("SCRIPTS", "Cannot load system macros")
-            print(e)
-            return
 
         for section in ["defines", "actions"]:
             if section not in yamlData:
                 continue
+
             v = yamlData[section]
 
             if not isinstance(v, list):
-                console_ui.emit_error("rc.yml",
-                                      "Expected list of defines in rc config")
-                return
+                raise ValueError("Expected list of defines in macro config")
+
             for item in v:
                 if not isinstance(item, dict):
-                    console_ui.emit_error("rc.yml",
-                                          "Expected key:value mapping in list")
-                    return
+                    raise ValueError("Expected key:value mapping in list")
+
                 keys = list(item.keys())
+
                 if len(keys) > 1:
-                    console_ui.emit_error("rc.yml",
-                                          "Expected one key in key:value")
-                    return
+                    raise ValueError("Expected one key in key:value")
+
                 key = keys[0]
                 value = item[key]
+
                 if value.endswith("\n"):
                     value = value[:-1]
+
                 value = value.strip()
+
                 if section == "defines":
                     self.define_macro(key, str(value))
                 else:
                     self.define_action_macro(key, str(value))
+
+
+    def load_system_macros(self):
+        macros_path = os.path.join("/usr", "share", "ypkg", "macros", "actions")
+
+        # Load all of the macros from the globbed files
+        for file in glob.glob(macros_path + "/*.yaml"):
+            try:
+                self.load_macros(file)
+            except ValueError as e:
+                console_ui.emit_warning(os.path.basename(file), "Invalid macro definition: {0}".format(e))
+                continue
+            except Exception as e:
+                console_ui.emit_warning("SCRIPTS", "Cannot load macro file '{0}': {1}".format(file, e))
+                continue
+
 
     def init_default_macros(self):
 
