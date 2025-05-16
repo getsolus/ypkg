@@ -1,0 +1,37 @@
+actions:
+    - cmake_kf6: |
+        %cmake_ninja -DCMAKE_INSTALL_LIBEXECDIR_kf6:PATH=%libdir%/kf6 \
+                     -DKDE_INSTALL_LIBEXECDIR:PATH=%libdir%/kf6 \
+                     -DKDE_INSTALL_USE_QT_SYS_PATHS:BOOL=ON \
+                     -DBUILD_QCH=ON \
+                     -DBUILD_TESTING=OFF
+
+    - qmake: |
+        qmake QMAKE_CFLAGS_RELEASE="${CFLAGS}" QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS}" QMAKE_LFLAGS="${LDFLAGS}"
+
+    - qmake4: |
+        qmake-qt4 QMAKE_CFLAGS_RELEASE="${CFLAGS}" QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS}" QMAKE_LFLAGS="${LDFLAGS}" QMAKE_LRELEASE=/usr/bin/lrelease-qt4 QMAKE_MOC=/usr/bin/moc-qt4 QMAKE_RCC=/usr/bin/rcc-qt4 QMAKE_UIC=/usr/bin/uic-qt4
+
+    - qml_cache: |
+        function generate_cache() {
+            pushd $installdir
+            find . -type f -name "*.qml" -print0 | while IFS= read -r -d '' i; do
+                if ! [ -a "${i}"c ]; then
+                    qmlcachegen -o "${i}"c "${i}" $*
+                fi
+            done
+            popd
+        }
+        generate_cache
+
+    - qml6_cache: |
+        function generate_qt6_cache() {
+            pushd $installdir
+            find . -type f -name "*.qml" -print0 | while IFS= read -r -d '' i; do
+                if ! [ -a "${i}"c ]; then
+                    qmlcachegen6 -o "${i}"c "${i}" $*
+                fi
+            done
+            popd
+        }
+        generate_qt6_cache
