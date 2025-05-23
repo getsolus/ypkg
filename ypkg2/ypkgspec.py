@@ -91,7 +91,7 @@ class YpkgSpec:
     pkg_clang = False
     pkg_strip = True
     pkg_lastrip = True
-    pkg_mancompress = False
+    pkg_mancompress = True
     pkg_ccache = True
     pkg_emul32 = False
     pkg_avx2 = False

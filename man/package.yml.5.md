@@ -301,12 +301,9 @@ additional functionality.
 
 * `mancompress` [boolean]
 
-    By default, this key is disabled. Enables compression of man/info pages
-    using gzip at the maximum compression level, to decrease the installed
-    size of the package on disk. Disabled by default as it generally increases the
-    size of eopkg file(s) due to xz having a hard time compressing pre-compressed
-    gzip files. Only enable when it significantly reduces the installed
-    size of a package on disk without sacrificing eopkg size too much.
+    By default, this key is enabled. Enables compression of man/info pages
+    using zstd at the maximum compression level, to decrease the installed
+    size of the package on disk.
 
 * `debug` [boolean]
 
