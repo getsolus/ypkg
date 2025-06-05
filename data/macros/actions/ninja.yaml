@@ -1,0 +1,9 @@
+actions:
+    - ninja_build: &ninja_build |
+        ninja %JOBS% -C solusBuildDir
+
+    - ninja_install: &ninja_install |
+        DESTDIR="%installroot%" ninja install %JOBS% -C solusBuildDir
+
+    - ninja_check: &ninja_check |
+        ninja test %JOBS% -C solusBuildDir

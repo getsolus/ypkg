@@ -1,0 +1,9 @@
+actions:
+    - waf_configure: |
+        ./waf configure --prefix=%PREFIX%
+
+    - waf_build: |
+        ./waf build --jobs="%YJOBS%"
+
+    - waf_install: |
+        ./waf install --jobs="%YJOBS%" --destdir="%installroot%"
