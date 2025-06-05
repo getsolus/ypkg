@@ -19,7 +19,7 @@ from .sources import SourceManager
 from .ypkgcontext import YpkgContext
 from .scripts import ScriptGenerator
 from .packages import PackageGenerator, PRIORITY_USER
-from .examine import PackageExaminer
+from .examine import PackageExaminer, is_elf_file
 from . import metadata
 from .dependencies import DependencyResolver
 from . import packager_name, packager_email
@@ -38,6 +38,7 @@ import subprocess
 
 from timeit import default_timer as timer
 from datetime import timedelta
+from pathlib import Path
 
 
 def show_version():
@@ -189,6 +190,41 @@ def execute_step(context, step, step_n, work_dir):
             print(e)
             return False
     return True
+
+was_avx2_context = False
+
+def post_execute_step(context, step, step_n, work_dir):
+
+    hwcaps_v3_bin_dir = os.path.join(context.get_install_dir(), "usr", "hwcaps", "x86-64-v3", "bin")
+    hwcaps_v1_bin_dir = os.path.join(context.get_install_dir(), "usr", "hwcaps", "x86-64-v1", "bin")
+    bin_dir = os.path.join(context.get_install_dir(), "usr", "bin")
+
+    if context.avx2 and step_n == "install":
+        global was_avx2_context
+        was_avx2_context = True
+
+        os.makedirs(hwcaps_v3_bin_dir, exist_ok=True)
+        for dirpath, dirnames, filenames in os.walk(bin_dir):
+            for file in filenames:
+                file_path = os.path.join(dirpath, file)
+                if is_elf_file(file_path):
+                    shutil.move(file_path, hwcaps_v3_bin_dir)
+
+    if context.emul32 is False and context.avx2 is False and step_n == "install" and was_avx2_context is True:
+        os.makedirs(hwcaps_v1_bin_dir, exist_ok=True)
+
+        dummy_hwcaps_loader = Path(bin_dir, "hwcaps-loader")
+        dummy_hwcaps_loader.touch()
+
+        for dirpath, dirnames, filenames in os.walk(bin_dir):
+            for file in filenames:
+                file_path = os.path.join(dirpath, file)
+                if is_elf_file(file_path):
+                    shutil.move(file_path, hwcaps_v1_bin_dir)
+                    relative_target = os.path.relpath(dummy_hwcaps_loader, start=os.path.dirname(file_path))
+                    os.symlink(relative_target, file_path)
+
+        os.unlink(dummy_hwcaps_loader)
 
 
 def build_package(filename, outputDir, buildDir=None):
@@ -380,6 +416,7 @@ def build_package(filename, outputDir, buildDir=None):
                 end_time = timer()
                 console_ui.emit_success("Build", "{} successful ({})".
                                         format(step, timedelta(seconds=end_time-start_time)))
+                post_execute_step(context, r_step, step, work_dir)
                 continue
             console_ui.emit_error("Build", "{} failed for {}".format(step, spec.pkg_name))
             sys.exit(1)
