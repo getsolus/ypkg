@@ -210,7 +210,7 @@ def build_package(filename, outputDir, buildDir=None):
             continue
         try:
             c = configparser.ConfigParser()
-            c.readfp(open(fpath))
+            c.read_file(open(fpath))
             pname = c.get("Packager", "Name")
             pemail = c.get("Packager", "Email")
 
