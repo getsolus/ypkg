@@ -37,6 +37,17 @@ r_soname = re.compile(r".*Library soname: \[(.*)\].*")
 
 global_xattrs = dict()
 
+def is_elf_file(file_path):
+    try:
+        with open(file_path, 'rb') as file:
+            magic = file.read(4)
+            return magic == b'\x7fELF'
+    except FileNotFoundError as e:
+        print(f"File not found: {file_path} {e}")
+        return False
+    except Exception as e:
+        print(f"{e}")
+        return False
 
 def is_pkgconfig_file(pretty, mgs):
     """ Simple as it sounds, work out if this is a pkgconfig file """
