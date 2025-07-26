@@ -125,6 +125,8 @@ def clean_build_dirs(context):
 
 def execute_step(context, step, step_n, work_dir):
     script = ScriptGenerator(context, context.spec, work_dir)
+    preExtraScripts = []
+    postExtraScripts = []
     if context.emul32:
         script.define_export("EMUL32BUILD", "1")
         script.define_export("PKG_CONFIG_PATH", EMUL32PC)
@@ -134,8 +136,6 @@ def execute_step(context, step, step_n, work_dir):
         script.define_export("PGO_GEN_BUILD", "1")
     if context.use_pgo:
         script.define_export("PGO_USE_BUILD", "1")
-    extraScript = None
-    endScript = None
 
     # Allow GCC and such to pick up on our timestamp
     script.define_export("SOURCE_DATE_EPOCH",
@@ -150,12 +150,15 @@ def execute_step(context, step, step_n, work_dir):
     elif context.use_pgo and context.spec.pkg_clang:
         profileFile = os.path.join(context.get_pgo_dir(),
                                    "default.profdata")
-        extraScript = "%llvm_profile_merge"
+        preExtraScripts.append("%llvm_profile_merge")
         script.define_export("LLVM_PROFILE_FILE", profileFile)
         script.define_export("YPKG_PGO_DIR", context.get_pgo_dir())
 
     if context.avx2 and step_n == "install":
-        endScript = "%avx2_lib_shift"
+        postExtraScripts.append("%avx2_lib_shift")
+
+    if step_n == "install":
+        postExtraScripts.append("%symlink_check")
 
     exports = script.emit_exports()
 
@@ -169,11 +172,19 @@ def execute_step(context, step, step_n, work_dir):
     full_text += "\n".join(exports)
     if context.spec.pkg_environment:
         full_text += "\n\n{}\n".format(context.spec.pkg_environment)
-    if extraScript:
-        full_text += "\n\n{}\n".format(extraScript)
+
+    # Any scripts to execute before running the step
+    if preExtraScripts is not None:
+        for preScript in preExtraScripts:
+            full_text += "\n\n{}\n".format(preScript)
+
     full_text += "\n\n{}\n".format(step)
-    if endScript:
-        full_text += "\n\n{}\n".format(endScript)
+
+    # Any post scripts to execute after running the step
+    if postExtraScripts is not None:
+        for postScript in postExtraScripts:
+            full_text += "\n\n{}\n".format(postScript)
+
     output = script.escape_string(full_text)
 
     with tempfile.NamedTemporaryFile(prefix="ypkg-%s" % step_n) as script_ex:
