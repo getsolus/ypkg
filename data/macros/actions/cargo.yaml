@@ -1,0 +1,24 @@
+actions:
+    - cargo_fetch: |
+        cargo fetch -v --locked
+
+    - cargo_build: |
+        cargo build -v -j "%YJOBS%" --frozen --release \
+            --config profile.release.debug=\"full\" \
+            --config profile.release.split-debuginfo=\"off\" \
+            --config profile.release.strip=\"none\"
+
+    - cargo_install: |
+        cargo_install(){
+            if [ $# -gt 0 ]; then
+                for binary in "$@"; do
+                    install -Dm00755 target/release/"$binary" $installdir/usr/bin/"$binary"
+                done
+            else
+                install -Dm00755 target/release/"$package" $installdir/usr/bin/"$package"
+            fi
+        }
+        cargo_install
+
+    - cargo_test: |
+        cargo test -v -j "%YJOBS%" --frozen --release --workspace

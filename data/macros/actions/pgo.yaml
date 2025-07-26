@@ -1,0 +1,47 @@
+actions:
+    - llvm_profile_merge: |
+        if [[ -d "$YPKG_PGO_DIR" ]]; then
+            pushd "$YPKG_PGO_DIR"
+            if [[ ! -e default.profdata ]]; then
+                llvm-profdata merge -output=default.profdata default-*.profraw
+            fi
+            popd
+        else
+            echo "\n\nError: Profiling requested by ypkg but doesn't exist\n\n"
+        fi
+
+    # Instrument file with llvm-bolt
+    - bolt_instr: |
+        binstr(){
+            mv ${1} ${1}.orig
+            mkdir -p $PKG_BUILD_DIR/BOLT/final
+            llvm-bolt ${1}.orig -instrument --instrumentation-file=$PKG_BUILD_DIR/BOLT/$(basename ${1}) --instrumentation-file-append-pid ${2} ${3} ${4} -o ${1}
+        }
+        binstr
+
+    # Merge fdata profiles into a single file
+    - bolt_merge: |
+        bmerge(){
+            merge-fdata $PKG_BUILD_DIR/BOLT/$(basename ${1}).*.fdata > $PKG_BUILD_DIR/BOLT/final/$(basename ${1}).fdata
+        }
+        bmerge
+
+    # Apply bolt profile
+    - bolt_opt: |
+        boptim(){
+            llvm-bolt ${1}.orig -o ${1}.bolt -data=$PKG_BUILD_DIR/BOLT/final/$(basename ${1}).fdata \
+                -update-debug-sections \
+                -reorder-blocks=ext-tsp \
+                -reorder-functions=hfsort+ \
+                -split-functions \
+                -split-all-cold \
+                -split-eh \
+                -dyno-stats \
+                -icf=1 \
+                -use-gnu-stack \
+                -peepholes=all \
+                -frame-opt=hot \
+                -use-old-text ${2} ${3} ${4}
+            cp ${1}.bolt ${1}
+        }
+        boptim
