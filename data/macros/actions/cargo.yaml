@@ -1,32 +1,44 @@
 actions:
-    - cargo_fetch: |
-        cargo fetch -v --locked
+    - cargo_fetch:
+        description: Runs cargo fetch --locked to get dependencies.
+        command: |
+            cargo fetch -v --locked
 
-    - cargo_build: |
-        cargo build %options_cargo_release%
+    - cargo_build:
+        description: Runs cargo build with some additional flags.
+        command: |
+            cargo build %options_cargo_release%
 
-    - cargo_cbuild: |
-        cargo cbuild %options_cargo_cbuild%
+    - cargo_cbuild:
+        description: Runs cargo cbuild with some additional flags. Used for Rust packages that provide a C ABI.
+        command: |
+            cargo cbuild %options_cargo_cbuild%
 
-    - cargo_install: |
-        cargo_install(){
-            if [ $# -gt 0 ]; then
-                for binary in "$@"; do
-                    install -Dm00755 %cargo_target_dir%/"$binary" $installdir/usr/bin/"$binary"
-                done
-            else
-                install -Dm00755 %cargo_target_dir%/"$package" $installdir/usr/bin/"$package"
-            fi
-        }
-        cargo_install
+    - cargo_install:
+        description: Installs the built binary to /usr/bin/PACKAGE-NAME, OR to /usr/bin/ARGUMENT.
+        command: |
+            cargo_install(){
+                if [ $# -gt 0 ]; then
+                    for binary in "$@"; do
+                        install -Dm00755 %cargo_target_dir%/"$binary" $installdir/usr/bin/"$binary"
+                    done
+                else
+                    install -Dm00755 %cargo_target_dir%/"$package" $installdir/usr/bin/"$package"
+                fi
+            }
+            cargo_install
 
-    - cargo_cinstall: |
-        cargo cinstall %options_cargo_cbuild% \
-            --destdir=$installdir \
-            --libdir=%libdir%
+    - cargo_cinstall:
+        description: Installs the built C artifacts.
+        command: |
+            cargo cinstall %options_cargo_cbuild% \
+                --destdir=$installdir \
+                --libdir=%libdir%
 
-    - cargo_test: |
-        cargo test %options_cargo_release% --workspace
+    - cargo_test:
+        description: Runs cargo test with some additional flags.
+        command: |
+            cargo test %options_cargo_release% --workspace
 
 defines:
     - cargo_profile: "release"

@@ -1,11 +1,15 @@
 actions:
-    - cmake: |
-        cmake -DCMAKE_C_FLAGS="${CFLAGS}" -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
-        -DCMAKE_LD_FLAGS="${LDFLAGS}" -DCMAKE_LIB_SUFFIX="%LIBSUFFIX%" \
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=%PREFIX%
+    - cmake:
+        description: Configures a CMake project with the distribution specific options, such as prefix and release type.
+        command: |
+            cmake -DCMAKE_C_FLAGS="${CFLAGS}" -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+                -DCMAKE_LD_FLAGS="${LDFLAGS}" -DCMAKE_LIB_SUFFIX="%LIBSUFFIX%" \
+                -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=%PREFIX%
 
-    - cmake_ninja: |
-        cmake -G Ninja . -B solusBuildDir \
-        -DCMAKE_C_FLAGS="${CFLAGS}" -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
-        -DCMAKE_LD_FLAGS="${LDFLAGS}" -DCMAKE_LIB_SUFFIX="%LIBSUFFIX%" \
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=%PREFIX%
+    - cmake_ninja:
+        description: Configures a CMake project with ninja so it can be used with %ninja_build, %ninja_install and %ninja_check macros.
+        command: |
+            cmake -G Ninja . -B solusBuildDir \
+                -DCMAKE_C_FLAGS="${CFLAGS}" -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+                -DCMAKE_LD_FLAGS="${LDFLAGS}" -DCMAKE_LIB_SUFFIX="%LIBSUFFIX%" \
+                -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=%PREFIX%

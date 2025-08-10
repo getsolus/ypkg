@@ -1,138 +1,156 @@
 actions:
-    - python_setup: |
-        function python_setup() {
-            if [[ -e $PKG_BUILD_DIR/.workdir ]]; then
-                cd "$(cat $PKG_BUILD_DIR/.workdir)"
-            else
-                echo "$workdir" > $PKG_BUILD_DIR/.workdir
-            fi
-
-            instdir=`basename "$PWD"`
-            pushd ..
-                cp -a "$instdir" py2build && pushd py2build
-                    python2.7 setup.py build $* || exit
-                popd
-            popd
-        }
-        python_setup
-
-    - python_install: |
-        function python_install() {
-            if [[ -e $PKG_BUILD_DIR/.workdir ]]; then
-                cd "$(cat $PKG_BUILD_DIR/.workdir)"
-            else
-                echo "$workdir" > $PKG_BUILD_DIR/.workdir
-            fi
-
-            instdir=`basename "$PWD"`
-            pushd ..
-                if [[ ! -d py2build ]]; then
-                    cp -a "$instdir" py2build
+    - python_setup:
+        description: Runs the build portion of a setup.py using python2.
+        command: |
+            function python_setup() {
+                if [[ -e $PKG_BUILD_DIR/.workdir ]]; then
+                    cd "$(cat $PKG_BUILD_DIR/.workdir)"
+                else
+                    echo "$workdir" > $PKG_BUILD_DIR/.workdir
                 fi
-                pushd py2build
-                    python2.7 setup.py install --root="%installroot%" $* || exit
+
+                instdir=`basename "$PWD"`
+                pushd ..
+                    cp -a "$instdir" py2build && pushd py2build
+                        python2.7 setup.py build $* || exit
+                    popd
                 popd
-            popd
-        }
-        python_install
+            }
+            python_setup
 
-    - python_test: |
-        function python_test() {
-            if [[ -d py2build ]]; then
-                cd py2build
-            fi
-
-            if [[ -z $PYTHONPATH ]]; then
-                export PYTHONPATH=%installroot%/usr/lib/python%python2_version%/site-packages:"$PWD"
-                if [[ -d build/lib ]]; then
-                    PYTHONPATH+=/build/lib
+    - python_install:
+        description: Runs the install portion of a setup.py, to the appropriate root, using python2.
+        command: |
+            function python_install() {
+                if [[ -e $PKG_BUILD_DIR/.workdir ]]; then
+                    cd "$(cat $PKG_BUILD_DIR/.workdir)"
+                else
+                    echo "$workdir" > $PKG_BUILD_DIR/.workdir
                 fi
-                local do_unset=true
-            fi
 
-            if [[ -z $1 ]]; then
-                python2 setup.py test || exit 1
-            elif [[ $1 =~ .*\.py$ ]] || [[ $1 == \-* ]]; then
-                python2 "$@" || exit 1
-            else
-                "$@" || exit
-            fi
+                instdir=`basename "$PWD"`
+                pushd ..
+                    if [[ ! -d py2build ]]; then
+                        cp -a "$instdir" py2build
+                    fi
+                    pushd py2build
+                        python2.7 setup.py install --root="%installroot%" $* || exit
+                    popd
+                popd
+            }
+            python_install
 
-            if [[ $do_unset ]]; then
-                unset PYTHONPATH
-            fi
+    - python_test:
+        description: Without argument, runs the test portion of setup.py. With a .py script, execute the script with python2. With something else execute the command "as it is".
+        command: |
+            function python_test() {
+                if [[ -d py2build ]]; then
+                    cd py2build
+                fi
 
-            if [[ -d ../py2build ]]; then
-                cd ..
-            fi
-        }
-        python_test
+                if [[ -z $PYTHONPATH ]]; then
+                    export PYTHONPATH=%installroot%/usr/lib/python%python2_version%/site-packages:"$PWD"
+                    if [[ -d build/lib ]]; then
+                        PYTHONPATH+=/build/lib
+                    fi
+                    local do_unset=true
+                fi
 
-    - python_compile: |
-        function python_compile() {
-            if [ -z "$1" ]; then
-                python2 -m compileall -q $installdir || exit 1
-            else
-                python2 -m compileall -q $* || exit 1
-            fi
-        }
-        python_compile
+                if [[ -z $1 ]]; then
+                    python2 setup.py test || exit 1
+                elif [[ $1 =~ .*\.py$ ]] || [[ $1 == \-* ]]; then
+                    python2 "$@" || exit 1
+                else
+                    "$@" || exit
+                fi
 
-    - python3_setup: |
-        function python3_setup() {
-            if [[ -f "pyproject.toml" || -f "setup.cfg" ]]; then
-                python3 -m build --wheel --no-isolation $*
-            else
-                echo "No pyproject.toml file found, assuming project isn't PEP517 compatibile"
-                python3 setup.py build $* || exit
-            fi
-        }
-        python3_setup
+                if [[ $do_unset ]]; then
+                    unset PYTHONPATH
+                fi
 
-    - python3_install: |
-        function python3_install() {
-            if [[ -f "pyproject.toml" || -f "setup.cfg" ]]; then
-                python3 -m installer --destdir=%installroot% dist/*.whl --overwrite-existing $*
-            else
-                echo "No pyproject.toml file found, installing setuptools"
-                python3 setup.py install --root="%installroot%" $* || exit
-            fi
-        }
-        python3_install
+                if [[ -d ../py2build ]]; then
+                    cd ..
+                fi
+            }
+            python_test
 
-    - python3_test: |
-        function python3_test() {
-            if [[ -z $PYTHONPATH ]]; then
-                export PYTHONPATH=%installroot%/usr/lib/python%python3_version%/site-packages:"$PWD"
-                local do_unset=true
-            fi
+    - python_compile:
+        description: Compiles *.py files using python2. This is only useful where the build doesn't compile them already (indicated by availability of *.pyc files).
+        command: |
+            function python_compile() {
+                if [ -z "$1" ]; then
+                    python2 -m compileall -q $installdir || exit 1
+                else
+                    python2 -m compileall -q $* || exit 1
+                fi
+            }
+            python_compile
 
-            if [[ -z $1 ]]; then
-                python3 -m unittest discover
-            elif [[ $1 =~ .*\.py$ ]] || [[ $1 == \-* ]]; then
-                python3 "$@" || exit 1
-            else
-                "$@" || exit
-            fi
+    - python3_setup:
+        description: Runs the build portion of a setup.py using python3.
+        command: |
+            function python3_setup() {
+                if [[ -f "pyproject.toml" || -f "setup.cfg" ]]; then
+                    python3 -m build --wheel --no-isolation $*
+                else
+                    echo "No pyproject.toml file found, assuming project isn't PEP517 compatibile"
+                    python3 setup.py build $* || exit
+                fi
+            }
+            python3_setup
 
-            if [[ $do_unset ]]; then
-                unset PYTHONPATH
-            fi
-        }
-        python3_test
+    - python3_install:
+        description: Runs the install portion of a setup.py, to the appropriate root, using python3.
+        command: |
+            function python3_install() {
+                if [[ -f "pyproject.toml" || -f "setup.cfg" ]]; then
+                    python3 -m installer --destdir=%installroot% dist/*.whl --overwrite-existing $*
+                else
+                    echo "No pyproject.toml file found, installing setuptools"
+                    python3 setup.py install --root="%installroot%" $* || exit
+                fi
+            }
+            python3_install
 
-    - python3_compile: |
-        function python3_compile() {
-            if [ -z "$1" ]; then
-                python3 -m compileall -q $installdir || exit 1
-            else
-                python3 -m compileall -q $* || exit 1
-            fi
-        }
-        python3_compile
+    - python3_test:
+        description: Without argument, runs the test portion of setup.py. With a .py script, execute the script with python3. With something else execute the command "as it is".
+        command: |
+            function python3_test() {
+                if [[ -z $PYTHONPATH ]]; then
+                    export PYTHONPATH=%installroot%/usr/lib/python%python3_version%/site-packages:"$PWD"
+                    local do_unset=true
+                fi
 
-    - python3_avx2_lib_shift: |
-        find %installroot%/usr/lib/python%python3_version%/ -name '*.so' -exec sh -c 'mv "$0" "${0%.so}.so.avx2"' {} \;
+                if [[ -z $1 ]]; then
+                    python3 -m unittest discover
+                elif [[ $1 =~ .*\.py$ ]] || [[ $1 == \-* ]]; then
+                    python3 "$@" || exit 1
+                else
+                    "$@" || exit
+                fi
+
+                if [[ $do_unset ]]; then
+                    unset PYTHONPATH
+                fi
+            }
+            python3_test
+
+    - python3_compile:
+        description: Compiles *.py files using python3. This is only useful where the build doesn't compile them already (indicated by availability of *.pyc files).
+        command: |
+            function python3_compile() {
+                if [ -z "$1" ]; then
+                    python3 -m compileall -q $installdir || exit 1
+                else
+                    python3 -m compileall -q $* || exit 1
+                fi
+            }
+            python3_compile
+
+    - python3_avx2_lib_shift:
+        description: Appends .avx2 to the filenames of libraries in the Python directory.
+        command: |
+            find %installroot%/usr/lib/python%python3_version%/ -name '*.so' -exec sh -c 'mv "$0" "${0%.so}.so.avx2"' {} \;
 
 defines:
     - python2_version: |

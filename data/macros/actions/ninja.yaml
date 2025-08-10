@@ -1,9 +1,15 @@
 actions:
-    - ninja_build: &ninja_build |
-        ninja %JOBS% -C solusBuildDir
+    - ninja_build:
+        description: Runs ninja and passes our %JOBS% variable.
+        command: |
+            ninja %JOBS% -C solusBuildDir
 
-    - ninja_install: &ninja_install |
-        DESTDIR="%installroot%" ninja install %JOBS% -C solusBuildDir
+    - ninja_install:
+        description: Runs ninja install and passes the appropriate DESTDIR and %JOBS% variable.
+        command: |
+            DESTDIR="%installroot%" ninja install %JOBS% -C solusBuildDir
 
-    - ninja_check: &ninja_check |
-        ninja test %JOBS% -C solusBuildDir
+    - ninja_check:
+        description: Runs ninja test and passes our %JOBS% variable.
+        command: |
+            ninja test %JOBS% -C solusBuildDir

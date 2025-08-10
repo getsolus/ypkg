@@ -1,3 +1,5 @@
 actions:
-    - meson_configure: |
-        CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" LDFLAGS="${LDFLAGS}" meson setup --prefix %PREFIX% --buildtype=plain --libdir="lib%LIBSUFFIX%" --libexecdir="lib%LIBSUFFIX%/%PKGNAME%" --sysconfdir=/etc --localstatedir=/var solusBuildDir
+    - meson_configure:
+        description: Runs meson with our CFLAGS and appropriate flags such as libdir.
+        command: |
+            CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" LDFLAGS="${LDFLAGS}" meson setup --prefix %PREFIX% --buildtype=plain --libdir="lib%LIBSUFFIX%" --libexecdir="lib%LIBSUFFIX%/%PKGNAME%" --sysconfdir=/etc --localstatedir=/var solusBuildDir
