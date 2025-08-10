@@ -1,9 +1,15 @@
 actions:
-    - waf_configure: |
-        ./waf configure --prefix=%PREFIX%
+    - waf_configure:
+        description: Runs waf configure with prefix.
+        command: |
+            ./waf configure --prefix=%PREFIX%
 
-    - waf_build: |
-        ./waf build --jobs="%YJOBS%"
+    - waf_build:
+        description: Runs waf and passes our %JOBS% variable.
+        command: |
+            ./waf build --jobs="%YJOBS%"
 
-    - waf_install: |
-        ./waf install --jobs="%YJOBS%" --destdir="%installroot%"
+    - waf_install:
+        description: Runs waf install and passes the appropriate destdir and %JOBS% variable.
+        command: |
+            ./waf install --jobs="%YJOBS%" --destdir="%installroot%"

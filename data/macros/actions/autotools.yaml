@@ -1,24 +1,36 @@
 actions:
-    - configure: |
-        ./configure %CONFOPTS%
+    - configure:
+        description: Runs ./configure with our %CONFOPTS% variable macro.
+        command: |
+            ./configure %CONFOPTS%
 
     # Some day enough programs will be updated that we don't need this. Some day.
-    - configure_no_runstatedir: |
-        ./configure $(sed 's|--runstatedir=/run||g' <<< "%CONFOPTS%")
+    - configure_no_runstatedir:
+        description: "Runs %configure without the --runstatedir option. Use if you encounter configure: error: unrecognized option: '--runstatedir=/run'."
+        command: |
+            ./configure $(sed 's|--runstatedir=/run||g' <<< "%CONFOPTS%")
 
-    - reconfigure: |
-        autoreconf -vfi
-        %configure
+    - reconfigure:
+        description: Updates build scripts such as ./configure and proceeds to run %configure.
+        command: |
+            autoreconf -vfi
+            %configure
 
-    - autogen: |
-        ./autogen.sh %CONFOPTS%
-        %configure
+    - autogen:
+        description: Runs autogen with our %CONFOPTS% to create a configure script then proceeds to run %configure.
+        command: |
+            ./autogen.sh %CONFOPTS%
+            %configure
 
-    - make: |
-        make %JOBS%
+    - make:
+        description: Runs the make command with the job count specified in eopkg.conf.
+        command: |
+            make %JOBS%
 
-    - make_install: |
-        %make install DESTDIR="%installroot%"
+    - make_install:
+        description: Performs a make install, using the DESTDIR variant. Should work for the vast majority of packages.
+        command: |
+            %make install DESTDIR="%installroot%"
 
 defines:
     - CONFOPTS: |
