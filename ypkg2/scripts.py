@@ -11,11 +11,14 @@
 #  (at your option) any later version.
 #
 
+
 from .util import console_ui
+from .macros import Macros
 
 from collections import OrderedDict
 import glob
 import os
+from pathlib import Path
 
 from yaml import load as yaml_load
 
@@ -30,7 +33,8 @@ class ScriptGenerator:
     tailored to the current build context and performing substitution
     on exported macros from this instance"""
 
-    macros = None
+    arches: dict[str, Macros] = None
+    macros: list[Macros] = None
     context = None
     spec = None
     exports = None
@@ -39,72 +43,44 @@ class ScriptGenerator:
 
     def __init__(self, context, spec, work_dir):
         self.work_dir = work_dir
-        self.macros = OrderedDict()
+        self.arches = {}
+        self.macros = {}
         self.context = context
         self.spec = spec
+
         self.init_default_macros()
-        self.load_system_macros()
         self.init_default_exports()
 
-    def define_macro(self, key, value):
-        """Define a named macro. This will take the form %name%"""
-        self.macros["%{}%".format(key)] = value
+        macros_path = os.path.join("/usr", "share", "ypkg", "macros")
+        actions_path = os.path.join(macros_path, "actions")
+        arches_path = os.path.join(macros_path, "arches")
 
-    def define_action_macro(self, key, value):
-        """Define an action macro. These take the form %action"""
-        self.macros["%{}".format(key)] = value
+        # Load all of the arches from the globbed files
+        for file in glob.glob(arches_path + "/*.yaml"):
+            try:
+                with open(file, "r") as f:
+                    yamlData = yaml_load(f, Loader=Loader)
 
-    def define_export(self, key, value):
-        """Define a shell export for scripts"""
-        self.exports[key] = value
-
-    def define_unexport(self, key):
-        """Ensure key is unexported from shell script"""
-        self.unexports[key] = (None,)
-
-    def load_macros(self, file_path):
-        """Load a set of macros from a file"""
-        with open(file_path, "r") as f:
-            yamlData = yaml_load(f, Loader=Loader)
-
-        for section in ["defines", "actions"]:
-            if section not in yamlData:
+                identifier = Path(file).stem
+                self.arches[identifier] = Macros(yamlData)
+            except ValueError as e:
+                console_ui.emit_warning(
+                    os.path.basename(file), "Invalid arch definition: {0}".format(e)
+                )
+                continue
+            except Exception as e:
+                console_ui.emit_warning(
+                    "SCRIPTS", "Cannot load arch file '{0}': {1}".format(file, e)
+                )
                 continue
 
-            v = yamlData[section]
-
-            if not isinstance(v, list):
-                raise ValueError("Expected list of defines in macro config")
-
-            for item in v:
-                if not isinstance(item, dict):
-                    raise ValueError("Expected key:value mapping in list")
-
-                keys = list(item.keys())
-
-                if len(keys) > 1:
-                    raise ValueError("Expected one key in key:value")
-
-                key = keys[0]
-                value = item[key]
-
-                if value.endswith("\n"):
-                    value = value[:-1]
-
-                value = value.strip()
-
-                if section == "defines":
-                    self.define_macro(key, str(value))
-                else:
-                    self.define_action_macro(key, str(value))
-
-    def load_system_macros(self):
-        macros_path = os.path.join("/usr", "share", "ypkg", "macros", "actions")
-
         # Load all of the macros from the globbed files
-        for file in glob.glob(macros_path + "/*.yaml"):
+        for file in glob.glob(actions_path + "/*.yaml"):
             try:
-                self.load_macros(file)
+                with open(file, "r") as f:
+                    yamlData = yaml_load(f, Loader=Loader)
+
+                self.macros.append(Macros(yamlData))
             except ValueError as e:
                 console_ui.emit_warning(
                     os.path.basename(file), "Invalid macro definition: {0}".format(e)
@@ -116,46 +92,62 @@ class ScriptGenerator:
                 )
                 continue
 
-    def init_default_macros(self):
+    def define_export(self, key, value):
+        """Define a shell export for scripts"""
+        self.exports[key] = value
+
+    def define_unexport(self, key):
+        """Ensure key is unexported from shell script"""
+        self.unexports[key] = (None,)
+
+    def init_default_macros(self) -> None:
+        default_macros = Macros()
+
         if self.context.emul32:
-            self.define_macro("libdir", "/usr/lib32")
-            self.define_macro("LIBSUFFIX", "32")
+            default_macros.add_definition("libdir", "/usr/lib32")
+            default_macros.add_definition("LIBSUFFIX", "32")
         else:
-            self.define_macro("libdir", "/usr/lib64")
-            self.define_macro("LIBSUFFIX", "64")
+            default_macros.add_definition("libdir", "/usr/lib64")
+            default_macros.add_definition("LIBSUFFIX", "64")
 
-        self.define_macro("PREFIX", "/usr")
+        default_macros.add_definition("PREFIX", "/usr")
 
-        self.define_macro("installroot", self.context.get_install_dir())
-        self.define_macro("workdir", self.work_dir)
-        self.define_macro("JOBS", "-j{}".format(self.context.build.jobcount))
-        self.define_macro("YJOBS", "{}".format(self.context.build.jobcount))
+        default_macros.add_definition("installroot", self.context.get_install_dir())
+        default_macros.add_definition("workdir", self.work_dir)
+        default_macros.add_definition(
+            "JOBS", "-j{}".format(self.context.build.jobcount)
+        )
+        default_macros.add_definition("YJOBS", "{}".format(self.context.build.jobcount))
 
         # Consider moving this somewhere else
-        self.define_macro("CFLAGS", " ".join(self.context.build.cflags))
-        self.define_macro("CXXFLAGS", " ".join(self.context.build.cxxflags))
-        self.define_macro("LDFLAGS", " ".join(self.context.build.ldflags))
-        self.define_macro("RUSTFLAGS", " ".join(self.context.build.rustflags))
+        default_macros.add_definition("CFLAGS", " ".join(self.context.build.cflags))
+        default_macros.add_definition("CXXFLAGS", " ".join(self.context.build.cxxflags))
+        default_macros.add_definition("LDFLAGS", " ".join(self.context.build.ldflags))
+        default_macros.add_definition(
+            "RUSTFLAGS", " ".join(self.context.build.rustflags)
+        )
 
-        self.define_macro("HOST", self.context.build.host)
-        self.define_macro("ARCH", self.context.build.arch)
+        default_macros.add_definition("HOST", self.context.build.host)
+        default_macros.add_definition("ARCH", self.context.build.arch)
         # Based on the default target list defined in rocBLAS's CMakeLists.txt
-        self.define_macro(
+        default_macros.add_definition(
             "AMDGPUTARGETS",
             "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1010;gfx1030;gfx1100;gfx1101;gfx1102",
         )
-        self.define_macro("PKGNAME", self.spec.pkg_name)
-        self.define_macro("PKGFILES", self.context.files_dir)
+        default_macros.add_definition("PKGNAME", self.spec.pkg_name)
+        default_macros.add_definition("PKGFILES", self.context.files_dir)
 
-        self.define_macro("package", self.context.spec.pkg_name)
-        self.define_macro("release", self.context.spec.pkg_release)
-        self.define_macro("version", self.context.spec.pkg_version)
-        self.define_macro("sources", self.context.get_sources_directory())
+        default_macros.add_definition("package", self.context.spec.pkg_name)
+        default_macros.add_definition("release", self.context.spec.pkg_release)
+        default_macros.add_definition("version", self.context.spec.pkg_version)
+        default_macros.add_definition("sources", self.context.get_sources_directory())
 
-        self.define_macro("rootdir", self.context.get_package_root_dir())
-        self.define_macro("builddir", self.context.get_build_dir())
+        default_macros.add_definition("rootdir", self.context.get_package_root_dir())
+        default_macros.add_definition("builddir", self.context.get_build_dir())
 
-    def init_default_exports(self):
+        self.macros.append(default_macros)
+
+    def init_default_exports(self) -> None:
         """Initialise our exports"""
         self.exports = OrderedDict()
         self.unexports = OrderedDict()
@@ -223,7 +215,7 @@ class ScriptGenerator:
         self.define_unexport("SUDO_COMMAND")
         self.define_unexport("CDPATH")
 
-    def emit_exports(self):
+    def emit_exports(self) -> list[str]:
         """TODO: Grab known exports into an OrderedDict populated by an rc
         YAML file to allow easier manipulation"""
         ret = []
@@ -234,41 +226,56 @@ class ScriptGenerator:
         ret.append(unset_line)
         return ret
 
-    def is_valid_macro_char(self, char):
+    def is_valid_macro_char(self, char: chr) -> bool:
         if char.isalpha() or char.isdigit():
             return True
         if char == "_":
             return True
 
-    def escape_single(self, line):
+        return False
+
+    def escape_single(self, line: str) -> (str, bool):
         offset = line.find("%")
+
         if offset < 0:
             return (line, False)
 
-        tmp_name = "%"
-        tmp_idx = 0
+        pattern = "%"
+
+        # Create a matcher in the format of %foo% or %bar
         for i in range(offset + 1, len(line)):
             if line[i] == "%":
-                tmp_name += "%"
+                pattern += "%"
                 break
+
             if self.is_valid_macro_char(line[i]):
-                tmp_name += line[i]
+                pattern += line[i]
             else:
                 break
-        start = line[0:offset]
-        remnant = line[offset + len(tmp_name) :]
-        # TODO: Change to is-valid-macro check and consume anyway
-        if tmp_name in self.macros:
-            mc = self.macros[tmp_name]
-            if mc is None:
-                mc = ""
-            line = "%s%s%s" % (start, mc, remnant)
-            return (line, True)
-        else:
-            line = "%s%s%s" % (start, tmp_name, remnant)
-            return (line, False)
 
-    def escape_string(self, input_string):
+        isAction = pattern[-1] == "%"
+        name = pattern[1 : len(pattern) - 1]
+
+        for macro in self.macros:
+            if isAction:
+                action = macro.match_action(name)
+
+                if action is None:
+                    continue
+
+                return (line.replace(pattern, action.command), True)
+            else:
+                definition = macro.match_definition(name)
+
+                if definition is None:
+                    continue
+
+                return (line.replace(pattern, definition), True)
+
+        # No matches, return the line as-is
+        return (line, False)
+
+    def escape_string(self, input_string: str) -> str:
         """Recursively escape our macros out of a string until no more of our
         macros appear in it"""
         ret = []
