@@ -28,7 +28,7 @@ actions:
     # and these macros explicitly use vendor libs
     - perl_install:
         description: Runs Perl install scripts or attempts %make_install.
-        commannd: |
+        command: |
             function perl_install() {
                 if [[ -e Makefile.PL ]]; then
                     %make_install $* || exit 1
