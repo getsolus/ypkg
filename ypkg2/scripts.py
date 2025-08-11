@@ -14,6 +14,8 @@
 
 from .util import console_ui
 from .macros import Macros
+from .ypkgcontext import YpkgContext
+from .ypkgspec import YpkgSpec
 
 from collections import OrderedDict
 import glob
@@ -35,16 +37,16 @@ class ScriptGenerator:
 
     arches: dict[str, Macros] = None
     macros: list[Macros] = None
-    context = None
-    spec = None
-    exports = None
-    unexports = None
-    work_dir = None
+    context: YpkgContext = None
+    spec: YpkgSpec = None
+    exports: OrderedDict[str, str] = None
+    unexports: list[str] = None
+    work_dir: str = None
 
-    def __init__(self, context, spec, work_dir):
+    def __init__(self, context: YpkgContext, spec: YpkgSpec, work_dir: str):
         self.work_dir = work_dir
         self.arches = {}
-        self.macros = {}
+        self.macros = []
         self.context = context
         self.spec = spec
 
@@ -65,12 +67,12 @@ class ScriptGenerator:
                 self.arches[identifier] = Macros(yamlData)
             except ValueError as e:
                 console_ui.emit_warning(
-                    os.path.basename(file), "Invalid arch definition: {0}".format(e)
+                    os.path.basename(file), f"Invalid arch definition: {e}"
                 )
                 continue
             except Exception as e:
                 console_ui.emit_warning(
-                    "SCRIPTS", "Cannot load arch file '{0}': {1}".format(file, e)
+                    "SCRIPTS", f"Cannot load arch file '{file}': {e}"
                 )
                 continue
 
@@ -83,22 +85,22 @@ class ScriptGenerator:
                 self.macros.append(Macros(yamlData))
             except ValueError as e:
                 console_ui.emit_warning(
-                    os.path.basename(file), "Invalid macro definition: {0}".format(e)
+                    os.path.basename(file), f"Invalid macro definition: {e}"
                 )
                 continue
             except Exception as e:
                 console_ui.emit_warning(
-                    "SCRIPTS", "Cannot load macro file '{0}': {1}".format(file, e)
+                    "SCRIPTS", f"Cannot load macro file '{file}': {e}"
                 )
                 continue
 
-    def define_export(self, key, value):
+    def define_export(self, key: str, value: str) -> None:
         """Define a shell export for scripts"""
         self.exports[key] = value
 
-    def define_unexport(self, key):
+    def define_unexport(self, key: str) -> None:
         """Ensure key is unexported from shell script"""
-        self.unexports[key] = (None,)
+        self.unexports.append(key)
 
     def init_default_macros(self) -> None:
         default_macros = Macros()
@@ -150,7 +152,7 @@ class ScriptGenerator:
     def init_default_exports(self) -> None:
         """Initialise our exports"""
         self.exports = OrderedDict()
-        self.unexports = OrderedDict()
+        self.unexports = []
 
         self.define_export("CFLAGS", " ".join(self.context.build.cflags))
         self.define_export("CXXFLAGS", " ".join(self.context.build.cxxflags))
@@ -222,7 +224,7 @@ class ScriptGenerator:
         for key in self.exports:
             ret.append('export {}="{}"'.format(key, self.exports[key]))
 
-        unset_line = "unset {} || :".format(" ".join(list(self.unexports.keys())))
+        unset_line = "unset {} || :".format(" ".join(self.unexports))
         ret.append(unset_line)
         return ret
 
@@ -253,24 +255,27 @@ class ScriptGenerator:
             else:
                 break
 
-        isAction = pattern[-1] == "%"
-        name = pattern[1 : len(pattern) - 1]
+        isDefinition = pattern[-1] == "%"
+        name = pattern.removeprefix("%").removesuffix("%")
 
         for macro in self.macros:
-            if isAction:
-                action = macro.match_action(name)
-
-                if action is None:
-                    continue
-
-                return (line.replace(pattern, action.command), True)
-            else:
+            if isDefinition:
                 definition = macro.match_definition(name)
 
                 if definition is None:
                     continue
 
-                return (line.replace(pattern, definition), True)
+                return (line.replace(pattern, str(definition).removesuffix("\n")), True)
+            else:
+                action = macro.match_action(name)
+
+                if action is None:
+                    continue
+
+                return (
+                    line.replace(pattern, str(action.command).removesuffix("\n")),
+                    True,
+                )
 
         # No matches, return the line as-is
         return (line, False)
