@@ -3,7 +3,7 @@
 #
 #  This file is part of ypkg2
 #
-#  Copyright 2015-2020 Solus Project
+#  Copyright 2015-2025 Solus Project
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -12,28 +12,39 @@
 #
 
 
-from .util import console_ui
-from .macros import Macros
+from .util import console_ui, metadata
+from .macros import Macros, MacroSet
 from .ypkgcontext import YpkgContext
 from .ypkgspec import YpkgSpec
 
 from collections import OrderedDict
-import glob
+from enum import Enum, StrEnum
 import os
 from pathlib import Path
 
 from yaml import load as yaml_load
-
 try:
     from yaml import CLoader as Loader
-except Exception:
+except Exception as e:
     from yaml import Loader
 
 
-class ScriptGenerator:
-    """Generates build scripts on the fly by providing a default header
-    tailored to the current build context and performing substitution
-    on exported macros from this instance"""
+class Target(Enum):
+    NATIVE = 1
+    EMUL32 = 2
+
+
+class Step(StrEnum):
+    """ Generates build scripts on the fly by providing a default header
+        tailored to the current build context and performing substitution
+        on exported macros from this instance """
+
+    # PREPARE = "prepare"
+    SETUP = "setup"
+    BUILD = "build"
+    INSTALL = "install"
+    CHECK = "check"
+    PROFILE = "profile"
 
     arches: dict[str, Macros] = None
     macros: list[Macros] = None
@@ -42,6 +53,13 @@ class ScriptGenerator:
     exports: OrderedDict[str, str] = None
     unexports: list[str] = None
     work_dir: str = None
+
+    @staticmethod
+    def list(use_pgo: bool) -> list['Step']:
+        if use_pgo:
+            return [Step.SETUP, Step.BUILD, Step.PROFILE]
+        else:
+            return [Step.SETUP, Step.BUILD, Step.INSTALL, Step.CHECK]
 
     def __init__(self, context: YpkgContext, spec: YpkgSpec, work_dir: str):
         self.work_dir = work_dir
@@ -53,6 +71,7 @@ class ScriptGenerator:
         self.init_default_macros()
         self.init_default_exports()
 
+<<<<<<< HEAD:ypkg2/scripts.py
         macros_path = os.path.join("/usr", "share", "ypkg", "macros")
         actions_path = os.path.join(macros_path, "actions")
         arches_path = os.path.join(macros_path, "arches")
@@ -94,6 +113,42 @@ class ScriptGenerator:
                 )
                 continue
 
+||||||| parent of 5f0ce82 (WIP):ypkg2/scripts.py
+        macros_path = os.path.join("/usr", "share", "ypkg", "macros")
+        actions_path = os.path.join(macros_path, "actions")
+        arches_path = os.path.join(macros_path, "arches")
+
+        # Load all of the arches from the globbed files
+        for file in glob.glob(arches_path + "/*.yaml"):
+            try:
+                with open(file, "r") as f:
+                    yamlData = yaml_load(f, Loader=Loader)
+
+                identifier = Path(file).stem
+                self.arches[identifier] = Macros(yamlData)
+            except ValueError as e:
+                console_ui.emit_warning(os.path.basename(file), f"Invalid arch definition: {e}")
+                continue
+            except Exception as e:
+                console_ui.emit_warning("SCRIPTS", f"Cannot load arch file '{file}': {e}")
+                continue
+
+        # Load all of the macros from the globbed files
+        for file in glob.glob(actions_path + "/*.yaml"):
+            try:
+                with open(file, "r") as f:
+                    yamlData = yaml_load(f, Loader=Loader)
+
+                self.macros.append(Macros(yamlData))
+            except ValueError as e:
+                console_ui.emit_warning(os.path.basename(file), f"Invalid macro definition: {e}")
+                continue
+            except Exception as e:
+                console_ui.emit_warning("SCRIPTS", f"Cannot load macro file '{file}': {e}")
+                continue
+
+=======
+>>>>>>> 5f0ce82 (WIP):ypkg2/step.py
     def define_export(self, key: str, value: str) -> None:
         """Define a shell export for scripts"""
         self.exports[key] = value
@@ -105,20 +160,24 @@ class ScriptGenerator:
     def init_default_macros(self) -> None:
         default_macros = Macros()
 
+        for arch in ["base", "x86_64"]:
+            defs = self.arches[arch]
+            default_macros.add_macros(defs)
+
         if self.context.emul32:
             default_macros.add_definition("libdir", "/usr/lib32")
-            default_macros.add_definition("LIBSUFFIX", "32")
         else:
             default_macros.add_definition("libdir", "/usr/lib64")
-            default_macros.add_definition("LIBSUFFIX", "64")
 
-        default_macros.add_definition("PREFIX", "/usr")
+        # Compatibility with existing packages
+        default_macros.add_definition("PREFIX", "%prefix%")
+        default_macros.add_definition("LIBSUFFIX", "%libsuffix%")
 
         default_macros.add_definition("installroot", self.context.get_install_dir())
         default_macros.add_definition("workdir", self.work_dir)
-        default_macros.add_definition(
-            "JOBS", "-j{}".format(self.context.build.jobcount)
-        )
+
+        #TODO: Don't rely on eopkg config'
+        default_macros.add_definition("JOBS", "-j{}".format(self.context.build.jobcount))
         default_macros.add_definition("YJOBS", "{}".format(self.context.build.jobcount))
 
         # Consider moving this somewhere else
@@ -129,8 +188,9 @@ class ScriptGenerator:
             "RUSTFLAGS", " ".join(self.context.build.rustflags)
         )
 
-        default_macros.add_definition("HOST", self.context.build.host)
-        default_macros.add_definition("ARCH", self.context.build.arch)
+        default_macros.add_definition("HOST", "%host_platform%")
+        # TODO: See if this can be not hardcoded
+        default_macros.add_definition("ARCH", "x86_64")
         # Based on the default target list defined in rocBLAS's CMakeLists.txt
         default_macros.add_definition(
             "AMDGPUTARGETS",
@@ -146,6 +206,41 @@ class ScriptGenerator:
 
         default_macros.add_definition("rootdir", self.context.get_package_root_dir())
         default_macros.add_definition("builddir", self.context.get_build_dir())
+
+        # Set up ccache
+
+
+        default_macros.add_definition("sourcedateepoch", f"{metadata.history_timestamp}")
+
+        # Set up our compilers
+        if self.context.spec.pkg_clang:
+            default_macros.add_definition("compiler_c", "clang")
+            default_macros.add_definition("compiler_cxx", "clang++")
+            default_macros.add_definition("compiler_objc", "clang")
+            default_macros.add_definition("compiler_objcxx", "clang++")
+            default_macros.add_definition("compiler_cpp", "clang-cpp")
+            default_macros.add_definition("compiler_objcpp", "clang -E -")
+            default_macros.add_definition("compiler_objcxxcpp", "clang++ -E")
+            default_macros.add_definition("compiler_d", "ldc2")
+            default_macros.add_definition("compiler_ar", "llvm-ar")
+            default_macros.add_definition("compiler_objcopy", "llvm-objcopy")
+            default_macros.add_definition("compiler_nm", "llvm-nm")
+            default_macros.add_definition("compiler_ranlib", "llvm-ranlib")
+            default_macros.add_definition("compiler_strip", "llvm-strip")
+        else:
+            default_macros.add_definition("compiler_c", "gcc")
+            default_macros.add_definition("compiler_cxx", "g++")
+            default_macros.add_definition("compiler_objc", "gcc")
+            default_macros.add_definition("compiler_objcxx", "g++")
+            default_macros.add_definition("compiler_cpp", "gcc -E")
+            default_macros.add_definition("compiler_objcpp", "gcc -E")
+            default_macros.add_definition("compiler_objcxxcpp", "g++ -E")
+            default_macros.add_definition("compiler_d", "gdc")
+            default_macros.add_definition("compiler_ar", "gcc-ar")
+            default_macros.add_definition("compiler_objcopy", "objcopy")
+            default_macros.add_definition("compiler_nm", "gcc-nm")
+            default_macros.add_definition("compiler_ranlib", "gcc-ranlib")
+            default_macros.add_definition("compiler_strip", "strip")
 
         self.macros.append(default_macros)
 
@@ -293,3 +388,37 @@ class ScriptGenerator:
                     break
 
         return "\n".join(ret)
+
+    def script(self, target: Target, use_pgo: bool, recipe: YpkgSpec, macros: MacroSet) -> str | None:
+        content: str = None
+
+        # Get the raw script content for this step.
+        match self:
+            case Step.SETUP:
+                content = recipe.step_setup
+            case Step.BUILD:
+                content = recipe.step_build
+            case Step.INSTALL:
+                content = recipe.step_install
+            case Step.CHECK:
+                content = recipe.step_check
+            case Step.PROFILE:
+                content = recipe.step_profile
+            case _:
+                raise ValueError(f"Unknown build step '{self.value}'")
+
+        if content is None:
+            return None
+
+        # Get our script base, and add any extra environment variables
+        # if any are present in the package recipe.
+        env = recipe.pkg_environment
+        env = f"%scriptBase\n{env}\n"
+
+        # Create a parser for the script
+
+        for arch in ["base", target.value]:
+            arch_macros = macros.arches[arch]
+            # TODO: Idk yet
+
+

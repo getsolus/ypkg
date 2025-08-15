@@ -1,0 +1,653 @@
+# Provides core definitions which each profile may override
+
+defines:
+    # Basic variables required for packages to build correctly
+    - libsuffix            : ""
+    - prefix               : "/usr"
+    - bindir               : "%prefix%/bin"
+    - includedir           : "%prefix%/include"
+    - sysusersdir          : "%prefix%/lib/sysusers.d"
+    - tmpfilesdir          : "%prefix%/lib/tmpfiles.d"
+    - udevrulesdir         : "%prefix%/lib/udev/rules.d"
+    - sbindir              : "%prefix%/sbin"
+    - datadir              : "%prefix%/share"
+    - vendordir            : "%datadir%/defaults"
+    - docdir               : "%datadir%/doc"
+    - infodir              : "%datadir%/info"
+    - localedir            : "%datadir%/locale"
+    - mandir               : "%datadir%/man"
+    - bashcompletionsdir   : "%datadir%/bash-completion/completions"
+    - fishcompletionsdir   : "%datadir%/fish/vendor_completions.d"
+    - zshcompletionsdir    : "%datadir%/zsh/site-functions"
+    - libdir               : "%prefix%/lib%libsuffix%"
+    - libexecdir           : "%libdir%/%name%"
+    - localstatedir        : "/var"
+    - sharedstatedir       : "%localstatedir%/lib"
+    - runstatedir          : "/run"
+    - sysconfdir           : "/etc"
+    # There's a bunch of special going on with builddir
+    # - builddir             : "solus-builddir"
+
+    # The vendorID is encoded into the triplet, toolchain, builds, etc.
+    # It must match the triplet from bootstrap-scripts.
+    - vendorID             : "solus-linux"
+
+    # Must be set for CC/CXX/CPP to work
+    - cc             : "%compiler_c%"
+    - cxx            : "%compiler_cxx%"
+    - objc           : "%compiler_objc%"
+    - objcxx         : "%compiler_objcxx%"
+    - cpp            : "%compiler_cpp%"
+    - objcpp         : "%compiler_objcpp%"
+    - objcxxcpp      : "%compiler_objcxxcpp%"
+    - d              : "%compiler_d%"
+    - ar             : "%compiler_ar%"
+    - ld             : "%compiler_ld%"
+    - objcopy        : "%compiler_objcopy%"
+    - nm             : "%compiler_nm%"
+    - ranlib         : "%compiler_ranlib%"
+    - strip          : "%compiler_strip%"
+    - path           : "%compiler_path%"
+    - ccachedir      : "%compiler_cache%"
+    - sccachedir     : "%scompiler_cache%"
+    - pkgconfigpath  : "%libdir%/pkgconfig:/usr/share/pkgconfig"
+
+actions :
+    - scriptBase:
+        description: This is used as the start of all build scripts.
+        command: |
+            #!/usr/bin/env -i /bin/bash --norc --noprofile
+            set -e
+            set -x
+            TERM="dumb"; export TERM
+            SOURCE_DATE_EPOCH="%(sourcedateepoch)"; export SOURCE_DATE_EPOCH
+            PGO_STAGE="%(pgo_stage)"; export PGO_STAGE
+            PKG_CONFIG_PATH="%(pkgconfigpath)"; export PKG_CONFIG_PATH
+            CFLAGS="%(cflags)"; export CFLAGS
+            CGO_CFLAGS="%(cflags)"; export CGO_CFLAGS
+            CXXFLAGS="%(cxxflags)"; export CXXFLAGS
+            CGO_CXXFLAGS="%(cxxflags)"; export CGO_CXXFLAGS
+            FFLAGS="%(fflags)"; export FFLAGS
+            LDFLAGS="%(ldflags)"; export LDFLAGS
+            CGO_LDFLAGS="%(ldflags) -Wl,--no-gc-sections"; export CGO_LDFLAGS
+            DFLAGS="%(dflags)"; export DFLAGS
+            RUSTFLAGS="%(rustflags)"; export RUSTFLAGS
+            CC="%(cc)"; export CC
+            CXX="%(cxx)"; export CXX
+            OBJC="%(objc)"; export OBJC
+            OBJCXX="%(objcxx)"; export OBJCXX
+            CPP="%(cpp)"; export CPP
+            OBJCPP="%(objcpp)"; export OBJCPP
+            OBJCXXCPP="%(objcxxcpp)"; export OBJCXXCPP
+            AR="%(ar)"; export AR
+            LD="%(ld)"; export LD
+            OBJCOPY="%(objcopy)"; export OBJCOPY
+            NM="%(nm)"; export NM
+            RANLIB="%(ranlib)"; export RANLIB
+            STRIP="%(strip)"; export STRIP
+            PATH="%(path)"; export PATH
+            CCACHE_DIR="%(ccachedir)"; export CCACHE_DIR;
+            CCACHE_BASEDIR="%(workdir)"; export CCACHE_BASEDIR
+            test -z "$CCACHE_DIR" && unset CCACHE_DIR;
+            %cargo_set_environment
+            RUSTC_WRAPPER="%(rustc_wrapper)"; export RUSTC_WRAPPER;
+            test -z "$RUSTC_WRAPPER" && unset RUSTC_WRAPPER;
+            SCCACHE_DIR="%(sccachedir)"; export SCCACHE_DIR;
+            test -z "$SCCACHE_DIR" && unset SCCACHE_DIR;
+            LANG="en_US.UTF-8"; export LANG
+            LC_ALL="en_US.UTF-8"; export LC_ALL
+            test -d "%(workdir)" || (echo "The work directory %(workdir) does not exist"; exit 1)
+            cd "%(workdir)" && echo "The work directory %%(workdir) is ${PWD}"
+
+defaultTuningGroups :
+    - asneeded
+    - avxwidth
+    - base
+    - bindnow
+    - build-id
+    - compress-debug
+    - debug
+    - fat-lto
+    - fortify
+    - frame-pointer
+    - harden
+    - icf
+    - lto
+    - lto-errors
+    - optimize
+    - relr
+    - symbolic
+
+tuning              :
+    # A set of groups we can toggle from the "tune" key
+
+    # Architecture flags should always be enabled
+    - architecture:
+        enabled:
+            - architecture
+
+    # Base flags should almost always be enabled, but want to be able to disable
+    - base:
+        enabled:
+            - base
+
+    - debug:
+        options:
+            - lines:
+                enabled: debug-lines
+            - std:
+                enabled: debug-std
+        default: std
+
+    # Debug symbol compression
+    - compress-debug:
+        options:
+            - none:
+                enabled: compress-debug-none
+            - zlib:
+                enabled: compress-debug-zlib
+            - zstd:
+                enabled: compress-debug-zstd
+        default: zstd
+
+    # Toggle frame-pointer
+    - frame-pointer:
+        enabled: no-omit-frame-pointer
+        disabled: omit-frame-pointer
+
+    # Toggle build-id
+    - build-id:
+        enabled: build-id
+
+    # Enable bindnow functionality
+    - bindnow:
+        enabled: bindnow
+
+    # Enable symbolic
+    - symbolic:
+        options:
+            - all:
+                enabled: symbolic-all
+            - functions:
+                enabled: symbolic-functions
+            - nonweak:
+                enabled: symbolic-nonweak
+        default: functions
+
+    # Enable fortify
+    - fortify:
+        enabled: fortify
+
+    # Enable hardening
+    - harden:
+        options:
+            - none:
+                enabled: harden-none
+            - lvl1:
+                enabled: harden-lvl1
+            - lvl2:
+                enabled: harden-lvl2
+        disabled: harden-none
+        default: lvl1
+
+    # Enable optimisation per given levels
+    - optimize:
+        options:
+            - fast:
+                enabled: optimize-fast
+            - generic:
+                enabled: optimize-generic
+            - size:
+                enabled:
+                    - optimize-size
+                    - sections
+            - speed:
+                enabled: optimize-speed
+        default: generic
+
+    # Enable LTO
+    - lto:
+        options:
+            - full:
+                enabled: lto-full
+            - thin:
+                enabled: lto-thin
+        default: thin
+
+    # Enable LTOextra. Requires the equivalent lto option
+    - ltoextra:
+        options:
+            - full:
+                enabled: ltoextra-full
+            - thin:
+                enabled: ltoextra-thin
+        default: thin
+
+    # Enable LTO errors
+    - lto-errors:
+        enabled: lto-errors
+
+    # Toggle fat LTO objects
+    - fat-lto:
+        enabled: fat-lto
+        disabled: fat-lto-none
+
+    # Enable ICF
+    - icf:
+        options:
+            - safe:
+                enabled: icf-safe
+            - all:
+                enabled: icf-all
+        default: safe
+
+    # Enable Ignore data address equality
+    - idae:
+        enabled: idae
+
+    # Enable Polly
+    - polly:
+        enabled: polly
+
+    # Enable section splitting
+    - sections:
+        enabled: sections
+
+    # Toggle common
+    - common:
+        enabled: common
+
+    # Enable math
+    - math:
+        enabled: math
+
+    # Enable noplt
+    - noplt:
+        enabled:
+            - noplt
+            - bindnow
+
+    # Enable nosemantic
+    - nosemantic:
+        enabled: nosemantic
+
+    # Enable nodaed
+    - nodaed:
+        enabled: nodaed
+
+    # Enable asneeded
+    - asneeded:
+        enabled: asneeded
+
+    # Enable avxwidth
+    - avxwidth:
+        enabled: avxwidth-128
+
+    # Enable bolt
+    - bolt:
+        enabled: bolt
+
+    # Enable runpath
+    - runpath:
+        enabled: runpath
+
+    # Enable sse2avx
+    - sse2avx:
+        enabled: sse2avx
+
+    # Enable pch-instantiate
+    - pch-instantiate:
+        enabled: pch-instantiate
+
+    # Enable visibility
+    - visibility:
+        options:
+            - inline:
+                enabled: visibility-inline
+            - hidden:
+                enabled: visibility-hidden
+        default: inline
+
+    # Enable relative-vtables
+    - relative-vtables:
+        enabled: relative-vtables
+
+    # Enable relr
+    - relr:
+        enabled: relr
+
+flags             :
+
+    # Needs overriding with -march/mtune values.
+    - architecture:
+        c         : ""
+        cxx       : ""
+        ld        : ""
+
+    # Base flags, enabled by default
+    - base:
+        c         : "-pipe -Wformat -Wformat-security -Wno-error -fPIC"
+        cxx       : "-pipe -Wformat -Wformat-security -Wno-error -fPIC"
+        f         : ""
+        ld        : "-Wl,-O2,--gc-sections"
+        d         : "-release -Hkeep-all-bodies -relocation-model=pic -wi"
+        rust      : "-C strip=none"
+
+    - omit-frame-pointer:
+        c         : "-fomit-frame-pointer -momit-leaf-frame-pointer"
+        cxx       : "-fomit-frame-pointer -momit-leaf-frame-pointer"
+        f         : "-fomit-frame-pointer"
+        d         : "-frame-pointer=none"
+        rust      : ""
+
+    - no-omit-frame-pointer:
+        c         : "-fno-omit-frame-pointer -mno-omit-leaf-frame-pointer"
+        cxx       : "-fno-omit-frame-pointer -mno-omit-leaf-frame-pointer"
+        f         : "-fno-omit-frame-pointer"
+        d         : "-frame-pointer=all"
+        rust      : "-C force-frame-pointers"
+
+    # Toggle bindnow (ON)
+    - bindnow:
+        ld        : "-Wl,-z,relro,-z,now"
+
+    # Toggle symbolic (ON symbolic-functions)
+    - symbolic-all:
+        ld        : "-Wl,-Bsymbolic"
+
+    - symbolic-functions:
+        ld        : "-Wl,-Bsymbolic-functions"
+
+    - symbolic-nonweak:
+        llvm:
+            ld        : "-Wl,-Bsymbolic-non-weak-functions"
+
+    # Toggle fortify (ON)
+    - fortify:
+        c         : "-D_FORTIFY_SOURCE=2"
+        cxx       : "-D_FORTIFY_SOURCE=2"
+        f         : "-D_FORTIFY_SOURCE=2"
+
+    # No hardening!
+    - harden-none:
+        c         : "-fno-stack-protector"
+        cxx       : "-fno-stack-protector"
+
+    # Hardening (ON harden-lvl1)
+    - harden-lvl1:
+        c         : "-fstack-protector --param ssp-buffer-size=32"
+        cxx       : "-fstack-protector --param ssp-buffer-size=32"
+
+    - harden-lvl2:
+        llvm:
+            c         : "-fstack-protector-strong -fstack-clash-protection -fPIE --param ssp-buffer-size=4"
+            cxx       : "-fstack-protector-strong -fstack-clash-protection -fPIE --param ssp-buffer-size=4"
+        gnu:
+            c         : "-fstack-protector-strong -fstack-clash-protection -fPIE --param ssp-buffer-size=4"
+            cxx       : "-fstack-protector-strong -fstack-clash-protection -fPIE --param ssp-buffer-size=4"
+
+    # Use section splitting, improves GC without lto only (OFF)
+    - sections:
+        c     : "-ffunction-sections -fdata-sections"
+        cxx   : "-ffunction-sections -fdata-sections"
+
+    # Optimize without care for math issues
+    - optimize-fast:
+        c         : "-Ofast"
+        cxx       : "-Ofast"
+        f         : "-Ofast"
+
+    # Generic optimisation case (ON)
+    - optimize-generic:
+        c         : "-O2"
+        cxx       : "-O2"
+        f         : "-O2"
+        d         : "-O2"
+        # opt-level=3 is common in the rust world so let that
+        # be our generic opt case.
+        rust      : "-C opt-level=3 -C codegen-units=16"
+
+    # Optimize for size (OFF)
+    - optimize-size:
+        c     : "-Os"
+        cxx   : "-Os"
+        d     : "-Os"
+        rust  : "-C opt-level=s -C codegen-units=16"
+        gnu:
+            f : "-Os"
+
+    # Optimize for speed (OFF)
+    - optimize-speed:
+        c         : "-O3"
+        cxx       : "-O3"
+        f         : "-O3"
+        d         : "-O3"
+        rust      : "-C opt-level=3 -C codegen-units=16"
+
+    # Enable LTO optimisations (OFF)
+    - lto-full:
+        rust      : "-C lto=fat -C linker-plugin-lto -C embed-bitcode=yes"
+        gnu:
+            c         : "-flto=%(jobs) -flto-partition=one"
+            cxx       : "-flto=%(jobs) -flto-partition=one"
+            f         : "-flto=%(jobs) -flto-partition=one"
+            ld        : "-flto=%(jobs) -flto-partition=one"
+        llvm:
+            c         : "-flto=full"
+            cxx       : "-flto=full"
+            f         : "-flto=full"
+            d         : "-flto=full"
+            ld        : "-flto=full"
+
+    # Enable Thin-LTO optimisations (ON)
+    - lto-thin:
+        rust      : "-C lto=thin -C linker-plugin-lto -C embed-bitcode=yes"
+        gnu:
+            c         : "-flto=%(jobs)"
+            cxx       : "-flto=%(jobs)"
+            f         : "-flto=%(jobs)"
+            ld        : "-flto=%(jobs)"
+        llvm:
+            c         : "-flto=thin"
+            cxx       : "-flto=thin"
+            f         : "-flto=thin"
+            d         : "-flto=thin"
+            ld        : "-flto=thin"
+
+    # Enable LTOextra optimisations (OFF)
+    - ltoextra-full:
+        gnu:
+            c         : "-fdevirtualize-at-ltrans"
+            cxx       : "-fdevirtualize-at-ltrans"
+        llvm:
+            c         : "-fwhole-program-vtables -fvirtual-function-elimination"
+            cxx       : "-fwhole-program-vtables -fvirtual-function-elimination"
+
+    # Enable Thin-LTOextra optimisations (OFF)
+    - ltoextra-thin:
+        llvm:
+            c         : "-fwhole-program-vtables"
+            cxx       : "-fwhole-program-vtables"
+
+    # Enable Fat LTO Objects. Note that this is only necessary when building static objects with LLVM that are used in a GCC build (ON)
+    - fat-lto:
+        c         : "-ffat-lto-objects"
+        cxx       : "-ffat-lto-objects"
+        gnu       :
+            f     : "-ffat-lto-objects"
+
+    # Disable Fat LTO Objects (OFF)
+    - fat-lto-none:
+        c         : "-fno-fat-lto-objects"
+        cxx       : "-fno-fat-lto-objects"
+        gnu       :
+            f     : "-fno-fat-lto-objects"
+
+    # Toggle LTO warning errors. If these throw an error it is likely that there will be runtime problems with LTO (ON)
+    - lto-errors:
+        gnu:
+            c         : "-Werror=odr -Werror=lto-type-mismatch -Werror=strict-aliasing"
+            cxx       : "-Werror=odr -Werror=lto-type-mismatch -Werror=strict-aliasing"
+        llvm:
+            c         : "-Werror=odr -Werror=strict-aliasing"
+            cxx       : "-Werror=odr -Werror=strict-aliasing"
+
+    # Enable build-id (ON)
+    - build-id:
+        ld        : "-Wl,--build-id=sha1"
+        rust      : "-C link-args=-Wl,--build-id=sha1"
+
+    # Compress debug symbols with Zstd (ON)
+    - compress-debug-zstd:
+        ld        : "-Wl,--compress-debug-sections=zstd"
+        rust      : "-C link-args=-Wl,--compress-debug-sections=zstd"
+
+    # Compress debug symbols with zlib (OFF)
+    - compress-debug-zlib:
+        ld        : "-Wl,--compress-debug-sections=zlib"
+        rust      : "-C link-args=-Wl,--compress-debug-sections=zlib"
+
+    # Don't compress debug symbols (OFF)
+    - compress-debug-none:
+        ld        : "-Wl,--compress-debug-sections=none"
+        rust      : "-C link-args=-Wl,--compress-debug-sections=none"
+
+    # Enable ALL LLVM ICF optimisations (OFF)
+    - icf-all:
+        llvm:
+            ld    : "-Wl,--icf=all"
+
+    # Enable LLVM ICF optimisations (ON)
+    - icf-safe:
+        llvm:
+            ld    : "-Wl,--icf=safe"
+
+    # Ignore data address equality (OFF)
+    - idae:
+        llvm:
+            ld    : "-Wl,--ignore-data-address-equality"
+
+    # Enable LLVM polly optimisations (OFF)
+    - polly:
+        llvm:
+            c     : "-fplugin=LLVMPolly.so -fpass-plugin=LLVMPolly.so -Xclang -mllvm -Xclang -polly -Xclang -mllvm -Xclang -polly-vectorizer=stripmine"
+            cxx   : "-fplugin=LLVMPolly.so -fpass-plugin=LLVMPolly.so -Xclang -mllvm -Xclang -polly -Xclang -mllvm -Xclang -polly-vectorizer=stripmine"
+            f     : "-fpass-plugin=LLVMPolly.so" # TODO: I don't think this does anything, but at least it doesn't fail
+            d     : "-polly -polly-vectorizer=stripmine"
+
+    # Toggle options you want to use with llvm-bolt (OFF)
+    - bolt:
+        gnu:
+            c         : "-fno-reorder-blocks-and-partition"
+            cxx       : "-fno-reorder-blocks-and-partition"
+            ld        : "-Wl,-q"
+        llvm:
+            c         : "-fno-split-machine-functions"
+            cxx       : "-fno-split-machine-functions"
+            ld        : "-Wl,-q"
+
+    # Toggle -fcommon (OFF)
+    - common:
+        c         : "-fcommon"
+        cxx       : "-fcommon"
+        gnu       :
+            f     : "-fcommon"
+
+    # Toggle debug-lines optimisations
+    - debug-lines:
+        rust      : "-C debuginfo=line-tables-only -C split-debuginfo=off"
+        llvm:
+            c         : "-gline-tables-only -fasynchronous-unwind-tables"
+            cxx       : "-gline-tables-only -fasynchronous-unwind-tables"
+            d         : "-gline-tables-only -gc"
+
+    # Toggle debug-std optimisations (ON)
+    - debug-std:
+        f         : "-g"
+        d         : "-g -gc -d-debug"
+        rust      : "-C debuginfo=2 -C split-debuginfo=off"
+        gnu:
+            c         : "-g -feliminate-unused-debug-types -fasynchronous-unwind-tables"
+            cxx       : "-g -feliminate-unused-debug-types -fasynchronous-unwind-tables"
+        llvm:
+            c         : "-g -fasynchronous-unwind-tables"
+            cxx       : "-g -fasynchronous-unwind-tables"
+
+    # Toggle fast math (OFF)
+    - math:
+        f         : "-ffast-math"
+        d         : "-ffast-math -fp-contract=fast"
+        gnu:
+            c         : "-fno-math-errno -fno-trapping-math"
+            cxx       : "-fno-math-errno -fno-trapping-math"
+        llvm:
+            c         : "-fno-math-errno -fno-trapping-math -ffp-contract=fast -ffp-model=fast"
+            cxx       : "-fno-math-errno -fno-trapping-math -ffp-contract=fast -ffp-model=fast"
+
+    # Toggle noplt, requires bindnow (OFF)
+    - noplt:
+        c         : "-fno-plt"
+        cxx       : "-fno-plt"
+        d         : "-fno-plt"
+        gnu:
+            f     : "-fno-plt"
+
+    # Toggle -fno-semantic-interposition (OFF)
+    - nosemantic:
+        c         : "-fno-semantic-interposition"
+        cxx       : "-fno-semantic-interposition"
+
+    # Toggle -fno-direct-access-external-data (OFF)
+    - nodaed:
+        llvm:
+            c         : "-fno-direct-access-external-data"
+            cxx       : "-fno-direct-access-external-data"
+
+    # Prefer 128-bit vector width (ON)
+    - avxwidth-128:
+        c         : "-mprefer-vector-width=128"
+        cxx       : "-mprefer-vector-width=128"
+        gnu:
+            f     : "-mprefer-vector-width=128"
+
+    # Toggle -fpch-instantiate-templates (OFF)
+    - pch-instantiate:
+        llvm:
+            c         : "-fpch-instantiate-templates"
+            cxx       : "-fpch-instantiate-templates"
+
+    # Toggle asneeded (ON)
+    - asneeded:
+        ld        : "-Wl,--as-needed"
+
+    # Toggle runpath (OFF)
+    - runpath:
+        ld        : "-Wl,--enable-new-dtags"
+
+    # Toggle sse2avx (OFF)
+    - sse2avx:
+        gnu:
+            c         : "-msse2avx"
+            cxx       : "-msse2avx"
+            f         : "-msse2avx"
+
+    # Toggle visibility hidden (OFF)
+    - visibility-hidden:
+        c          : "-fvisibility=hidden"
+        cxx        : "-fvisibility-inlines-hidden -fvisibility=hidden"
+        d          : "-fvisibility=hidden"
+        gnu:
+            f      : "-fvisibility=hidden"
+
+    # Toggle visibility inlines hidden (OFF)
+    - visibility-inline:
+        cxx        : "-fvisibility-inlines-hidden"
+
+    # Enable relative vtables (OFF)
+    - relative-vtables:
+        llvm:
+            cxx       : "-fexperimental-library -fexperimental-relative-c++-abi-vtables"
+
+    # Toggle relr (ON)
+    - relr:
+        ld        : "-Wl,-z,pack-relative-relocs"
