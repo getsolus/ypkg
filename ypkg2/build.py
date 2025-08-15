@@ -46,7 +46,7 @@ def clean_build_dirs(context):
     return True
 
 
-def execute_step(context, step, step_n, work_dir):
+def execute_step(context, step, step_name, work_dir):
     script = ScriptGenerator(context, context.spec, work_dir)
     if context.emul32:
         script.define_export("EMUL32BUILD", "1")
@@ -61,7 +61,7 @@ def execute_step(context, step, step_n, work_dir):
     endScript = None
 
     # Allow GCC and such to pick up on our timestamp
-    script.define_export("SOURCE_DATE_EPOCH", f"{metadata.history_timestamp}")
+    script.define_export("SOURCE_DATE_EPOCH", "{}".format(metadata.history_timestamp))
 
     # Handle the anal nature of llvm profiling
     if context.gen_pgo and context.spec.pkg_clang:
@@ -74,7 +74,7 @@ def execute_step(context, step, step_n, work_dir):
         script.define_export("LLVM_PROFILE_FILE", profileFile)
         script.define_export("YPKG_PGO_DIR", context.get_pgo_dir())
 
-    if context.avx2 and step_n == "install":
+    if context.avx2 and step_name == "install":
         endScript = "%avx2_lib_shift"
 
     exports = script.emit_exports()
@@ -87,15 +87,15 @@ def execute_step(context, step, step_n, work_dir):
     # Add our exports
     full_text += "\n".join(exports)
     if context.spec.pkg_environment:
-        full_text += f"\n\n{context.spec.pkg_environment}\n"
+        full_text += "\n\n{}\n".format(context.spec.pkg_environment)
     if extraScript:
-        full_text += f"\n\n{extraScript}\n"
-    full_text += f"\n\n{step}\n"
+        full_text += "\n\n{}\n".format(extraScript)
+    full_text += "\n\n{}\n".format(step)
     if endScript:
-        full_text += f"\n\n{endScript}\n"
+        full_text += "\n\n{}\n".format(endScript)
     output = script.escape_string(full_text)
 
-    with tempfile.NamedTemporaryFile(prefix=f"ypkg-{step_n}") as script_ex:
+    with tempfile.NamedTemporaryFile(prefix="ypkg-%s" % step_name) as script_ex:
         script_ex.write(output.encode("utf-8"))
         script_ex.flush()
 
