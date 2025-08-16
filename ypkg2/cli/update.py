@@ -35,12 +35,14 @@ parser.add_argument("--cache", nargs='?', help="Cache the tarball in the solbuil
 
 cleanup = True
 
+
 def usage(msg=None, ex=1):
     if msg:
         print(msg)
     else:
         parser.print_help()
     sys.exit(ex)
+
 
 def shasum(url):
     try:
@@ -54,6 +56,7 @@ def shasum(url):
 
     sha256 = subprocess.check_output(["sha256sum", filename]).split()[0].strip()
     return sha256.decode('utf-8')
+
 
 def cache_tarball_to_solbuild(filename, sha256sum):
 
@@ -74,7 +77,8 @@ def cache_tarball_to_solbuild(filename, sha256sum):
         print("Tarball already exists in solbuild cache")
         return False
 
-if __name__ == "__main__":
+
+def main():
     args = parser.parse_args()
 
     ymlfile = args.yml
@@ -125,6 +129,11 @@ if __name__ == "__main__":
     if args.cache is not False and not url.startswith("git|"):
         if cache_tarball_to_solbuild(filename, sha256sum):
             cleanup = False
+
+
+if __name__ == "__main__":
+    main()
+
 
 # Cleanup on exit
 import atexit
