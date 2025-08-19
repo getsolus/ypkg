@@ -21,19 +21,32 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description="Ypkg")
-    parser.add_argument("-n", "--no-colors", help="Disable color output",
-                        action="store_true")
-    parser.add_argument("-v", "--version", action="store_true",
-                        help="Show version information and exit")
-    parser.add_argument("-f", "--force", help="Force install dependencies, "
-                        "i.e. no prompt", action="store_true")
-    parser.add_argument("-D", "--output-dir", type=str,
-                        help="Set the output directory for resulting files")
-    parser.add_argument("-B", "--build-dir", type=str,
-                        help="Set the base directory for performing the build")
+    parser.add_argument(
+        "-n", "--no-colors", help="Disable color output", action="store_true"
+    )
+    parser.add_argument(
+        "-v", "--version", action="store_true", help="Show version information and exit"
+    )
+    parser.add_argument(
+        "-f",
+        "--force",
+        help="Force install dependencies, i.e. no prompt",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-D",
+        "--output-dir",
+        type=str,
+        help="Set the output directory for resulting files",
+    )
+    parser.add_argument(
+        "-B",
+        "--build-dir",
+        type=str,
+        help="Set the base directory for performing the build",
+    )
     # Main file
-    parser.add_argument("filename", help="Path to the ypkg YAML file",
-                        nargs='?')
+    parser.add_argument("filename", help="Path to the ypkg YAML file", nargs="?")
 
     args = parser.parse_args()
     # Kill colors
@@ -55,16 +68,22 @@ def main():
         if "FAKED_MODE" not in os.environ:
             needFakeroot = False
 
-    args = " ".join(sys.argv[1:])
     vargs = sys.argv[1:]
     cargs = " ".join([x for x in vargs if x != "-f" and x != "--force"])
+
     try:
-        subprocess.check_call("ypkg-install-deps {}".format(args), shell=True)
+        output_flag = f"-D {args.output_dir}" if args.output_dir else ""
+        force_flag = "--force" if args.force else ""
+        subprocess.check_call(
+            f"ypkg-install-deps {output_flag} {force_flag} {args.filename}", shell=True
+        )
+
         if needFakeroot:
             sub = "fakeroot "
         else:
             sub = ""
-        subprocess.check_call("{}ypkg-build {}".format(sub, cargs), shell=True)
+
+        subprocess.check_call(f"{sub}ypkg-build {cargs}", shell=True)
     except Exception as e:
         print(e)
         sys.exit(1)
