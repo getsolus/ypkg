@@ -11,10 +11,7 @@
 #  (at your option) any later version.
 #
 
-from . import console_ui
-from . import readlink
-from . import remove_prefix
-from . import EMUL32PC
+
 import magic
 import re
 import os
@@ -23,6 +20,9 @@ import shutil
 import multiprocessing
 import xattr
 import base64
+
+from .util import console_ui, readlink, remove_prefix, EMUL32PC
+
 global share_ctx
 
 
@@ -39,7 +39,7 @@ global_xattrs = dict()
 
 
 def is_pkgconfig_file(pretty, mgs):
-    """ Simple as it sounds, work out if this is a pkgconfig file """
+    """Simple as it sounds, work out if this is a pkgconfig file"""
     if pretty.endswith(".pc"):
         pname = os.path.basename(os.path.dirname(pretty))
         if pname == "pkgconfig":
@@ -48,7 +48,7 @@ def is_pkgconfig_file(pretty, mgs):
 
 
 def is_soname_link(file, mgs):
-    """ Used to detect soname links """
+    """Used to detect soname links"""
     if not file.endswith(".so"):
         return False
 
@@ -58,7 +58,7 @@ def is_soname_link(file, mgs):
 
 
 def is_static_archive(file, mgs):
-    """ Very trivially determine .a files """
+    """Very trivially determine .a files"""
     if not file.endswith(".a"):
         return False
 
@@ -72,7 +72,7 @@ def is_static_archive(file, mgs):
 
 
 def is_system_map(file, mgs):
-    """ Ensure we have a system map file """
+    """Ensure we have a system map file"""
     if "kernel/System.map-" not in file:
         return False
 
@@ -86,7 +86,6 @@ def is_system_map(file, mgs):
 
 
 class FileReport:
-
     pkgconfig_deps = None
     pkgconfig_name = None
 
@@ -106,13 +105,14 @@ class FileReport:
     prov_kernel = None
 
     def scan_kernel(self, file):
-        """ Scan a .ko file to figure out which kernel this depends on """
-        cmd = "LC_ALL=C /sbin/modinfo --field=vermagic \"{}\"".format(file)
+        """Scan a .ko file to figure out which kernel this depends on"""
+        cmd = 'LC_ALL=C /sbin/modinfo --field=vermagic "{}"'.format(file)
         try:
             output = subprocess.check_output(cmd, shell=True)
         except Exception as e:
-            console_ui.emit_warning("File", "Failed to scan kernel modules for"
-                                    " path: {}".format(file))
+            console_ui.emit_warning(
+                "File", "Failed to scan kernel modules for path: {}".format(file)
+            )
             return
         line = output.split("\n")[0]
         splits = line.strip().split(" ")
@@ -123,12 +123,13 @@ class FileReport:
         self.dep_kernel = splits[0].strip()
 
     def scan_binary(self, file, check_soname=False):
-        cmd = "LC_ALL=C /usr/bin/readelf -d \"{}\"".format(file)
+        cmd = 'LC_ALL=C /usr/bin/readelf -d "{}"'.format(file)
         try:
             output = subprocess.check_output(cmd, shell=True).decode()
         except Exception as e:
-            console_ui.emit_warning("File", "Failed to scan binary deps for"
-                                    " path: {}".format(file))
+            console_ui.emit_warning(
+                "File", "Failed to scan binary deps for path: {}".format(file)
+            )
             return
 
         for line in output.split("\n"):
@@ -183,11 +184,11 @@ class FileReport:
                 pkgConfigPaths.append(p)
 
         if len(pkgConfigPaths) > 0:
-            sub = "PKG_CONFIG_PATH=\"{}\" ".format(":".join(pkgConfigPaths))
+            sub = 'PKG_CONFIG_PATH="{}" '.format(":".join(pkgConfigPaths))
 
         cmds = [
-            "LC_ALL=C {}pkg-config --print-requires \"{}\"",
-            "LC_ALL=C {}pkg-config --print-requires-private \"{}\""
+            'LC_ALL=C {}pkg-config --print-requires "{}"',
+            'LC_ALL=C {}pkg-config --print-requires-private "{}"',
         ]
 
         pcname = os.path.basename(file).split(".pc")[0]
@@ -197,8 +198,9 @@ class FileReport:
             return
         for cmd in cmds:
             try:
-                out = subprocess.check_output(cmd.format(sub, file),
-                                              shell=True).decode()
+                out = subprocess.check_output(
+                    cmd.format(sub, file), shell=True
+                ).decode()
             except Exception as e:
                 print(e)
                 continue
@@ -223,18 +225,18 @@ class FileReport:
                 self.pkgconfig_deps.add(name)
 
     def add_solink(self, file, pretty):
-        """ .so links are almost always split into -devel subpackages in ypkg,
-            unless explicitly overriden. However, they are useless without the
-            actual versioned so they link to. Therefore, we add an automatic
-            dependency to the hosting package when we find one of these, i.e:
+        """.so links are almost always split into -devel subpackages in ypkg,
+        unless explicitly overriden. However, they are useless without the
+        actual versioned so they link to. Therefore, we add an automatic
+        dependency to the hosting package when we find one of these, i.e:
 
-            zlib:
-                /usr/lib64/libz.so.1.2.8
-            zlib-devel:
-                /usr/lib64/libz.so -> libz.so.1.2.8
+        zlib:
+            /usr/lib64/libz.so.1.2.8
+        zlib-devel:
+            /usr/lib64/libz.so -> libz.so.1.2.8
 
-            zlib-devel -> zlib
-            """
+        zlib-devel -> zlib
+        """
         fpath = readlink(file)
 
         dirn = os.path.dirname(file)
@@ -282,25 +284,21 @@ class FileReport:
 
 
 def strip_file(context, pretty, file, magic_string, mode=None):
-    """ Schedule a strip, basically. """
+    """Schedule a strip, basically."""
     if not context.spec.pkg_strip:
         return
     exports = ["LC_ALL=C"]
     if context.spec.pkg_optimize and not context.spec.pkg_clang:
-        if "thin-lto" in context.spec.pkg_optimize \
-                or "lto" in context.spec.pkg_optimize:
-            exports.extend([
-                "AR=\"gcc-ar\"",
-                "RANLIB=\"gcc-ranlib\"",
-                "NM=\"gcc-nm\""])
+        if (
+            "thin-lto" in context.spec.pkg_optimize
+            or "lto" in context.spec.pkg_optimize
+        ):
+            exports.extend(['AR="gcc-ar"', 'RANLIB="gcc-ranlib"', 'NM="gcc-nm"'])
     else:
         if context.spec.pkg_clang:
-            exports.extend([
-                "AR=\"llvm-ar\"",
-                "RANLIB=\"llvm-ranlib\"",
-                "NM=\"llvm-nm\""])
+            exports.extend(['AR="llvm-ar"', 'RANLIB="llvm-ranlib"', 'NM="llvm-nm"'])
 
-    cmd = "{} strip {} \"{}\""
+    cmd = '{} strip {} "{}"'
     flags = ""
     if mode == "shared":
         flags = "--strip-unneeded"
@@ -309,20 +307,19 @@ def strip_file(context, pretty, file, magic_string, mode=None):
     elif mode == "ar":
         flags = "--strip-debug -p -R .gnu.lto_* -R .gnu.debuglto_* -R .llvm.lto -N __gnu_lto_v1"
         if context.spec.pkg_clang:
-            cmd = "{} llvm-objcopy {} \"{}\""
+            cmd = '{} llvm-objcopy {} "{}"'
     try:
         s = " ".join(exports)
         subprocess.check_call(cmd.format(s, flags, file), shell=True)
         console_ui.emit_info("Stripped", pretty)
     except Exception as e:
-        console_ui.emit_warning("Strip", "Failed to strip '{}'".
-                                format(pretty))
+        console_ui.emit_warning("Strip", "Failed to strip '{}'".format(pretty))
         print(e)
 
 
 def get_debug_path(context, file, magic_string):
-    """ Grab the NT_GNU_BUILD_ID """
-    cmd = "LC_ALL=C readelf -n \"{}\"".format(file)
+    """Grab the NT_GNU_BUILD_ID"""
+    cmd = 'LC_ALL=C readelf -n "{}"'.format(file)
     try:
         lines = subprocess.check_output(cmd, shell=True).decode()
     except Exception as e:
@@ -417,14 +414,13 @@ def store_debug(context, pretty, file, magic_string):
         console_ui.emit_error("Debug", "Failed to make directory")
         return
 
-    cmd = "objcopy --only-keep-debug \"{}\" \"{}\"".format(file, did_full)
+    cmd = 'objcopy --only-keep-debug "{}" "{}"'.format(file, did_full)
     try:
         subprocess.check_call(cmd, shell=True)
     except Exception as e:
         console_ui.emit_warning("objcopy", "Failed --only-keep-debug")
         return
-    cmd = "objcopy --add-gnu-debuglink=\"{}\" \"{}\"".format(did_full,
-                                                             file)
+    cmd = 'objcopy --add-gnu-debuglink="{}" "{}"'.format(did_full, file)
     try:
         subprocess.check_call(cmd, shell=True)
     except Exception as e:
@@ -433,9 +429,9 @@ def store_debug(context, pretty, file, magic_string):
 
 
 class PackageExaminer:
-    """ Responsible for identifying files suitable for further examination,
-        such as those that should be removed, checked for dependencies,
-        providers, and even those that should be stripped
+    """Responsible for identifying files suitable for further examination,
+    such as those that should be removed, checked for dependencies,
+    providers, and even those that should be stripped
     """
 
     def __init__(self):
@@ -451,7 +447,7 @@ class PackageExaminer:
         if pretty.startswith("/emul32"):
             return True
         # Nuke AVX2 dir .a files with no remorse
-        if (pretty.startswith("/usr/lib64/glibc-hwcaps/x86-64-v3/")):
+        if pretty.startswith("/usr/lib64/glibc-hwcaps/x86-64-v3/"):
             if ".so" not in pretty:
                 return True
             # Don't want .so links, they're useless.
@@ -460,7 +456,7 @@ class PackageExaminer:
         return False
 
     def file_is_of_interest(self, pretty, file, mgs):
-        """ So we can keep our list of things to check low """
+        """So we can keep our list of things to check low"""
         if v_dyn.match(mgs) or v_bin.match(mgs) or v_pie.match(mgs) or v_rel.match(mgs):
             if not self.can_kernel and file.endswith(".ko"):
                 return False
@@ -476,7 +472,7 @@ class PackageExaminer:
         return False
 
     def examine_package(self, context, package):
-        """ Examine the given package and update symbols, etc. """
+        """Examine the given package and update symbols, etc."""
         install_dir = context.get_install_dir()
 
         global share_ctx
@@ -491,7 +487,7 @@ class PackageExaminer:
         results = list()
 
         for file in package.emit_files():
-            if file[0] == '/':
+            if file[0] == "/":
                 file = file[1:]
             fpath = os.path.join(install_dir, file)
             try:
@@ -506,20 +502,24 @@ class PackageExaminer:
                     else:
                         shutil.rmtree(fpath)
                 except Exception as e:
-                    console_ui.emit_error("Clean", "Failed to remove unwanted"
-                                          "file: {}".format(e))
+                    console_ui.emit_error(
+                        "Clean", "Failed to remove unwantedfile: {}".format(e)
+                    )
                     return False
-                console_ui.emit_info("Clean", "Removed unwanted file: {}".
-                                     format("/" + file))
+                console_ui.emit_info(
+                    "Clean", "Removed unwanted file: {}".format("/" + file)
+                )
                 removed.add("/" + file)
                 continue
 
             if not self.file_is_of_interest("/" + file, fpath, mgs):
                 continue
             # Handle this asynchronously
-            results.append(pool.apply_async(examine_file, [
-                           package, "/" + file, fpath, mgs],
-                           callback=None))
+            results.append(
+                pool.apply_async(
+                    examine_file, [package, "/" + file, fpath, mgs], callback=None
+                )
+            )
 
         pool.close()
         pool.join()
@@ -530,13 +530,12 @@ class PackageExaminer:
                 continue
             global_xattrs[info.pretty] = info.xattrs
 
-
         for r in removed:
             package.remove_file(r)
         return infos
 
     def examine_packages(self, context, packages):
-        """ Examine all packages, in order to update dependencies, etc """
+        """Examine all packages, in order to update dependencies, etc"""
         console_ui.emit_info("Examine", "Examining packages")
 
         examinations = dict()

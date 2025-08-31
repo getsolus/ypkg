@@ -14,25 +14,23 @@
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 
-from . import console_ui
-from .stringglob import StringPathGlob
 
 import os
 
-PRIORITY_DEFAULT = 0    # Standard internal priority for a pattern
-PRIORITY_USER = 100     # Priority for a user pattern, do what they say.
-DBG = 1000              # Never allow the user to override these guys.
+from .stringglob import StringPathGlob
+
+PRIORITY_DEFAULT = 0  # Standard internal priority for a pattern
+PRIORITY_USER = 100  # Priority for a user pattern, do what they say.
+DBG = 1000  # Never allow the user to override these guys.
 
 
 class DefaultPolicy(StringPathGlob):
-
     def __init__(self):
         StringPathGlob.__init__(self, "a")
         pass
 
 
 class Package:
-
     patterns = None
     files = None
     excludes = None
@@ -60,19 +58,18 @@ class Package:
         self.default_policy = DefaultPolicy()
 
     def get_pattern(self, path):
-        """ Return a matching pattern for the given path.
-            This is ordered according to priority to enable
-            multiple layers of priorities """
+        """Return a matching pattern for the given path.
+        This is ordered according to priority to enable
+        multiple layers of priorities"""
         matches = [p for p in self.patterns if p.match(path)]
         if len(matches) == 0:
             return self.default_policy
 
-        matches = sorted(matches, key=StringPathGlob.get_priority,
-                         reverse=True)
+        matches = sorted(matches, key=StringPathGlob.get_priority, reverse=True)
         return matches[0]
 
     def add_file(self, pattern, path, permanent):
-        """ Add a file by a given pattern to this package """
+        """Add a file by a given pattern to this package"""
         if pattern is None:
             pattern = self.default_policy
         if pattern not in self.patterns:
@@ -83,7 +80,7 @@ class Package:
             self.permanent.add(path)
 
     def remove_file(self, path):
-        """ Remove a file from this package if it owns it """
+        """Remove a file from this package if it owns it"""
         pat = self.get_pattern(path)
         if not pat:
             return
@@ -93,7 +90,7 @@ class Package:
             self.files.remove(path)
 
     def exclude_file(self, path):
-        """ Exclude a file from this package if it captures it """
+        """Exclude a file from this package if it captures it"""
         pat = self.get_pattern(path)
         if not pat:
             return
@@ -102,7 +99,7 @@ class Package:
         self.excludes.add(path)
 
     def emit_files(self):
-        """ Emit actual file lists, vs the globs we have """
+        """Emit actual file lists, vs the globs we have"""
         ret = set()
         for pt in self.patterns:
             adds = [x for x in self.patterns[pt] if x not in self.excludes]
@@ -110,13 +107,13 @@ class Package:
         return sorted(ret)
 
     def is_permanent(self, path):
-        """ Determine if a path if a permanent path or not """
+        """Determine if a path if a permanent path or not"""
         return path in self.permanent
 
     def emit_files_by_pattern(self):
-        """ Emit file lists, using the globs though. Note that eopkg has no
-            exclude concept, this is left for us to handle as we build the
-            resulting eopkg ourselves """
+        """Emit file lists, using the globs though. Note that eopkg has no
+        exclude concept, this is left for us to handle as we build the
+        resulting eopkg ourselves"""
         ret = set()
         for pt in self.patterns:
             pat = self.patterns[pt]
@@ -133,7 +130,6 @@ class Package:
 
 
 class PackageGenerator:
-
     patterns = None
     packages = None
     permanent = None
@@ -156,8 +152,7 @@ class PackageGenerator:
         self.add_pattern("/usr/lib64/glibc-hwcaps/x86-64-v3/*.so*", "main")
         self.add_pattern("/usr/lib/lib*.so.*", "main")
         self.add_pattern("/usr/lib32/", "32bit")
-        self.add_pattern("/usr/lib32/lib*.so.*", "32bit",
-                         priority=PRIORITY_DEFAULT+1)
+        self.add_pattern("/usr/lib32/lib*.so.*", "32bit", priority=PRIORITY_DEFAULT + 1)
 
         self.add_pattern("/usr/share/locale", "main")
         self.add_pattern("/usr/share/doc", "main")
@@ -166,14 +161,16 @@ class PackageGenerator:
         if spec.pkg_libsplit:
             self.add_pattern("/usr/lib64/lib*.so", "devel")
             self.add_pattern("/usr/lib/lib*.so", "devel")
-            self.add_pattern("/usr/lib32/lib*.so", "32bit-devel",
-                             priority=PRIORITY_DEFAULT+1)
+            self.add_pattern(
+                "/usr/lib32/lib*.so", "32bit-devel", priority=PRIORITY_DEFAULT + 1
+            )
 
         else:
             self.add_pattern("/usr/lib64/lib*.so", "main")
             self.add_pattern("/usr/lib/lib*.so", "main")
-            self.add_pattern("/usr/lib32/lib*.so", "32bit",
-                             priority=PRIORITY_DEFAULT+1)
+            self.add_pattern(
+                "/usr/lib32/lib*.so", "32bit", priority=PRIORITY_DEFAULT + 1
+            )
 
         self.add_pattern("/usr/lib64/lib*.a", "devel")
         self.add_pattern("/usr/lib/lib*.a", "devel")
@@ -185,10 +182,12 @@ class PackageGenerator:
         self.add_pattern("/usr/share/aclocal/*.m4", "devel")
         self.add_pattern("/usr/share/aclocal/*.ac", "devel")
 
-        self.add_pattern("/usr/lib32/lib*.a", "32bit-devel",
-                        priority=PRIORITY_DEFAULT+1)
-        self.add_pattern("/usr/lib32/pkgconfig/*.pc", "32bit-devel",
-                         priority=PRIORITY_DEFAULT+1)
+        self.add_pattern(
+            "/usr/lib32/lib*.a", "32bit-devel", priority=PRIORITY_DEFAULT + 1
+        )
+        self.add_pattern(
+            "/usr/lib32/pkgconfig/*.pc", "32bit-devel", priority=PRIORITY_DEFAULT + 1
+        )
 
         # Debug infos get highest priority. you don't override these guys.
         self.add_pattern("/usr/lib64/debug/", "dbginfo", priority=DBG)
@@ -201,8 +200,9 @@ class PackageGenerator:
         self.add_pattern("/usr/share/cmake/", "devel")
         self.add_pattern("/usr/lib64/cmake/", "devel")
         self.add_pattern("/usr/lib/cmake/", "devel")
-        self.add_pattern("/usr/lib32/cmake/", "32bit-devel",
-                         priority=PRIORITY_DEFAULT+1)
+        self.add_pattern(
+            "/usr/lib32/cmake/", "32bit-devel", priority=PRIORITY_DEFAULT + 1
+        )
 
         # Haskell
         self.add_pattern("/usr/lib64/ghc-*/*/*.a", "devel")
@@ -214,18 +214,24 @@ class PackageGenerator:
         self.add_pattern("/usr/share/gir-1.0/*.gir", "devel")
 
         # Qt/KDE developer documentation
-        self.add_pattern("/usr/share/doc/qt5/*.qch", "devel",
-                         priority=PRIORITY_DEFAULT+1)
-        self.add_pattern("/usr/share/doc/qt5/*.tags", "devel",
-                         priority=PRIORITY_DEFAULT+1)
-        self.add_pattern("/usr/share/qt5/doc/*.qch", "devel",
-                         priority=PRIORITY_DEFAULT+1)
-        self.add_pattern("/usr/share/qt5/doc/*.tags", "devel",
-                         priority=PRIORITY_DEFAULT+1)
-        self.add_pattern("/usr/share/doc/qt6/*.qch", "devel",
-                         priority=PRIORITY_DEFAULT+1)
-        self.add_pattern("/usr/share/doc/qt6/*.tags", "devel",
-                         priority=PRIORITY_DEFAULT+1)
+        self.add_pattern(
+            "/usr/share/doc/qt5/*.qch", "devel", priority=PRIORITY_DEFAULT + 1
+        )
+        self.add_pattern(
+            "/usr/share/doc/qt5/*.tags", "devel", priority=PRIORITY_DEFAULT + 1
+        )
+        self.add_pattern(
+            "/usr/share/qt5/doc/*.qch", "devel", priority=PRIORITY_DEFAULT + 1
+        )
+        self.add_pattern(
+            "/usr/share/qt5/doc/*.tags", "devel", priority=PRIORITY_DEFAULT + 1
+        )
+        self.add_pattern(
+            "/usr/share/doc/qt6/*.qch", "devel", priority=PRIORITY_DEFAULT + 1
+        )
+        self.add_pattern(
+            "/usr/share/doc/qt6/*.tags", "devel", priority=PRIORITY_DEFAULT + 1
+        )
 
         # Plugins for qt5/qt6 designer
         self.add_pattern("/usr/lib/qt5/plugins/designer/*.so", "devel")
@@ -234,8 +240,7 @@ class PackageGenerator:
         self.add_pattern("/usr/lib64/qt6/plugins/designer/*.so", "devel")
 
         # This is almost always man files for api functions
-        self.add_pattern("/usr/share/man/man3", "devel",
-                         priority=PRIORITY_DEFAULT+1)
+        self.add_pattern("/usr/share/man/man3", "devel", priority=PRIORITY_DEFAULT + 1)
 
         # These files are used by qt5/kf5 builds
         self.add_pattern("/usr/lib/libQt5*.prl", "devel")
@@ -255,15 +260,15 @@ class PackageGenerator:
         self.add_pattern("/usr/lib64/qt6/sbom", "devel")
 
     def add_file(self, path):
-        """ Add a file path to the owned list and place it into the correct
-            package (main or named subpackage) according to the highest found
-            priority pattern rule, otherwise it shall fallback under default
-            policy into the main package itself.
+        """Add a file path to the owned list and place it into the correct
+        package (main or named subpackage) according to the highest found
+        priority pattern rule, otherwise it shall fallback under default
+        policy into the main package itself.
 
-            This enables a fallback approach, whereby subpackages "steal" from
-            the main listing, and everything that is left is packaged into the
-            main package (YpkgSpec::name), making "abandoned" files utterly
-            impossible. """
+        This enables a fallback approach, whereby subpackages "steal" from
+        the main listing, and everything that is left is packaged into the
+        main package (YpkgSpec::name), making "abandoned" files utterly
+        impossible."""
 
         target = "main"  # default pattern name
         pattern = self.get_pattern(path)
@@ -281,27 +286,26 @@ class PackageGenerator:
         self.packages[target].add_file(pattern, path, permanent)
 
     def remove_file(self, path):
-        """ Remove a file from our set, in any of our main or sub packages
-            that may currently own it. """
+        """Remove a file from our set, in any of our main or sub packages
+        that may currently own it."""
 
         for pkg in self.packages:
             self.packages[pkg].remove_file(path)
 
     def get_pattern(self, path):
-        """ Return a matching pattern for the given path.
-            This is ordered according to priority to enable
-            multiple layers of priorities """
+        """Return a matching pattern for the given path.
+        This is ordered according to priority to enable
+        multiple layers of priorities"""
         matches = [p for p in self.patterns if p.match(path)]
         if len(matches) == 0:
             return None
 
-        matches = sorted(matches, key=StringPathGlob.get_priority,
-                         reverse=True)
+        matches = sorted(matches, key=StringPathGlob.get_priority, reverse=True)
         return matches[0]
 
     def add_pattern(self, pattern, pkgName, priority=PRIORITY_DEFAULT):
-        """ Add a pattern to the internal map according to the
-            given priority. """
+        """Add a pattern to the internal map according to the
+        given priority."""
 
         obj = None
         is_prefix = False
@@ -313,7 +317,7 @@ class PackageGenerator:
         self.patterns[obj] = pkgName
 
     def add_permanent_pattern(self, pattern):
-        """ Add a pattern to our mapping of permanent paths. """
+        """Add a pattern to our mapping of permanent paths."""
         obj = None
         is_prefix = False
         if pattern.endswith(os.sep):
@@ -324,11 +328,11 @@ class PackageGenerator:
         self.permanent.add(obj)
 
     def emit_packages(self):
-        """ Ensure we've finalized our state, allowing proper theft and
-            exclusion to take place, and then return all package objects
-            that we've managed to generate. There is no gaurantee that
-            a "main" package will be generated, as patterns may omit
-            the production of one. """
+        """Ensure we've finalized our state, allowing proper theft and
+        exclusion to take place, and then return all package objects
+        that we've managed to generate. There is no gaurantee that
+        a "main" package will be generated, as patterns may omit
+        the production of one."""
 
         for package in self.packages:
             for comparison in self.packages:
@@ -338,7 +342,7 @@ class PackageGenerator:
                     self.packages[package].exclude_file(file)
 
     def get_file_owner(self, file):
-        """ Return the owning package for the specified file """
+        """Return the owning package for the specified file"""
         rname = os.path.realpath(file)
         for pkg in self.packages:
             package = self.packages[pkg]

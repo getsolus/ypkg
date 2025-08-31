@@ -18,6 +18,7 @@ dependencies = [
     "PyYaml >= 5.0.0",
     "python-magic >= 0.4.0",
     "ruamel.yaml >= 0.18.0",
+    "typer >= 0.16.0",
     "xattr >= 0.10.0",
     "zstandard >= 0.18.0"
 ]
@@ -30,17 +31,14 @@ classifiers = [
 
 [project.scripts]
 ybump = "ypkg2.cli.bump:main"
-ypkg = "ypkg2.cli.ypkg:main"
-ypkg-build = "ypkg2.main:main"
-ypkg-gen-history = "ypkg2.cli.genhistory:main"
-ypkg-install-deps = "ypkg2.cli.installdeps:main"
+ypkg = "ypkg2.main:app"
 yupdate = "ypkg2.cli.update:main"
 
 [project.urls]
 Homepage = "https://getsol.us"
 Documentation = "https://help.getsol.us"
 Repository = "https://github.com/getsolus/ypkg"
-Issues = "https://github.com/getsolus/ypkg/issues/new/choose"
+Issues = "https://github.com/getsolus/ypkg/issues"
 
 [tool.black]
 line-length = 120

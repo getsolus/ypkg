@@ -11,24 +11,24 @@
 #  (at your option) any later version.
 #
 
-from . import console_ui
+from .util import console_ui
 
 from collections import OrderedDict
 import glob
-import re
 import os
 
 from yaml import load as yaml_load
+
 try:
     from yaml import CLoader as Loader
-except Exception as e:
+except Exception:
     from yaml import Loader
 
 
 class ScriptGenerator:
-    """ Generates build scripts on the fly by providing a default header
-        tailored to the current build context and performing substitution
-        on exported macros from this instance """
+    """Generates build scripts on the fly by providing a default header
+    tailored to the current build context and performing substitution
+    on exported macros from this instance"""
 
     macros = None
     context = None
@@ -47,24 +47,23 @@ class ScriptGenerator:
         self.init_default_exports()
 
     def define_macro(self, key, value):
-        """ Define a named macro. This will take the form %name% """
+        """Define a named macro. This will take the form %name%"""
         self.macros["%{}%".format(key)] = value
 
     def define_action_macro(self, key, value):
-        """ Define an action macro. These take the form %action """
+        """Define an action macro. These take the form %action"""
         self.macros["%{}".format(key)] = value
 
     def define_export(self, key, value):
-        """ Define a shell export for scripts """
+        """Define a shell export for scripts"""
         self.exports[key] = value
 
     def define_unexport(self, key):
-        """ Ensure key is unexported from shell script """
+        """Ensure key is unexported from shell script"""
         self.unexports[key] = (None,)
 
-
     def load_macros(self, file_path):
-        """ Load a set of macros from a file """
+        """Load a set of macros from a file"""
         with open(file_path, "r") as f:
             yamlData = yaml_load(f, Loader=Loader)
 
@@ -99,7 +98,6 @@ class ScriptGenerator:
                 else:
                     self.define_action_macro(key, str(value))
 
-
     def load_system_macros(self):
         macros_path = os.path.join("/usr", "share", "ypkg", "macros", "actions")
 
@@ -108,15 +106,17 @@ class ScriptGenerator:
             try:
                 self.load_macros(file)
             except ValueError as e:
-                console_ui.emit_warning(os.path.basename(file), "Invalid macro definition: {0}".format(e))
+                console_ui.emit_warning(
+                    os.path.basename(file), "Invalid macro definition: {0}".format(e)
+                )
                 continue
             except Exception as e:
-                console_ui.emit_warning("SCRIPTS", "Cannot load macro file '{0}': {1}".format(file, e))
+                console_ui.emit_warning(
+                    "SCRIPTS", "Cannot load macro file '{0}': {1}".format(file, e)
+                )
                 continue
 
-
     def init_default_macros(self):
-
         if self.context.emul32:
             self.define_macro("libdir", "/usr/lib32")
             self.define_macro("LIBSUFFIX", "32")
@@ -140,7 +140,10 @@ class ScriptGenerator:
         self.define_macro("HOST", self.context.build.host)
         self.define_macro("ARCH", self.context.build.arch)
         # Based on the default target list defined in rocBLAS's CMakeLists.txt
-        self.define_macro("AMDGPUTARGETS", "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1010;gfx1030;gfx1100;gfx1101;gfx1102")
+        self.define_macro(
+            "AMDGPUTARGETS",
+            "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1010;gfx1030;gfx1100;gfx1101;gfx1102",
+        )
         self.define_macro("PKGNAME", self.spec.pkg_name)
         self.define_macro("PKGFILES", self.context.files_dir)
 
@@ -153,7 +156,7 @@ class ScriptGenerator:
         self.define_macro("builddir", self.context.get_build_dir())
 
     def init_default_exports(self):
-        """ Initialise our exports """
+        """Initialise our exports"""
         self.exports = OrderedDict()
         self.unexports = OrderedDict()
 
@@ -182,8 +185,10 @@ class ScriptGenerator:
 
         # Handle lto correctly
         if self.context.spec.pkg_optimize and not self.context.spec.pkg_clang:
-            if "thin-lto" in self.context.spec.pkg_optimize \
-                    or "lto" in self.context.spec.pkg_optimize:
+            if (
+                "thin-lto" in self.context.spec.pkg_optimize
+                or "lto" in self.context.spec.pkg_optimize
+            ):
                 self.define_export("AR", "gcc-ar")
                 self.define_export("RANLIB", "gcc-ranlib")
                 self.define_export("NM", "gcc-nm")
@@ -219,11 +224,11 @@ class ScriptGenerator:
         self.define_unexport("CDPATH")
 
     def emit_exports(self):
-        """ TODO: Grab known exports into an OrderedDict populated by an rc
-            YAML file to allow easier manipulation """
+        """TODO: Grab known exports into an OrderedDict populated by an rc
+        YAML file to allow easier manipulation"""
         ret = []
         for key in self.exports:
-            ret.append("export {}=\"{}\"".format(key, self.exports[key]))
+            ret.append('export {}="{}"'.format(key, self.exports[key]))
 
         unset_line = "unset {} || :".format(" ".join(list(self.unexports.keys())))
         ret.append(unset_line)
@@ -236,13 +241,13 @@ class ScriptGenerator:
             return True
 
     def escape_single(self, line):
-        offset = line.find('%')
+        offset = line.find("%")
         if offset < 0:
             return (line, False)
 
         tmp_name = "%"
         tmp_idx = 0
-        for i in range(offset+1, len(line)):
+        for i in range(offset + 1, len(line)):
             if line[i] == "%":
                 tmp_name += "%"
                 break
@@ -251,7 +256,7 @@ class ScriptGenerator:
             else:
                 break
         start = line[0:offset]
-        remnant = line[offset+len(tmp_name):]
+        remnant = line[offset + len(tmp_name) :]
         # TODO: Change to is-valid-macro check and consume anyway
         if tmp_name in self.macros:
             mc = self.macros[tmp_name]
@@ -264,12 +269,12 @@ class ScriptGenerator:
             return (line, False)
 
     def escape_string(self, input_string):
-        """ Recursively escape our macros out of a string until no more of our
-            macros appear in it """
+        """Recursively escape our macros out of a string until no more of our
+        macros appear in it"""
         ret = []
 
         for line in input_string.split("\n"):
-            while (True):
+            while True:
                 (line, cont) = self.escape_single(line)
                 if not cont:
                     ret.append(line)

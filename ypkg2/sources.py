@@ -11,53 +11,52 @@
 #  (at your option) any later version.
 #
 
-from . import console_ui
-
 import os
 import hashlib
 import subprocess
 import fnmatch
 import shutil
 
+from .util import console_ui
+
 KnownSourceTypes = {
-    'tar': [
-        '*.tar.*',
-        '*.tgz',
+    "tar": [
+        "*.tar.*",
+        "*.tgz",
     ],
-    'zip': [
-        '*.zip',
+    "zip": [
+        "*.zip",
     ],
 }
 
 
 class YpkgSource:
-
     def __init__(self):
         pass
 
     def fetch(self, context):
-        """ Fetch this source from it's given location """
+        """Fetch this source from it's given location"""
         return False
 
     def verify(self, context):
-        """ Verify the locally obtained source """
+        """Verify the locally obtained source"""
         return False
 
     def extract(self, context):
-        """ Attempt extraction of this source type, if needed """
+        """Attempt extraction of this source type, if needed"""
         return False
 
     def remove(self, context):
-        """ Attempt removal of this source type """
+        """Attempt removal of this source type"""
         return False
 
     def cached(self, context):
-        """ Report on whether this source is cached """
+        """Report on whether this source is cached"""
         return False
 
 
 class GitSource(YpkgSource):
-    """ Provides git source support to ypkg """
+    """Provides git source support to ypkg"""
 
     # Source URI
     uri = None
@@ -75,25 +74,24 @@ class GitSource(YpkgSource):
         return "{} ({})".format(self.uri, self.tag)
 
     def is_dumb_transport(self):
-        """ Http depth cloning = no go """
+        """Http depth cloning = no go"""
         if self.uri.startswith("http:") or self.uri.startswith("https:"):
             return True
         return False
 
     def get_target_name(self):
-        """ Get the target directory base name after its fetched """
+        """Get the target directory base name after its fetched"""
         uri = str(self.uri)
         if uri.endswith(".git"):
             uri = uri[:-4]
         return os.path.basename(uri) + ".git"
 
     def get_full_path(self, context):
-        """ Fully qualified target path """
-        return os.path.join(context.get_sources_directory(),
-                            self.get_target_name())
+        """Fully qualified target path"""
+        return os.path.join(context.get_sources_directory(), self.get_target_name())
 
     def fetch(self, context):
-        """ Clone the actual git repo, favouring efficiency... """
+        """Clone the actual git repo, favouring efficiency..."""
         source_dir = context.get_sources_directory()
 
         # Ensure source dir exists
@@ -101,49 +99,48 @@ class GitSource(YpkgSource):
             try:
                 os.makedirs(source_dir, mode=0o0755)
             except Exception as e:
-                console_ui.emit_error("Source", "Cannot create sources "
-                                      "directory: {}".format(e))
+                console_ui.emit_error(
+                    "Source", "Cannot create sources directory: {}".format(e)
+                )
                 return False
 
-        cmd = "git -C \"{}\" clone \"{}\" {}".format(
-            source_dir, self.uri, self.get_target_name())
+        cmd = 'git -C "{}" clone "{}" {}'.format(
+            source_dir, self.uri, self.get_target_name()
+        )
 
         console_ui.emit_info("Git", "Fetching: {}".format(self.uri))
         try:
             r = subprocess.check_call(cmd, shell=True)
         except Exception as e:
-            console_ui.emit_error("Git", "Failed to fetch {}".format(
-                                  self.uri))
+            console_ui.emit_error("Git", "Failed to fetch {}".format(self.uri))
             print(("Error follows: {}".format(e)))
             return False
 
         console_ui.emit_info("Git", "Checking out: {}".format(self.tag))
-        cmd = "git -C \"{}\" checkout \"{}\"".format(
-            os.path.join(source_dir, self.get_target_name()),
-            self.tag)
+        cmd = 'git -C "{}" checkout "{}"'.format(
+            os.path.join(source_dir, self.get_target_name()), self.tag
+        )
         try:
             r = subprocess.check_call(cmd, shell=True)
         except Exception as e:
-            console_ui.emit_error("Git", "Failed to checkout {}".format(
-                                  self.tag))
+            console_ui.emit_error("Git", "Failed to checkout {}".format(self.tag))
             return False
 
         ddir = os.path.join(source_dir, self.get_target_name())
         if not os.path.exists(os.path.join(ddir, ".gitmodules")):
             return True
 
-        submodule_cmd = "git -C \"{}\" submodule update --init --recursive".format(ddir)
+        submodule_cmd = 'git -C "{}" submodule update --init --recursive'.format(ddir)
 
         try:
             r = subprocess.check_call(submodule_cmd, shell=True)
         except Exception as e:
-            console_ui.emit_error("Git", "Failed to fetch git submodules {}".format(
-                                  e))
+            console_ui.emit_error("Git", "Failed to fetch git submodules {}".format(e))
             return False
         return True
 
     def verify(self, context):
-        """ Verify source = good. """
+        """Verify source = good."""
         bpath = self.get_full_path(context)
 
         status_cmd = "git -C {} diff --exit-code"
@@ -155,13 +152,12 @@ class GitSource(YpkgSource):
         return True
 
     def extract(self, context):
-        """ Extract ~= copy source into build area. Nasty but original source
-            should not be tainted between runs.
+        """Extract ~= copy source into build area. Nasty but original source
+        should not be tainted between runs.
         """
 
         source = self.get_full_path(context)
-        target = os.path.join(context.get_build_dir(),
-                              self.get_target_name())
+        target = os.path.join(context.get_build_dir(), self.get_target_name())
 
         if os.path.exists(target):
             try:
@@ -175,11 +171,12 @@ class GitSource(YpkgSource):
             try:
                 os.makedirs(context.get_build_dir(), mode=0o0755)
             except Exception as e:
-                console_ui.emit_error("Source", "Cannot create sources "
-                                      "directory: {}".format(e))
+                console_ui.emit_error(
+                    "Source", "Cannot create sources directory: {}".format(e)
+                )
                 return False
         try:
-            cmd = "cp -Ra \"{}/\" \"{}\"".format(source, target)
+            cmd = 'cp -Ra "{}/" "{}"'.format(source, target)
             subprocess.check_call(cmd, shell=True)
         except Exception as e:
             console_ui.emit_error("Git", "Failed to copy source to build")
@@ -193,7 +190,7 @@ class GitSource(YpkgSource):
 
 
 class TarSource(YpkgSource):
-    """ Represents a simple tarball source """
+    """Represents a simple tarball source"""
 
     uri = None
     hash = None
@@ -203,8 +200,8 @@ class TarSource(YpkgSource):
         YpkgSource.__init__(self)
         self.uri = uri
         self.hash = hash
-        if '#' in uri: #support URI fragments for renaming sources
-            self.filename = os.path.basename(uri[uri.index("#")+1:])
+        if "#" in uri:  # support URI fragments for renaming sources
+            self.filename = os.path.basename(uri[uri.index("#") + 1 :])
         else:
             self.filename = os.path.basename(uri)
 
@@ -212,8 +209,7 @@ class TarSource(YpkgSource):
         return "%s (%s)" % (self.uri, self.hash)
 
     def _get_full_path(self, context):
-        bpath = os.path.join(context.get_sources_directory(),
-                             self.filename)
+        bpath = os.path.join(context.get_sources_directory(), self.filename)
         return bpath
 
     def fetch(self, context):
@@ -224,19 +220,18 @@ class TarSource(YpkgSource):
             try:
                 os.makedirs(source_dir, mode=0o0755)
             except Exception as e:
-                console_ui.emit_error("Source", "Cannot create sources "
-                                      "directory: {}".format(e))
+                console_ui.emit_error(
+                    "Source", "Cannot create sources directory: {}".format(e)
+                )
                 return False
 
         console_ui.emit_info("Source", "Fetching: {}".format(self.uri))
         fpath = self._get_full_path(context)
-        cmd = "curl -o \"{}\" --url \"{}\" --location".format(
-               fpath, self.uri)
+        cmd = 'curl -o "{}" --url "{}" --location'.format(fpath, self.uri)
         try:
             r = subprocess.check_call(cmd, shell=True)
         except Exception as e:
-            console_ui.emit_error("Source", "Failed to fetch {}".format(
-                                  self.uri))
+            console_ui.emit_error("Source", "Failed to fetch {}".format(self.uri))
             print(("Error follows: {}".format(e)))
             return False
 
@@ -252,8 +247,9 @@ class TarSource(YpkgSource):
             h.update(inp.read())
             hash = h.hexdigest()
         if hash != self.hash:
-            console_ui.emit_error("Source", "Incorrect hash for {}".
-                                  format(self.filename))
+            console_ui.emit_error(
+                "Source", "Incorrect hash for {}".format(self.filename)
+            )
             print(("Found hash    : {}".format(hash)))
             print(("Expected hash : {}".format(self.hash)))
             return False
@@ -262,25 +258,24 @@ class TarSource(YpkgSource):
         target = os.path.join(BallDir, os.path.basename(x))
         ext = "unzip" if target.endswith(".zip") else "tar xf"
         diropt = "-d" if target.endswith(".zip") else "-C"
-        cmd = "%s \"%s\" %s \"%s\"" % (ext, target, diropt, bd)
+        cmd = '%s "%s" %s "%s"' % (ext, target, diropt, bd)
 
     def get_extract_command_zip(self, context, bpath):
-        """ Get a command tailored for zip usage """
-        cmd = "unzip \"{}\" -d \"{}/\"".format(bpath, context.get_build_dir())
+        """Get a command tailored for zip usage"""
+        cmd = 'unzip "{}" -d "{}/"'.format(bpath, context.get_build_dir())
         return cmd
 
     def get_extract_command_tar(self, context, bpath):
-        """ Get a command tailored for tar usage """
+        """Get a command tailored for tar usage"""
         if os.path.exists("/usr/bin/bsdtar"):
             frag = "bsdtar"
         else:
             frag = "tar"
-        cmd = "{} xf \"{}\" -C \"{}/\"".format(
-            frag, bpath, context.get_build_dir())
+        cmd = '{} xf "{}" -C "{}/"'.format(frag, bpath, context.get_build_dir())
         return cmd
 
     def extract(self, context):
-        """ Extract an archive into the context.get_build_dir() """
+        """Extract an archive into the context.get_build_dir()"""
         bpath = self._get_full_path(context)
 
         # Grab the correct extraction command
@@ -295,23 +290,26 @@ class TarSource(YpkgSource):
                 break
 
         if not fileType:
-            console_ui.emit_warning("Source", "Type of file {} is unknown, "
-                                    "falling back to tar handler".
-                                    format(self.filename))
+            console_ui.emit_warning(
+                "Source",
+                "Type of file {} is unknown, falling back to tar handler".format(
+                    self.filename
+                ),
+            )
             fileType = "tar"
 
         cmd_name = "get_extract_command_{}".format(fileType)
         if not hasattr(self, cmd_name):
-            console_ui.emit_error("Source", "Fatal error: No handler for {}".
-                                  format(fileType))
+            console_ui.emit_error(
+                "Source", "Fatal error: No handler for {}".format(fileType)
+            )
             return False
 
         if not os.path.exists(context.get_build_dir()):
             try:
                 os.makedirs(context.get_build_dir(), mode=0o0755)
             except Exception as e:
-                console_ui.emit_error("Source", "Failed to construct build "
-                                      "directory")
+                console_ui.emit_error("Source", "Failed to construct build directory")
                 print(e)
                 return False
 
@@ -319,8 +317,9 @@ class TarSource(YpkgSource):
         try:
             subprocess.check_call(cmd, shell=True)
         except Exception as e:
-            console_ui.emit_error("Source", "Failed to extract {}".
-                                  format(self.filename))
+            console_ui.emit_error(
+                "Source", "Failed to extract {}".format(self.filename)
+            )
             return False
         return True
 
@@ -334,8 +333,8 @@ class TarSource(YpkgSource):
 
 
 class SourceManager:
-    """ Responsible for identifying, fetching, and verifying sources as listed
-        within a YpkgSpec. """
+    """Responsible for identifying, fetching, and verifying sources as listed
+    within a YpkgSpec."""
 
     sources = None
 
@@ -348,15 +347,14 @@ class SourceManager:
 
         for source in spec.pkg_source:
             if not isinstance(source, dict):
-                console_ui.emit_error("SOURCE",
-                                      "Source lines must be of 'key : value' "
-                                      "mapping type")
+                console_ui.emit_error(
+                    "SOURCE", "Source lines must be of 'key : value' mapping type"
+                )
                 print(("Erronous line: {}".format(str(source))))
                 return False
 
             if len(list(source.keys())) != 1:
-                console_ui.emit_error("SOURCE",
-                                      "Encountered too many keys in source")
+                console_ui.emit_error("SOURCE", "Encountered too many keys in source")
                 print(("Erronous source: {}".format(str(source))))
                 return False
 
@@ -366,7 +364,7 @@ class SourceManager:
             if "|" in uri:
                 brk = uri.split("|")
                 # It's a git| prefix
-                if brk[0] == 'git':
+                if brk[0] == "git":
                     uri = "|".join(brk[1:])
                     self.sources.append(GitSource(uri, hash))
                     continue
@@ -375,7 +373,7 @@ class SourceManager:
         return True
 
     def _get_working_dir(self, context):
-        """ Need to make this.. better. It's very tar-type now"""
+        """Need to make this.. better. It's very tar-type now"""
         build_dir = context.get_build_dir()
 
         source0 = self.sources[0].filename

@@ -10,47 +10,52 @@
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 
-from . import console_ui, pkgconfig_dep, pkgconfig32_dep
-from . import packager_name, packager_email, readlink
-from . import examine
 
 import os
-import pisi.util
-import pisi.metadata
-import pisi.specfile
-import pisi.package
-from pisi.db.installdb import InstallDB
+
 import stat
-import subprocess
 from collections import OrderedDict
 from timeit import default_timer as timer
 from datetime import timedelta
 import datetime
 import calendar
 import sys
-import xattr
-import base64
 
+import pisi.util
+import pisi.metadata
+import pisi.specfile
+import pisi.package
+from pisi.db.installdb import InstallDB
 
-FileTypes = OrderedDict([
-    ("/usr/lib/pkgconfig", "data"),
-    ("/usr/lib64/pkgconfig", "data"),
-    ("/usr/lib32/pkgconfig", "data"),
-    ("/usr/libexec", "executable"),
-    ("/usr/lib", "library"),
-    ("/usr/share/info", "info"),
-    ("/usr/share/man", "man"),
-    ("/usr/share/doc", "doc"),
-    ("/usr/share/help", "doc"),
-    ("/usr/share/gtk-doc", "doc"),
-    ("/usr/share/locale", "localedata"),
-    ("/usr/include", "header"),
-    ("/usr/bin", "executable"),
-    ("/bin", "executable"),
-    ("/usr/sbin", "executable"),
-    ("/sbin", "executable"),
-    ("/etc", "config"),
-])
+from .util import (
+    console_ui,
+    pkgconfig_dep,
+    pkgconfig32_dep,
+    readlink,
+)
+from . import examine
+
+FileTypes = OrderedDict(
+    [
+        ("/usr/lib/pkgconfig", "data"),
+        ("/usr/lib64/pkgconfig", "data"),
+        ("/usr/lib32/pkgconfig", "data"),
+        ("/usr/libexec", "executable"),
+        ("/usr/lib", "library"),
+        ("/usr/share/info", "info"),
+        ("/usr/share/man", "man"),
+        ("/usr/share/doc", "doc"),
+        ("/usr/share/help", "doc"),
+        ("/usr/share/gtk-doc", "doc"),
+        ("/usr/share/locale", "localedata"),
+        ("/usr/include", "header"),
+        ("/usr/bin", "executable"),
+        ("/bin", "executable"),
+        ("/usr/sbin", "executable"),
+        ("/sbin", "executable"),
+        ("/etc", "config"),
+    ]
+)
 
 history_timestamp = None
 history_date = None
@@ -74,9 +79,9 @@ def utc_date_for_date_only(date):
 
 
 def initialize_timestamp(spec):
-    """ To support reproducible builds, we need to ensure we utime them to
-        some valid value. This is basically whatever the next update time
-        would be in our spec.. """
+    """To support reproducible builds, we need to ensure we utime them to
+    some valid value. This is basically whatever the next update time
+    would be in our spec.."""
     global history_date
     global history_timestamp
     global fallback_timestamp
@@ -103,7 +108,7 @@ def initialize_timestamp(spec):
 
 
 def get_file_type(t):
-    """ Return the fileType for a given file. Defaults to data """
+    """Return the fileType for a given file. Defaults to data"""
     for prefix in FileTypes:
         if t.startswith(prefix):
             return FileTypes[prefix]
@@ -111,14 +116,14 @@ def get_file_type(t):
 
 
 def create_files_xml(context, package):
-    """ Create an XML representation of our files """
+    """Create an XML representation of our files"""
     files = pisi.files.Files()
     global history_timestamp
 
     # TODO: Remove reliance on pisi.util functions completely.
 
     for path in sorted(package.emit_files()):
-        if path[0] == '/':
+        if path[0] == "/":
             path = path[1:]
 
         full_path = os.path.join(context.get_install_dir(), path)
@@ -138,25 +143,29 @@ def create_files_xml(context, package):
             permanent = "true"
         ftype = get_file_type("/" + path)
 
-        if (stat.S_IMODE(st.st_mode) & stat.S_ISUID):
+        if stat.S_IMODE(st.st_mode) & stat.S_ISUID:
             # Preserve compatibility with older eopkg implementation
-            console_ui.emit_warning("Package", "{} has suid bit set".
-                                    format(full_path))
+            console_ui.emit_warning("Package", "{} has suid bit set".format(full_path))
 
-        file_info = pisi.files.FileInfo(path=path, type=ftype,
-                                        permanent=permanent, size=fsize,
-                                        hash=hash, uid=str(st.st_uid),
-                                        gid=str(st.st_gid),
-                                        mode=str(oct(stat.S_IMODE(st.st_mode))).replace("0o", "0"))
+        file_info = pisi.files.FileInfo(
+            path=path,
+            type=ftype,
+            permanent=permanent,
+            size=fsize,
+            hash=hash,
+            uid=str(st.st_uid),
+            gid=str(st.st_gid),
+            mode=str(oct(stat.S_IMODE(st.st_mode))).replace("0o", "0"),
+        )
 
         if "/" + path in examine.global_xattrs:
             info = examine.global_xattrs["/" + path]
             for attr in info:
                 val = info[attr]
-                console_ui.emit_warning("XAttr", "File {} has xattr set: {}".
-                                        format("/" + path, attr))
-                ftmp = pisi.files.ExtendedAttribute(label=attr,
-                                                    value=val)
+                console_ui.emit_warning(
+                    "XAttr", "File {} has xattr set: {}".format("/" + path, attr)
+                )
+                ftmp = pisi.files.ExtendedAttribute(label=attr, value=val)
                 file_info.extendedAttributes.append(ftmp)
 
         files.append(file_info)
@@ -168,7 +177,7 @@ def create_files_xml(context, package):
 
 
 def create_packager(name, email):
-    """ Factory: Create a packager """
+    """Factory: Create a packager"""
     packager = pisi.specfile.Packager()
     packager.name = str(name)
     packager.email = str(email)
@@ -176,7 +185,7 @@ def create_packager(name, email):
 
 
 def metadata_from_package(context, package, files):
-    """ Base metadata cruft. Tedious   """
+    """Base metadata cruft. Tedious"""
     global history_date
     global history_timestamp
     global fallback_timestamp
@@ -231,8 +240,8 @@ def metadata_from_package(context, package, files):
 
     meta.package.source.packager = packager
 
-    meta.package.summary['en'] = summary
-    meta.package.description['en'] = description
+    meta.package.summary["en"] = summary
+    meta.package.description["en"] = description
 
     if component is not None:
         meta.package.partOf = str(component)
@@ -250,19 +259,21 @@ def metadata_from_package(context, package, files):
 
 
 def construct_package_name(context, package):
-    """ .eopkg path """
+    """.eopkg path"""
     extension = "eopkg"
     name = context.spec.get_package_name(package.name)
     config = context.pconfig
 
     did = config.values.general.distribution_release
     parts = [
-              name,
-              context.spec.pkg_version,
-              str(context.spec.pkg_release),
-              did,
-              config.values.general.architecture]
+        name,
+        context.spec.pkg_version,
+        str(context.spec.pkg_release),
+        did,
+        config.values.general.architecture,
+    ]
     return "{}.{}".format("-".join(parts), extension)
+
 
 global idb
 
@@ -270,7 +281,7 @@ idb = None
 
 
 def handle_dependencies(context, gene, metadata, package, files):
-    """ Insert providers and dependencies into the spec """
+    """Insert providers and dependencies into the spec"""
     global idb
 
     # Insert the simple guys first, replaces/conflicts, as these don't map
@@ -368,7 +379,7 @@ def handle_dependencies(context, gene, metadata, package, files):
 
 
 def create_meta_xml(context, gene, package, files):
-    """ Create the main metadata.xml file """
+    """Create the main metadata.xml file"""
     global history_timestamp
 
     meta = metadata_from_package(context, package, files)
@@ -380,8 +391,7 @@ def create_meta_xml(context, gene, package, files):
     meta.package.buildHost = config.values.build.build_host
 
     meta.package.distribution = config.values.general.distribution
-    meta.package.distributionRelease = \
-        config.values.general.distribution_release
+    meta.package.distributionRelease = config.values.general.distribution_release
     meta.package.architecture = config.values.general.architecture
     meta.package.packageFormat = pisi.package.Package.default_format
 
@@ -395,7 +405,7 @@ def create_meta_xml(context, gene, package, files):
 
 
 def create_eopkg(context, gene, package, outputDir):
-    """ Do the hard work and write the package out """
+    """Do the hard work and write the package out"""
     global history_timestamp
 
     start_time = timer()
@@ -418,12 +428,11 @@ def create_eopkg(context, gene, package, outputDir):
     # Start creating a package.
 
     try:
-        pkg = pisi.package.Package(fpath, "w",
-                                   format=pisi.package.Package.default_format,
-                                   tmp_dir=pdir)
+        pkg = pisi.package.Package(
+            fpath, "w", format=pisi.package.Package.default_format, tmp_dir=pdir
+        )
     except Exception as e:
-        console_ui.emit_error("Build", "Failed to emit package: {}".
-                              format(e))
+        console_ui.emit_error("Build", "Failed to emit package: {}".format(e))
         sys.exit(1)
 
     if history_timestamp:
@@ -435,7 +444,7 @@ def create_eopkg(context, gene, package, outputDir):
     for finfo in files.list:
         # old eopkg trick to ensure the file names are all valid
         orgname = os.path.join(context.get_install_dir(), finfo.path)
-        orgname = orgname.encode('utf-8').decode('utf-8').encode("latin1")
+        orgname = orgname.encode("utf-8").decode("utf-8").encode("latin1")
 
         # if os.path.islink(orgname) and not os.path.isdir(orgname):
         #     t = history_timestamp
@@ -459,16 +468,18 @@ def create_eopkg(context, gene, package, outputDir):
     try:
         pkg.close()
     except Exception as e:
-        console_ui.emit_error("Build", "Failed to emit package: {}".
-                              format(e))
+        console_ui.emit_error("Build", "Failed to emit package: {}".format(e))
         sys.exit(1)
 
     end_time = timer()
-    console_ui.emit_info("Package", "{} took {} to emit".format(name, timedelta(seconds=end_time-start_time)))
+    console_ui.emit_info(
+        "Package",
+        "{} took {} to emit".format(name, timedelta(seconds=end_time - start_time)),
+    )
 
 
 def write_spec(context, gene, outputDir):
-    """ Write out a compatibility pspec_$ARCH.xml """
+    """Write out a compatibility pspec_$ARCH.xml"""
     global accum_packages
 
     packages = list()
@@ -488,8 +499,8 @@ def write_spec(context, gene, outputDir):
     spec.history = pkg_main.package.history
     spec.source = pisi.specfile.Source()
     spec.source.name = context.spec.pkg_name
-    spec.source.summary['en'] = context.spec.get_summary("main")
-    spec.source.description['en'] = context.spec.get_description("main")
+    spec.source.summary["en"] = context.spec.get_summary("main")
+    spec.source.description["en"] = context.spec.get_description("main")
     spec.source.homepage = context.spec.pkg_homepage
     spec.source.packager = pkg_main.source.packager
     spec.source.license = pkg_main.package.license
@@ -514,8 +525,7 @@ def write_spec(context, gene, outputDir):
             continue
 
         specPkg = pisi.specfile.Package()
-        copies = ["name", "summary", "description", "partOf",
-                  "replaces", "conflicts"]
+        copies = ["name", "summary", "description", "partOf", "replaces", "conflicts"]
         for item in copies:
             if not hasattr(package.package, item):
                 continue

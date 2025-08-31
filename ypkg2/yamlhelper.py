@@ -11,25 +11,22 @@
 #  (at your option) any later version.
 #
 
-from . import console_ui
-
-import yaml
-import os
-import sys
-import re
 from collections import OrderedDict
+
+from .util import console_ui
 
 iterable_types = [list, dict]
 
 
 class OneOrMoreString:
-    """ Request one or more string """
+    """Request one or more string"""
+
     def __init__(self):
         pass
 
 
 class MultimapFormat:
-    """ Request items in a multimap format """
+    """Request items in a multimap format"""
 
     ref_object = None
     ref_function = None
@@ -42,7 +39,7 @@ class MultimapFormat:
 
 
 def _insert_helper(mapping, key, value):
-    """ Helper to prevent repetetive code """
+    """Helper to prevent repetetive code"""
     if key not in mapping:
         mapping[key] = list()
     mapping[key].append(value)
@@ -61,8 +58,7 @@ def get_key_value_mapping(data, t):
     for mapp in dicts:
         keys = list(mapp.keys())
         if len(keys) > 1:
-            console_ui.emit_error("YAML",
-                                  "Encountered multiple keys")
+            console_ui.emit_error("YAML", "Encountered multiple keys")
             return False
         key = keys[0]
         val = mapp[key]
@@ -70,8 +66,7 @@ def get_key_value_mapping(data, t):
         if isinstance(val, list):
             bad = [s for s in val if type(s) in iterable_types]
             if len(bad) > 0:
-                console_ui.emit_error("YAML",
-                                      "Multimap does not support inception...")
+                console_ui.emit_error("YAML", "Multimap does not support inception...")
                 return None
             for item in val:
                 _insert_helper(mapping, key, str(item))
@@ -89,11 +84,12 @@ def get_key_value_mapping(data, t):
 
 
 def assertMultimap(ymlFile, key, t):
-    """ Perform multi-map operations in the given key """
+    """Perform multi-map operations in the given key"""
 
     if key not in ymlFile:
-        console_ui.emit_error("YAML:{}".format(key),
-                              "Fatally requested a non-existent key!")
+        console_ui.emit_error(
+            "YAML:{}".format(key), "Fatally requested a non-existent key!"
+        )
         return False
 
     val = ymlFile[key]
@@ -114,15 +110,13 @@ def assertMultimap(ymlFile, key, t):
 
 
 def assertGetType(ymlFile, key, t):
-    """ Ensure a value of the given type exists """
+    """Ensure a value of the given type exists"""
     if key not in ymlFile:
-        console_ui.emit_error("YAML",
-                              "Mandatory token '{}' is missing".format(key))
+        console_ui.emit_error("YAML", "Mandatory token '{}' is missing".format(key))
         return None
     val = ymlFile[key]
     if val is None:
-        console_ui.emit_error("YAML:{}".format(key),
-                              "Mandatory token cannot be empty")
+        console_ui.emit_error("YAML:{}".format(key), "Mandatory token cannot be empty")
         return None
     val_type = type(val)
     # YAML might report integer when we want strings, which is OK.
@@ -133,15 +127,16 @@ def assertGetType(ymlFile, key, t):
             ret.append(val)
             return ret
         if val_type != list:
-            console_ui.emit_error("YAML:{}".format(key),
-                                  "Token must be a string or list of strings")
+            console_ui.emit_error(
+                "YAML:{}".format(key), "Token must be a string or list of strings"
+            )
             return None
         for item in val:
             if type(item) in iterable_types:
-                console_ui.emit_error("YAML:{}".format(key),
-                                      "Found unexpected iterable type in list")
-                console_ui.emit_error("YAML:{}".format(key),
-                                      "Expected a string")
+                console_ui.emit_error(
+                    "YAML:{}".format(key), "Found unexpected iterable type in list"
+                )
+                console_ui.emit_error("YAML:{}".format(key), "Expected a string")
                 return None
             ret.append(item)
         return ret
@@ -156,9 +151,9 @@ def assertGetType(ymlFile, key, t):
     if not isinstance(val, t):
         j = t.__name__
         f = type(val).__name__
-        console_ui.emit_error("YAML",
-                              "Token '{}' must be of type '{}'".format(key, j))
-        console_ui.emit_error("YAML:{}".format(key),
-                              "Token found was of type '{}".format(f))
+        console_ui.emit_error("YAML", "Token '{}' must be of type '{}'".format(key, j))
+        console_ui.emit_error(
+            "YAML:{}".format(key), "Token found was of type '{}".format(f)
+        )
         return None
     return val

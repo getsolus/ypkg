@@ -11,12 +11,12 @@
 #  (at your option) any later version.
 #
 
-from . import console_ui
-
 import pisi.config
 import os
 import shutil
 import multiprocessing
+
+from .util import console_ui
 
 # This speed flag set was originally from autospec in
 # Clear Linux Project For Intel Architecture.
@@ -66,21 +66,26 @@ UNROLL_LOOPS_FLAGS = "-funroll-loops"
 RUNPATH_FLAGS = "-Wl,--enable-new-dtags"
 
 # GCC PGO flags
-PGO_GEN_FLAGS = "-fprofile-generate -fprofile-dir=\"{}\""
-PGO_USE_FLAGS = "-fprofile-use -fprofile-dir=\"{}\" -fprofile-correction"
+PGO_GEN_FLAGS = '-fprofile-generate -fprofile-dir="{}"'
+PGO_USE_FLAGS = '-fprofile-use -fprofile-dir="{}" -fprofile-correction'
 
 # Clang can handle parameters to the args unlike GCC
-PGO_GEN_FLAGS_CLANG = "-fprofile-generate=\"{}/default-%m.profraw\""
-PGO_USE_FLAGS_CLANG = "-fprofile-use=\"{}/default.profdata\""
+PGO_GEN_FLAGS_CLANG = '-fprofile-generate="{}/default-%m.profraw"'
+PGO_USE_FLAGS_CLANG = '-fprofile-use="{}/default.profdata"'
 
 # Rust PGO flags
-PGO_GEN_FLAGS_RUST = "-Cprofile-generate=\"{}\""
-PGO_USE_FLAGS_RUST = "-Cprofile-use=\"{}/default.profdata\" -Cllvm-args=-pgo-warn-missing-function"
+PGO_GEN_FLAGS_RUST = '-Cprofile-generate="{}"'
+PGO_USE_FLAGS_RUST = (
+    '-Cprofile-use="{}/default.profdata" -Cllvm-args=-pgo-warn-missing-function'
+)
 
 # Frame Pointer flags used for making profiling more useful at a slight hit to performance
 # See https://fedoraproject.org/wiki/Changes/fno-omit-frame-pointer
-FRAME_POINTER_FLAGS = ["-fno-omit-frame-pointer", "-mno-omit-leaf-frame-pointer",
-                       "-Cforce-frame-pointers"] # The equivalent Rust flag
+FRAME_POINTER_FLAGS = [
+    "-fno-omit-frame-pointer",
+    "-mno-omit-leaf-frame-pointer",
+    "-Cforce-frame-pointers",
+]  # The equivalent Rust flag
 
 # BOLT: Emit relocations for bolt
 EMIT_RELOCS = "-Wl,--emit-relocs"
@@ -98,7 +103,6 @@ AVX2_FLAGS = "-mprefer-vector-width=128"
 
 
 class Flags:
-
     C = 0
     CXX = 1
     LD = 2
@@ -106,7 +110,7 @@ class Flags:
 
     @staticmethod
     def get_desc(f):
-        ''' Get descriptor for flag type '''
+        """Get descriptor for flag type"""
         if f == Flags.C:
             return "CFLAGS"
         elif f == Flags.CXX:
@@ -120,13 +124,13 @@ class Flags:
 
     @staticmethod
     def filter_flags(f, filters):
-        """ Filter the flags from this set """
+        """Filter the flags from this set"""
         nflags = [s for s in f if s not in filters]
         return nflags
 
     @staticmethod
     def optimize_flags(f, opt_type, clang=False):
-        """ Optimize this flag set for a given optimisation type """
+        """Optimize this flag set for a given optimisation type"""
         newflags = f
         if opt_type == "speed" or opt_type == "size":
             # Only filter optimisation levels when changing it
@@ -178,17 +182,20 @@ class Flags:
             if clang:
                 newflags.extend(POLLY.split(" "))
             else:
-                console_ui.emit_warning("Flags", "Optimization only supported with clang: {}".
-                                        format(opt_type))
+                console_ui.emit_warning(
+                    "Flags",
+                    "Optimization only supported with clang: {}".format(opt_type),
+                )
         else:
-            console_ui.emit_warning("Flags", "Unknown optimization: {}".
-                                    format(opt_type))
+            console_ui.emit_warning(
+                "Flags", "Unknown optimization: {}".format(opt_type)
+            )
             return f
         return newflags
 
     @staticmethod
     def pgo_gen_flags(f, d, clang=False):
-        """ Update C/CXX flags with PGO generator flags """
+        """Update C/CXX flags with PGO generator flags"""
         r = list(f)
         flagSet = PGO_GEN_FLAGS if not clang else PGO_GEN_FLAGS_CLANG
         r.extend((flagSet.format(d).split(" ")))
@@ -196,7 +203,7 @@ class Flags:
 
     @staticmethod
     def pgo_gen_flags_rust(f, d):
-        """ Update RUSTFLAGS with PGO generator flags """
+        """Update RUSTFLAGS with PGO generator flags"""
         r = list(f)
         flagSet = PGO_GEN_FLAGS_RUST
         r.extend((flagSet.format(d).split(" ")))
@@ -204,7 +211,7 @@ class Flags:
 
     @staticmethod
     def pgo_use_flags(f, d, clang=False):
-        """ Update C/CXX flags with PGO use flags """
+        """Update C/CXX flags with PGO use flags"""
         r = list(f)
         flagSet = PGO_USE_FLAGS if not clang else PGO_USE_FLAGS_CLANG
         r.extend((flagSet.format(d).split(" ")))
@@ -212,7 +219,7 @@ class Flags:
 
     @staticmethod
     def pgo_use_flags_rust(f, d):
-        """ Update RUSTFLAGS with PGO use flags """
+        """Update RUSTFLAGS with PGO use flags"""
         r = list(f)
         flagSet = PGO_USE_FLAGS_RUST
         r.extend((flagSet.format(d).split(" ")))
@@ -220,7 +227,6 @@ class Flags:
 
 
 class BuildConfig:
-
     arch = None
     host = None
     ccache = None
@@ -238,7 +244,7 @@ class BuildConfig:
     jobcount = 4
 
     def get_flags(self, t):
-        """ Simple switch to grab a set of flags by a type """
+        """Simple switch to grab a set of flags by a type"""
         if t == Flags.C:
             return self.cflags
         if t == Flags.CXX:
@@ -251,7 +257,7 @@ class BuildConfig:
 
 
 class YpkgContext:
-    """ Base context for things like cflags, etc """
+    """Base context for things like cflags, etc"""
 
     build = None
 
@@ -277,7 +283,7 @@ class YpkgContext:
             self.is_root = True
 
     def get_path(self):
-        """ Return the path, mutated to include ccache if needed """
+        """Return the path, mutated to include ccache if needed"""
         path = "/usr/bin:/bin:/usr/sbin:/sbin"
 
         if not self.spec.pkg_ccache:
@@ -290,7 +296,7 @@ class YpkgContext:
             if os.path.exists(i):
                 console_ui.emit_info("Build", "Enabling ccache")
                 path = "{}:{}".format(i, path)
-                break # To prevent emitting the same info twice.
+                break  # To prevent emitting the same info twice.
 
         # If ccache is enabled, sccache is also enabled. However, sccache
         # doesn't need to manipulate PATH, so only a log is emitted. No further
@@ -298,18 +304,20 @@ class YpkgContext:
         if os.path.exists("/usr/bin/sccache"):
             console_ui.emit_info("Build", "Enabling sccache")
         else:
-            console_ui.emit_warning("Build", "sccache is enabled but cannot be found. Disabling sccache")
+            console_ui.emit_warning(
+                "Build", "sccache is enabled but cannot be found. Disabling sccache"
+            )
 
         return path
 
     def get_sources_directory(self):
-        """ Get the configured source directory for fetching sources to """
+        """Get the configured source directory for fetching sources to"""
         if self.is_root and self.spec.build_dir is None:
             return self.global_archive_dir
         return os.path.join(self.get_build_prefix(), "sources")
 
     def get_build_prefix(self):
-        """ Get the build prefix used by ypkg """
+        """Get the build prefix used by ypkg"""
         if self.spec.build_dir is not None:
             return self.spec.build_dir
         if self.is_root:
@@ -317,19 +325,19 @@ class YpkgContext:
         return "{}/YPKG".format(os.path.expanduser("~"))
 
     def get_install_dir(self):
-        """ Get the install directory for the given package """
-        return os.path.abspath("{}/root/{}/install".format(
-                               self.get_build_prefix(),
-                               self.spec.pkg_name))
+        """Get the install directory for the given package"""
+        return os.path.abspath(
+            "{}/root/{}/install".format(self.get_build_prefix(), self.spec.pkg_name)
+        )
 
     def get_packaging_dir(self):
-        """ The temporary packaging directory """
-        return os.path.abspath("{}/root/{}/pkg".format(
-                               self.get_build_prefix(),
-                               self.spec.pkg_name))
+        """The temporary packaging directory"""
+        return os.path.abspath(
+            "{}/root/{}/pkg".format(self.get_build_prefix(), self.spec.pkg_name)
+        )
 
     def get_build_dir(self):
-        """ Get the build directory for the given package """
+        """Get the build directory for the given package"""
         buildSuffix = "build"
         if self.avx2:
             if self.emul32:
@@ -339,19 +347,20 @@ class YpkgContext:
         elif self.emul32:
             buildSuffix = "build-32"
 
-        return os.path.abspath("{}/root/{}/{}".format(
-                               self.get_build_prefix(),
-                               self.spec.pkg_name,
-                               buildSuffix))
+        return os.path.abspath(
+            "{}/root/{}/{}".format(
+                self.get_build_prefix(), self.spec.pkg_name, buildSuffix
+            )
+        )
 
     def get_package_root_dir(self):
-        """ Return the root directory for the package """
-        return os.path.abspath("{}/root/{}".format(
-                               self.get_build_prefix(),
-                               self.spec.pkg_name))
+        """Return the root directory for the package"""
+        return os.path.abspath(
+            "{}/root/{}".format(self.get_build_prefix(), self.spec.pkg_name)
+        )
 
     def get_pgo_dir(self):
-        """ Get the PGO data directory for the given package """
+        """Get the PGO data directory for the given package"""
         pgoSuffix = "pgo"
         if self.avx2:
             if self.emul32:
@@ -361,13 +370,14 @@ class YpkgContext:
         elif self.emul32:
             pgoSuffix = "pgo-32"
 
-        return os.path.abspath("{}/root/{}/{}".format(
-                                self.get_build_prefix(),
-                                self.spec.pkg_name,
-                                pgoSuffix))
+        return os.path.abspath(
+            "{}/root/{}/{}".format(
+                self.get_build_prefix(), self.spec.pkg_name, pgoSuffix
+            )
+        )
 
     def repl_flags_avx2(self, flags):
-        """ Adjust flags to compensate for avx2 build """
+        """Adjust flags to compensate for avx2 build"""
         ncflags = list()
         for flag in flags:
             if flag.startswith("-march="):
@@ -378,7 +388,7 @@ class YpkgContext:
         return ncflags
 
     def init_config(self):
-        """ Initialise our configuration prior to building """
+        """Initialise our configuration prior to building"""
         conf = pisi.config.Config()
 
         # For now follow the eopkg.conf..
@@ -411,14 +421,15 @@ class YpkgContext:
                 jobs = multiprocessing.cpu_count()
             except Exception as e:
                 console_ui.emit_warning(
-                    "BUILD", "Failed to detect CPU count, defaulting to 4")
+                    "BUILD", "Failed to detect CPU count, defaulting to 4"
+                )
         try:
             jcount = int(jobs)
             self.build.jobcount = jcount
         except Exception as e:
-            console_ui.emit_warning("BUILD",
-                                    "Invalid job count of {}, defaulting to".
-                                    format(jobs))
+            console_ui.emit_warning(
+                "BUILD", "Invalid job count of {}, defaulting to".format(jobs)
+            )
 
         self.global_archive_dir = conf.values.dirs.archives_dir
 
@@ -426,15 +437,22 @@ class YpkgContext:
         if self.spec.pkg_clang:
             self.build.cc = "clang"
             self.build.cxx = "clang++"
-            self.build.ldflags = Flags.filter_flags(self.build.ldflags, \
-                                                    NON_LD_LINKER_FLAGS)
+            self.build.ldflags = Flags.filter_flags(
+                self.build.ldflags, NON_LD_LINKER_FLAGS
+            )
         else:
             self.build.cc = "{}-gcc".format(self.pconfig.values.build.host)
             self.build.cxx = "{}-g++".format(self.pconfig.values.build.host)
             if self.spec.pkg_optimize:
-                if "thin-lto" or "icf-safe" or "icf-all" or "emit-relocs" in self.spec.pkg_optimize:
-                    self.build.ldflags = Flags.filter_flags(self.build.ldflags, \
-                                                        NON_LD_LINKER_FLAGS)
+                if (
+                    "thin-lto"
+                    or "icf-safe"
+                    or "icf-all"
+                    or "emit-relocs" in self.spec.pkg_optimize
+                ):
+                    self.build.ldflags = Flags.filter_flags(
+                        self.build.ldflags, NON_LD_LINKER_FLAGS
+                    )
 
         if self.spec.pkg_optimize:
             self.init_optimize()
@@ -446,30 +464,40 @@ class YpkgContext:
             self.init_avx2()
 
     def init_optimize(self):
-        """ Handle optimize settings within the spec """
+        """Handle optimize settings within the spec"""
         for opt in self.spec.pkg_optimize:
-            if opt == "runpath" or opt == "icf-safe" or opt == "icf-all" or opt == "emit-relocs":
+            if (
+                opt == "runpath"
+                or opt == "icf-safe"
+                or opt == "icf-all"
+                or opt == "emit-relocs"
+            ):
                 pass
             else:
-                self.build.cflags = Flags.optimize_flags(self.build.cflags,
-                                                        opt,
-                                                        self.spec.pkg_clang)
-                self.build.cxxflags = Flags.optimize_flags(self.build.cxxflags,
-                                                        opt,
-                                                        self.spec.pkg_clang)
+                self.build.cflags = Flags.optimize_flags(
+                    self.build.cflags, opt, self.spec.pkg_clang
+                )
+                self.build.cxxflags = Flags.optimize_flags(
+                    self.build.cxxflags, opt, self.spec.pkg_clang
+                )
                 if opt == "no-frame-pointer":
-                    self.build.rustflags = Flags.optimize_flags(self.build.rustflags,
-                                                        opt,
-                                                        self.spec.pkg_clang)
-            if opt == "no-bind-now" or opt == "no-symbolic" \
-                or opt == "runpath" or opt == "icf-safe"    \
-                or opt == "icf-all" or opt == "emit-relocs" :
-                self.build.ldflags = Flags.optimize_flags(self.build.ldflags,
-                                                          opt,
-                                                          self.spec.pkg_clang)
+                    self.build.rustflags = Flags.optimize_flags(
+                        self.build.rustflags, opt, self.spec.pkg_clang
+                    )
+            if (
+                opt == "no-bind-now"
+                or opt == "no-symbolic"
+                or opt == "runpath"
+                or opt == "icf-safe"
+                or opt == "icf-all"
+                or opt == "emit-relocs"
+            ):
+                self.build.ldflags = Flags.optimize_flags(
+                    self.build.ldflags, opt, self.spec.pkg_clang
+                )
 
     def init_emul32(self):
-        """ Handle emul32 toolchain options """
+        """Handle emul32 toolchain options"""
         ncflags = list()
         for flag in self.build.cflags:
             if flag.startswith("-march="):
@@ -494,7 +522,7 @@ class YpkgContext:
             self.build.cxx = "g++ -m32"
 
     def init_avx2(self):
-        """ Adjust flags for AVX2 builds """
+        """Adjust flags for AVX2 builds"""
         self.build.cflags = self.repl_flags_avx2(self.build.cflags)
         self.build.cxxflags = self.repl_flags_avx2(self.build.cxxflags)
         if self.spec.pkg_optimize:
@@ -506,39 +534,40 @@ class YpkgContext:
             self.build.cxxflags.extend(AVX2_FLAGS.split(" "))
 
     def enable_pgo_generate(self):
-        """ Enable PGO generate step """
+        """Enable PGO generate step"""
         pgo_dir = self.get_pgo_dir()
         self.gen_pgo = True
-        self.build.cflags = Flags.pgo_gen_flags(self.build.cflags,
-                                                pgo_dir,
-                                                self.spec.pkg_clang)
-        self.build.cxxflags = Flags.pgo_gen_flags(self.build.cxxflags,
-                                                  pgo_dir,
-                                                  self.spec.pkg_clang)
-        self.build.ldflags = Flags.pgo_gen_flags(self.build.ldflags,
-                                                  pgo_dir,
-                                                  self.spec.pkg_clang)
-        self.build.rustflags = Flags.pgo_gen_flags_rust(self.build.rustflags,
-                                                    pgo_dir)
+        self.build.cflags = Flags.pgo_gen_flags(
+            self.build.cflags, pgo_dir, self.spec.pkg_clang
+        )
+        self.build.cxxflags = Flags.pgo_gen_flags(
+            self.build.cxxflags, pgo_dir, self.spec.pkg_clang
+        )
+        self.build.ldflags = Flags.pgo_gen_flags(
+            self.build.ldflags, pgo_dir, self.spec.pkg_clang
+        )
+        self.build.rustflags = Flags.pgo_gen_flags_rust(self.build.rustflags, pgo_dir)
 
     def enable_pgo_use(self):
-        """ Enable PGO use step """
+        """Enable PGO use step"""
         pgo_dir = self.get_pgo_dir()
         self.use_pgo = True
-        self.build.cflags = Flags.pgo_use_flags(self.build.cflags,
-                                                pgo_dir,
-                                                self.spec.pkg_clang)
-        self.build.cxxflags = Flags.pgo_use_flags(self.build.cxxflags,
-                                                  pgo_dir,
-                                                  self.spec.pkg_clang)
-        self.build.rustflags = Flags.pgo_use_flags_rust(self.build.rustflags,
-                                                    pgo_dir)
+        self.build.cflags = Flags.pgo_use_flags(
+            self.build.cflags, pgo_dir, self.spec.pkg_clang
+        )
+        self.build.cxxflags = Flags.pgo_use_flags(
+            self.build.cxxflags, pgo_dir, self.spec.pkg_clang
+        )
+        self.build.rustflags = Flags.pgo_use_flags_rust(self.build.rustflags, pgo_dir)
 
     def clean_pgo(self):
         suffixes = ["pgo", "pgo-avx2", "pgo-32", "pgo-32-avx2"]
-        pgo_dirs = [os.path.abspath("{}/root/{}/{}".format(
-                    self.get_build_prefix(),
-                    self.spec.pkg_name, x)) for x in suffixes]
+        pgo_dirs = [
+            os.path.abspath(
+                "{}/root/{}/{}".format(self.get_build_prefix(), self.spec.pkg_name, x)
+            )
+            for x in suffixes
+        ]
 
         for d in pgo_dirs:
             if not os.path.exists(d):
@@ -552,7 +581,7 @@ class YpkgContext:
         return True
 
     def clean_install(self):
-        """ Purge the install directory """
+        """Purge the install directory"""
         d = self.get_install_dir()
         if not os.path.exists(d):
             return True
@@ -564,7 +593,7 @@ class YpkgContext:
         return True
 
     def clean_pkg(self):
-        """ Purge the packing directory """
+        """Purge the packing directory"""
         d = self.get_packaging_dir()
         if not os.path.exists(d):
             return True
