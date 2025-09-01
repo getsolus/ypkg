@@ -48,8 +48,6 @@ line-length = 120
 line-length = 120
 
 [tool.hatch.build.targets.wheel.shared-data]
-"data/man/man1/ypkg-build.1" = "/share/man/man1/ypkg-build.1"
-"data/man/man1/ypkg-install-deps.1" = "/share/man/man1/ypkg-install-deps.1"
 "data/man/man1/ypkg.1" = "/share/man/man1/ypkg.1"
 "data/man/man5/package.yml.5" = "/share/man/man5/package.yml.5"
 "data/macros" = "/share/ypkg/macros"

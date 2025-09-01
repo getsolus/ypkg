@@ -1,163 +1,288 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
-  <meta http-equiv='content-type' content='text/html;charset=utf-8'>
-  <meta name='generator' content='Ronn-NG/v0.10.1 (http://github.com/apjanke/ronn-ng/tree/0.10.1)'>
-  <title>ypkg(1) - Build Solus ypkg files</title>
-  <style type='text/css' media='all'>
-  /* style: man */
-  body#manpage {margin:0}
-  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
-  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
-  .mp h2 {margin:10px 0 0 0}
-  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
-  .mp h3 {margin:0 0 0 4ex}
-  .mp dt {margin:0;clear:left}
-  .mp dt.flush {float:left;width:8ex}
-  .mp dd {margin:0 0 0 9ex}
-  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
-  .mp pre {margin-bottom:20px}
-  .mp pre+h2,.mp pre+h3 {margin-top:22px}
-  .mp h2+pre,.mp h3+pre {margin-top:5px}
-  .mp img {display:block;margin:auto}
-  .mp h1.man-title {display:none}
-  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
-  .mp h2 {font-size:16px;line-height:1.25}
-  .mp h1 {font-size:20px;line-height:2}
-  .mp {text-align:justify;background:#fff}
-  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
-  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
-  .mp u {text-decoration:underline}
-  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
-  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
-  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
-  .mp b.man-ref {font-weight:normal;color:#434241}
-  .mp pre {padding:0 4ex}
-  .mp pre code {font-weight:normal;color:#434241}
-  .mp h2+pre,h3+pre {padding-left:0}
-  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
-  ol.man-decor {width:100%}
-  ol.man-decor li.tl {text-align:left}
-  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
-  ol.man-decor li.tr {text-align:right;float:right}
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="dcterms.date" content="2025-09-01" />
+  <title>YPKG</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
 </head>
-<!--
-  The following styles are deprecated and will be removed at some point:
-  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
-
-  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
-  .man-navigation should be used instead.
--->
-<body id='manpage'>
-  <div class='mp' id='man'>
-
-  <div class='man-navigation' style='display:none'>
-    <a href="#NAME">NAME</a>
-    <a href="#SYNOPSIS">SYNOPSIS</a>
-    <a href="#DESCRIPTION">DESCRIPTION</a>
-    <a href="#OPTIONS">OPTIONS</a>
-    <a href="#EXIT-STATUS">EXIT STATUS</a>
-    <a href="#COPYRIGHT">COPYRIGHT</a>
-    <a href="#SEE-ALSO">SEE ALSO</a>
-    <a href="#NOTES">NOTES</a>
-  </div>
-
-  <ol class='man-decor man-head man head'>
-    <li class='tl'>ypkg(1)</li>
-    <li class='tc'></li>
-    <li class='tr'>ypkg(1)</li>
-  </ol>
-
-  
-
-<h2 id="NAME">NAME</h2>
-<p class="man-name">
-  <code>ypkg</code> - <span class="man-whatis">Build Solus ypkg files</span>
-</p>
-<h2 id="SYNOPSIS">SYNOPSIS</h2>
-
-<p><code>ypkg &lt;flags&gt; [package.yml]</code></p>
-
-<h2 id="DESCRIPTION">DESCRIPTION</h2>
-
-<p><code>ypkg</code> is the main entry point into <code>package.yml(5)</code> program. It is a stub that
-will first call out to <code>ypkg-install-deps(1)</code> before passing off to <code>ypkg-build(1)</code>.
-See those manpages for more details.</p>
-
-<p>Note that you should not use <code>ypkg(1)</code> directly unless completely unavoidable.
-Instead, you should be using <code>solbuild(1)</code> for isolated build environments.</p>
-
-<h2 id="OPTIONS">OPTIONS</h2>
-
+<body>
+<header id="title-block-header">
+<h1 class="title">YPKG</h1>
+<p class="date">September 1, 2025</p>
+</header>
+<h1 id="name">NAME</h1>
+<p>ypkg(1) – Build Solus ypkg files</p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<p><code>ypkg [OPTIONS] command [ARGS]...</code></p>
+<h1 id="description">DESCRIPTION</h1>
+<p><code>ypkg</code> is a tool to generate an <code>eopkg</code> package
+file from a <code>package.yml(5)</code> file.</p>
+<p>Note that you should not use <code>ypkg(1)</code> directly unless
+completely unavoidable. Instead, you should be using
+<code>solbuild(1)</code> for isolated build environments.</p>
+<h1 id="options">OPTIONS</h1>
 <p>The following options are applicable to <code>ypkg(1)</code>.</p>
-
 <ul>
-  <li>
-    <p><code>-h</code>, <code>--help</code></p>
-
-    <p>Print the command line options for <code>ypkg(1)</code> and exit.</p>
-  </li>
-  <li>
-    <p><code>-v</code>, <code>--version</code></p>
-
-    <p>Print the <code>ypkg(1)</code> version and exit.</p>
-  </li>
-  <li>
-    <p><code>-n</code>, <code>--no-colors</code></p>
-
-    <p>Disable text colourisation in the output from <code>ypkg</code> and all child
-processes.</p>
-  </li>
-  <li>
-    <p><code>-D</code>, <code>--output-dir</code></p>
-
-    <p>Set the output directory for <code>ypkg-build(1)</code></p>
-  </li>
-  <li>
-    <p><code>-f</code>, <code>--force</code></p>
-
-    <p>Force the installation of package dependencies, which will bypass any
-prompting by ypkg. The default behaviour is to prompt before installing
-packages.</p>
-  </li>
+<li><p><code>-h</code>, <code>--help</code></p>
+<p>Print the command line options for <code>ypkg(1)</code> and
+exit.</p></li>
 </ul>
+<h1 id="subcommands">SUBCOMMANDS</h1>
+<p>All available subcommands are listed below by their primary name.</p>
+<p><code>build &lt;package.yml&gt;</code></p>
+<pre><code>Given a `package.yml(5)` file, it will attempt to build the
+package according to the rules, patterns and steps set in the
+file.
 
-<h2 id="EXIT-STATUS">EXIT STATUS</h2>
+For details on the package format itself, please refer to the
+`package.yml(5)` manpage, or the Solus wiki.
 
-<p>On success, 0 is returned. A non-zero return code signals a failure.</p>
+* `-D`, `--output-dir`:
 
-<h2 id="COPYRIGHT">COPYRIGHT</h2>
+    Set the output directory for resulting files.
 
+* `-B`, `--build-dir`:
+
+    Set the base directory for performing the build.
+
+* `-t`, `--timestamp`:
+
+    This argument should be a UNIX timestamp, and will be used to set the file
+    timestamps inside the final `.eopkg` archive, as well as the container files
+    within that archive.
+
+    Using this option helps achieve reproducible builds, and this option is passed
+    by `solbuild(1)` automatically for ypkg builds. It will examine the git history
+    and use the UTC UNIX timestamp for the last tag, ensuring the package can be
+    built by any machine using `solbuild(1)` and result in an identical package,
+    byte for byte.
+
+* `-n`, `--no-colors`:
+
+    Disable text colorization in the output from `ypkg(1)` and all child processes.
+
+* `--help`:
+
+    Show help text about this command.</code></pre>
+<p><code>gen-history &lt;filename&gt;</code></p>
+<pre><code>Generates a history.xml file.
+
+* `-D`, `--output-dir`:
+
+    Set the output directory for resulting files.
+
+* `--help`:
+
+    Show help text about this command.</code></pre>
+<p><code>install-deps &lt;package.yml&gt;</code></p>
+<pre><code>This command will install all of the build dependencies listed in the
+given `package.yml(5)` file. Note that resolution of `pkgconfig` and `pkgconfig32`
+dependencies is handled automatically.
+
+* `-D`, `--output-dir`:
+
+    Set the output directory for resulting files.
+
+* `-e`, `--eopkg-cmd`:
+
+    Specify which `eopkg(1)` command to use.
+
+* `-f`, `--force`:
+
+    Force the installation of package dependencies, which will bypass any
+    prompting by `ypkg(1)`. The default behaviour is to prompt before installing
+    packages.
+
+* `-n`, `--no-colors`:
+
+    Disable text colorization in the output from `ypkg(1)` and all child processes.
+
+* `--help`:
+
+    Show help text about this command.</code></pre>
+<h1 id="exit-status">EXIT STATUS</h1>
+<p>On success, 0 is returned. A non-zero return code signals a
+failure.</p>
+<h1 id="copyright">COPYRIGHT</h1>
 <ul>
-  <li>Copyright © 2016-2020 Solus Project</li>
+<li>Copyright © 2016-2025 Solus Project</li>
 </ul>
-
 <p>Released under the terms of the CC-BY-SA-3.0 license</p>
-
-<h2 id="SEE-ALSO">SEE ALSO</h2>
-
-<p><code>solbuild(1)</code>, <code>ypkg-install-deps(1)</code>, <code>ypkg-build(1)</code>, <code>package.yml(5)</code></p>
-
+<h1 id="see-also">SEE ALSO</h1>
+<p><code>solbuild(1)</code>, <code>ypkg-install-deps(1)</code>,
+<code>ypkg-build(1)</code>, <code>package.yml(5)</code></p>
 <ul>
-  <li>https://github.com/getsolus/ypkg</li>
-  <li>https://getsol.us/articles/packaging</li>
+<li>https://github.com/getsolus/ypkg</li>
+<li>https://getsol.us/articles/packaging</li>
 </ul>
-
-<h2 id="NOTES">NOTES</h2>
-
+<h1 id="notes">NOTES</h1>
 <p>Creative Commons Attribution-ShareAlike 3.0 Unported</p>
-
 <ul>
-  <li>http://creativecommons.org/licenses/by-sa/3.0/</li>
+<li>http://creativecommons.org/licenses/by-sa/3.0/</li>
 </ul>
-
-  <ol class='man-decor man-foot man foot'>
-    <li class='tl'></li>
-    <li class='tc'>September 2024</li>
-    <li class='tr'>ypkg(1)</li>
-  </ol>
-
-  </div>
 </body>
 </html>

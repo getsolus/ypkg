@@ -1,22 +1,29 @@
+---
+title: YPKG
+section: 1
+header: User Manual
+footer: ypkg 34
+date: September 1, 2025
+---
+
+# NAME
+
 ypkg(1) -- Build Solus ypkg files
-=================================
 
 
-## SYNOPSIS
+# SYNOPSIS
 
-`ypkg <flags> [package.yml]`
+`ypkg [OPTIONS] command [ARGS]...`
 
 
-## DESCRIPTION
+# DESCRIPTION
 
-`ypkg` is the main entry point into `package.yml(5)` program. It is a stub that
-will first call out to `ypkg-install-deps(1)` before passing off to `ypkg-build(1)`.
-See those manpages for more details.
+`ypkg` is a tool to generate an `eopkg` package file from a `package.yml(5)` file.
 
 Note that you should not use `ypkg(1)` directly unless completely unavoidable.
 Instead, you should be using `solbuild(1)` for isolated build environments.
 
-## OPTIONS
+# OPTIONS
 
 The following options are applicable to `ypkg(1)`.
 
@@ -24,46 +31,108 @@ The following options are applicable to `ypkg(1)`.
 
    Print the command line options for `ypkg(1)` and exit.
 
- * `-v`, `--version`
 
-   Print the `ypkg(1)` version and exit.
+# SUBCOMMANDS
 
- * `-n`, `--no-colors`
+All available subcommands are listed below by their primary name.
 
-   Disable text colourisation in the output from `ypkg` and all child
-   processes.
+`build <package.yml>`
 
- * `-D`, `--output-dir`
+    Given a `package.yml(5)` file, it will attempt to build the
+    package according to the rules, patterns and steps set in the
+    file.
 
-   Set the output directory for `ypkg-build(1)`
+    For details on the package format itself, please refer to the
+    `package.yml(5)` manpage, or the Solus wiki.
 
- * `-f`, `--force`
+    * `-D`, `--output-dir`:
 
-   Force the installation of package dependencies, which will bypass any
-   prompting by ypkg. The default behaviour is to prompt before installing
-   packages.
+        Set the output directory for resulting files.
 
+    * `-B`, `--build-dir`:
 
-## EXIT STATUS
+        Set the base directory for performing the build.
+
+    * `-t`, `--timestamp`:
+
+        This argument should be a UNIX timestamp, and will be used to set the file
+        timestamps inside the final `.eopkg` archive, as well as the container files
+        within that archive.
+
+        Using this option helps achieve reproducible builds, and this option is passed
+        by `solbuild(1)` automatically for ypkg builds. It will examine the git history
+        and use the UTC UNIX timestamp for the last tag, ensuring the package can be
+        built by any machine using `solbuild(1)` and result in an identical package,
+        byte for byte.
+
+    * `-n`, `--no-colors`:
+
+        Disable text colorization in the output from `ypkg(1)` and all child processes.
+
+    * `--help`:
+
+        Show help text about this command.
+
+`gen-history <filename>`
+
+    Generates a history.xml file.
+
+    * `-D`, `--output-dir`:
+
+        Set the output directory for resulting files.
+
+    * `--help`:
+
+        Show help text about this command.
+
+`install-deps <package.yml>`
+
+    This command will install all of the build dependencies listed in the
+    given `package.yml(5)` file. Note that resolution of `pkgconfig` and `pkgconfig32`
+    dependencies is handled automatically.
+
+    * `-D`, `--output-dir`:
+
+        Set the output directory for resulting files.
+
+    * `-e`, `--eopkg-cmd`:
+
+        Specify which `eopkg(1)` command to use.
+
+    * `-f`, `--force`:
+
+        Force the installation of package dependencies, which will bypass any
+        prompting by `ypkg(1)`. The default behaviour is to prompt before installing
+        packages.
+
+    * `-n`, `--no-colors`:
+
+        Disable text colorization in the output from `ypkg(1)` and all child processes.
+
+    * `--help`:
+
+        Show help text about this command.
+
+# EXIT STATUS
 
 On success, 0 is returned. A non-zero return code signals a failure.
 
 
-## COPYRIGHT
+# COPYRIGHT
 
- * Copyright © 2016-2020 Solus Project
+ * Copyright © 2016-2025 Solus Project
 
 Released under the terms of the CC-BY-SA-3.0 license
 
 
-## SEE ALSO
+# SEE ALSO
 
 `solbuild(1)`, `ypkg-install-deps(1)`, `ypkg-build(1)`, `package.yml(5)`
 
  * https://github.com/getsolus/ypkg
  * https://getsol.us/articles/packaging
 
-## NOTES
+# NOTES
 
 Creative Commons Attribution-ShareAlike 3.0 Unported
 
