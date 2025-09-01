@@ -11,11 +11,13 @@
 #  (at your option) any later version.
 #
 
-from . import console_ui
+import os
+
 from pisi.db.installdb import InstallDB
 from pisi.db.packagedb import PackageDB
 from pisi.db.filesdb import FilesDB
-import os
+
+from .util import console_ui
 
 # Provided historically for our pre-glvnd architecture.
 # Technically speaking this isn't required anymore, but lets just
@@ -40,7 +42,6 @@ ExceptionRules = [
 
 
 class DependencyResolver:
-
     idb = None
     pdb = None
     fdb = None
@@ -71,7 +72,7 @@ class DependencyResolver:
     pkgConfigs32 = None
 
     def search_file(self, fname):
-        if fname[0] == '/':
+        if fname[0] == "/":
             fname = fname[1:]
         if fname in self.deadends:
             return None
@@ -87,7 +88,7 @@ class DependencyResolver:
         return None
 
     def __init__(self):
-        """ Allows us to do look ups on all packages """
+        """Allows us to do look ups on all packages"""
         self.idb = InstallDB()
         self.pdb = PackageDB()
         self.fdb = FilesDB()
@@ -96,7 +97,7 @@ class DependencyResolver:
         self.pkgConfigs, self.pkgConfigs32 = self.pdb.get_pkgconfig_providers()
 
     def get_symbol_provider(self, info, symbol):
-        """ Grab the symbol from the local packages """
+        """Grab the symbol from the local packages"""
         if info.emul32:
             tgtMap = self.global_sonames32
             rPaths = self.global_rpaths32
@@ -117,8 +118,8 @@ class DependencyResolver:
         return None
 
     def get_symbol_external(self, info, symbol, paths=None):
-        """ Get the provider of the required symbol from the files database,
-            i.e. installed binary dependencies
+        """Get the provider of the required symbol from the files database,
+        i.e. installed binary dependencies
         """
         # Try a cached approach first.
         if info.emul32:
@@ -159,9 +160,12 @@ class DependencyResolver:
                     self.bindeps_emul32[symbol] = lpkg
                 else:
                     self.bindeps_cache[symbol] = lpkg
-                console_ui.emit_info("Dependency",
-                                     "{} adds dependency on {} from {}".
-                                     format(info.pretty, symbol, lpkg))
+                console_ui.emit_info(
+                    "Dependency",
+                    "{} adds dependency on {} from {}".format(
+                        info.pretty, symbol, lpkg
+                    ),
+                )
 
                 # Populate a global files cache, basically there is a high
                 # chance that each package depends on multiple things in a
@@ -172,7 +176,7 @@ class DependencyResolver:
         return None
 
     def get_pkgconfig_provider(self, info, name):
-        """ Get the internal provider for a pkgconfig name """
+        """Get the internal provider for a pkgconfig name"""
         if info.emul32:
             if name in self.global_pkgconfig32s:
                 pkg = self.global_pkgconfig32s[name]
@@ -183,7 +187,7 @@ class DependencyResolver:
         return None
 
     def get_pkgconfig_external(self, info, name):
-        """ Get the external provider of a pkgconfig name """
+        """Get the external provider of a pkgconfig name"""
         pkg = None
 
         if info.emul32:
@@ -227,7 +231,7 @@ class DependencyResolver:
         return pkg.name
 
     def handle_binary_deps(self, packageName, info):
-        """ Handle direct binary dependencies """
+        """Handle direct binary dependencies"""
         pkgName = self.ctx.spec.get_package_name(packageName)
 
         for sym in info.symbol_deps:
@@ -243,19 +247,19 @@ class DependencyResolver:
             self.gene.packages[packageName].depend_packages.add(r)
 
     def handle_pkgconfig_deps(self, packageName, info):
-        """ Handle pkgconfig dependencies """
+        """Handle pkgconfig dependencies"""
         pkgName = self.ctx.spec.get_package_name(packageName)
 
         for item in info.pkgconfig_deps:
-
             prov = self.get_pkgconfig_provider(info, item)
             if not prov:
                 prov = self.get_pkgconfig_external(info, item)
 
             if not prov:
-                console_ui.emit_warning("PKGCONFIG", "Not adding unknown"
-                                        " dependency {} to {}".
-                                        format(item, pkgName))
+                console_ui.emit_warning(
+                    "PKGCONFIG",
+                    "Not adding unknown dependency {} to {}".format(item, pkgName),
+                )
                 continue
             tgtPkg = self.gene.packages[packageName]
 
@@ -267,8 +271,9 @@ class DependencyResolver:
                 continue
             tgtPkg.depend_packages.add(prov)
 
-            console_ui.emit_info("PKGCONFIG", "{} adds dependency on {}".
-                                 format(pkgName, prov))
+            console_ui.emit_info(
+                "PKGCONFIG", "{} adds dependency on {}".format(pkgName, prov)
+            )
 
     def handle_pkgconfig_provides(self, packageName, info):
         adder = None
@@ -281,39 +286,40 @@ class DependencyResolver:
         pass
 
     def handle_soname_links(self, packageName, info):
-        """ Add dependencies between packages due to a .so splitting """
+        """Add dependencies between packages due to a .so splitting"""
         ourName = self.ctx.spec.get_package_name(packageName)
 
         for link in info.soname_links:
             fi = self.gene.get_file_owner(link)
             if not fi:
-                console_ui.emit_warning("SOLINK", "{} depends on non existing "
-                                        "soname link: {}".
-                                        format(packageName, link))
+                console_ui.emit_warning(
+                    "SOLINK",
+                    "{} depends on non existing soname link: {}".format(
+                        packageName, link
+                    ),
+                )
                 continue
             pkgName = self.ctx.spec.get_package_name(fi.name)
             if pkgName == ourName:
                 continue
             self.gene.packages[packageName].depend_packages.add(pkgName)
-            console_ui.emit_info("SOLINK", "{} depends on {} through .so link".
-                                 format(ourName, pkgName))
+            console_ui.emit_info(
+                "SOLINK", "{} depends on {} through .so link".format(ourName, pkgName)
+            )
 
     def get_kernel_provider(self, info, version):
-        """ i.e. self dependency situation """
+        """i.e. self dependency situation"""
         if version in self.global_kernels:
             pkg = self.global_kernels[version]
             return self.ctx.spec.get_package_name(pkg)
         return None
 
     def get_kernel_external(self, info, version):
-        """ Try to find the owning kernel for a version """
+        """Try to find the owning kernel for a version"""
         if version in self.kernel_cache:
             return self.kernel_cache[version]
 
-        paths = [
-            "/usr/lib/kernel",
-            "/usr/lib64/kernel"
-        ]
+        paths = ["/usr/lib/kernel", "/usr/lib64/kernel"]
 
         pkg = None
         for path in paths:
@@ -330,9 +336,12 @@ class DependencyResolver:
                     lpkg = pkg[0]
             if lpkg:
                 self.kernel_cache[version] = lpkg
-                console_ui.emit_info("Kernel",
-                                     "{} adds module dependency on {} from {}".
-                                     format(info.pretty, version, lpkg))
+                console_ui.emit_info(
+                    "Kernel",
+                    "{} adds module dependency on {} from {}".format(
+                        info.pretty, version, lpkg
+                    ),
+                )
 
                 # Populate a global files cache, basically there is a high
                 # chance that each package depends on multiple things in a
@@ -343,7 +352,7 @@ class DependencyResolver:
         return None
 
     def handle_kernel_deps(self, packageName, info):
-        """ Add dependency between packages due to kernel version """
+        """Add dependency between packages due to kernel version"""
         pkgName = self.ctx.spec.get_package_name(packageName)
 
         r = self.get_kernel_provider(info, info.dep_kernel)
@@ -358,7 +367,7 @@ class DependencyResolver:
         self.gene.packages[packageName].depend_packages.add(r)
 
     def compute_for_packages(self, context, gene, packageSet):
-        """ packageSet is a dict mapping here. """
+        """packageSet is a dict mapping here."""
         self.gene = gene
         self.packageSet = packageSet
         self.ctx = context

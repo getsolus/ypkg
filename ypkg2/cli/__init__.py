@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/bin/true
 # -*- coding: utf-8 -*-
 #
 #  This file is part of ypkg2
@@ -10,10 +10,3 @@
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-
-from ypkg2.main import main
-from ypkg2 import console_ui
-
-
-if __name__ == "__main__":
-    main()

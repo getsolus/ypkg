@@ -20,6 +20,7 @@ from ruamel.yaml import YAML
 from ruamel.yaml.emitter import Emitter
 Emitter.MAX_SIMPLE_KEY_LENGTH = 4096
 
+
 def usage(msg=None, ex=1):
     if msg:
         print(msg)
@@ -27,7 +28,8 @@ def usage(msg=None, ex=1):
         print(("Usage: %s file.yml" % sys.argv[0]))
     sys.exit(ex)
 
-if __name__ == "__main__":
+
+def main():
     if len(sys.argv) != 2:
         usage()
 
@@ -49,3 +51,7 @@ if __name__ == "__main__":
         print("Error writing file, may need to reset it.")
         print(e)
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

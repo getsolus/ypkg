@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ypkg2"
+version = "34.0.0"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Solus Developers", email = "copyright@getsol.us"}
+]
+description = "Solus tool for building packages."
+readme = "README.md"
+keywords = ["build", "package"]
+requires-python = ">=3.10"
+dependencies = [
+    "humanize >= 4.8.0",
+    "PyYaml >= 5.0.0",
+    "python-magic >= 0.4.0",
+    "ruamel.yaml >= 0.18.0",
+    "typer >= 0.16.0",
+    "xattr >= 0.10.0",
+    "zstandard >= 0.18.0"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Topic :: Software Development :: Build Tools",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+]
+
+[project.scripts]
+ybump = "ypkg2.cli.bump:main"
+ypkg = "ypkg2.main:app"
+yupdate = "ypkg2.cli.update:main"
+
+[project.urls]
+Homepage = "https://getsol.us"
+Documentation = "https://help.getsol.us"
+Repository = "https://github.com/getsolus/ypkg"
+Issues = "https://github.com/getsolus/ypkg/issues"
+
+[tool.black]
+line-length = 120
+
+[tool.ruff]
+line-length = 120
+
+[tool.hatch.build.targets.wheel.shared-data]
+"data/man/man1/ypkg.1" = "/share/man/man1/ypkg.1"
+"data/man/man5/package.yml.5" = "/share/man/man5/package.yml.5"
+"data/macros" = "/share/ypkg/macros"

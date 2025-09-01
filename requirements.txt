@@ -1,4 +1,0 @@
-PyYaml
-python-magic
-xattr
-zstandard
