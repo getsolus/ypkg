@@ -40,14 +40,13 @@ app = typer.Typer()
 
 @app.command()
 def build(
-    filename: Annotated[str, typer.Argument(help="Path to the ypkg YAML file")],
+    filename: Annotated[str, typer.Argument(help="Path to the ypkg YAML file.")],
     output_dir: Annotated[
         str,
         typer.Option(
             "--output-dir",
             "-D",
-            default="",
-            help="Set the output directory for resulting files",
+            help="Set the output directory for resulting files.",
         ),
     ] = "",
     build_dir: Annotated[
@@ -55,19 +54,16 @@ def build(
         typer.Option(
             "--build-dir",
             "-B",
-            default="",
-            help="Set the base directory for performing the build",
+            help="Set the base directory for performing the build.",
         ),
     ] = "",
-    no_color: Annotated[
-        bool, typer.Option("--no-colors", "-n", help="Disable color output")
-    ] = False,
     timestamp: Annotated[
         int,
-        typer.Option(
-            "--timestamp", "-t", default=-1, help="Set the UNIX timestamp for the build"
-        ),
+        typer.Option("--timestamp", "-t", help="Set the UNIX timestamp for the build."),
     ] = -1,
+    no_color: Annotated[
+        bool, typer.Option("--no-colors", "-n", help="Disable color output.")
+    ] = False,
 ):
     """
     Build a package from a YPKG YAML file.
@@ -114,14 +110,13 @@ def build(
 
 @app.command()
 def gen_history(
-    filename: Annotated[str, typer.Argument(help="Path to the ypkg YAML file")],
+    filename: Annotated[str, typer.Argument(help="Path to the ypkg YAML file.")],
     output_dir: Annotated[
         str,
         typer.Option(
             "--output-dir",
             "-D",
-            default="",
-            help="Set the output directory for resulting files",
+            help="Set the output directory for resulting files.",
         ),
     ] = "",
 ):
@@ -196,20 +191,15 @@ def gen_history(
     hist_obj.write(hist)
 
 
-@typer.command()
+@app.command()
 def install_deps(
-    filename: Annotated[str, typer.Argument(help="Path to the ypkg YAML file")],
-    force: Annotated[
-        bool,
-        typer.Option("--force", "-f", default=False, help="Force install dependencies"),
-    ],
+    filename: Annotated[str, typer.Argument(help="Path to the ypkg YAML file.")],
     output_dir: Annotated[
         str,
         typer.Option(
             "--output-dir",
             "-D",
-            default="",
-            help="Set the output directory for resulting files",
+            help="Set the output directory for resulting files.",
         ),
     ] = "",
     eopkg_cmd: Annotated[
@@ -217,12 +207,15 @@ def install_deps(
         typer.Option(
             "--eopkg-cmd",
             "-e",
-            default="eopkg.py3",
-            help="Specify which eopkg command to use",
+            help="Specify which eopkg command to use.",
         ),
     ] = "eopkg.py3",
+    force: Annotated[
+        bool,
+        typer.Option("--force", "-f", help="Force install dependencies."),
+    ] = False,
     no_color: Annotated[
-        bool, typer.Option("--no-colors", "-n", help="Disable color output")
+        bool, typer.Option("--no-colors", "-n", help="Disable color output.")
     ] = False,
 ):
     """
