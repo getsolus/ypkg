@@ -123,8 +123,8 @@ def build_package(filename, outputDir, buildDir=None):
         "{}/.evolveos/packager",
     ]
 
-    packager_name = ypkg2.packager_name
-    packager_email = ypkg2.packager_email
+    packager_name = ypkg2.util.packager_name
+    packager_email = ypkg2.util.packager_email
 
     dflt = True
     for item in possibles:
@@ -147,8 +147,8 @@ def build_package(filename, outputDir, buildDir=None):
             dflt = True
             break
     if dflt:
-        packager_name = ypkg2.packager_name
-        packager_email = ypkg2.packager_email
+        packager_name = ypkg2.util.packager_name
+        packager_email = ypkg2.util.packager_email
         console_ui.emit_warning("Config", "Using default packager values")
         print(f"  Name: {packager_name}")
         print(f"  Email: {packager_email}")
