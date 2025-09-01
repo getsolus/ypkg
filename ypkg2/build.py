@@ -18,7 +18,7 @@ import subprocess
 import sys
 import tempfile
 
-import humanize
+from humanize import naturalsize
 from timeit import default_timer as timer
 from datetime import timedelta
 
@@ -323,7 +323,7 @@ def build_package(filename, outputDir, buildDir=None):
                 (compressed, saved) = compress_man_pages(dir)
                 console_ui.emit_success(
                     "Man",
-                    f"Compressed {compressed} file(s), saving {humanize(saved)}",
+                    f"Compressed {compressed} file(s), saving {naturalsize(saved)}",
                 )
             except Exception as e:
                 console_ui.emit_warning(
@@ -339,7 +339,7 @@ def build_package(filename, outputDir, buildDir=None):
                 (compressed, saved) = compress_info_pages(info_dir)
                 console_ui.emit_success(
                     "Man",
-                    f"Compressed {compressed} file(s), saving {humanize(saved)}",
+                    f"Compressed {compressed} file(s), saving {naturalsize(saved)}",
                 )
             except Exception as e:
                 console_ui.emit_warning("Man", "Failed to compress info pages")
