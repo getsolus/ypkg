@@ -49,9 +49,6 @@ parser.add_argument(
     default=False,
 )
 
-cleanup = True
-filename = ""
-
 
 def usage(msg=None, ex=1):
     if msg:
@@ -99,6 +96,8 @@ def cache_tarball_to_solbuild(filename, sha256sum):
 
 
 def main():
+    global cleanup
+    cleanup = True
     args = parser.parse_args()
 
     ymlfile = args.yml
@@ -115,6 +114,7 @@ def main():
         sys.exit(1)
 
     url = args.url
+    global filename
     filename = os.path.basename(url)
     sha256sum = shasum(url)
     if not url.startswith("git|"):
