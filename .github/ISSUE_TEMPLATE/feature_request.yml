@@ -1,0 +1,18 @@
+name: Feature Request
+description: Suggest a new feature or other enhancement.
+title: "[FEATURE] "
+labels: ["enhancement"]
+projects: ["getsolus/8"]
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Tell us about the feature you would like added.
+    validations:
+      required: true
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Use cases
+      description: In order to properly evaluate a feature request, it is necessary to understand the use-cases for it. Please describe below the end goal you are trying to achieve that has led you to request this feature.

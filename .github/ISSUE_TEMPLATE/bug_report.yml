@@ -1,0 +1,46 @@
+name: Bug Report
+description: Let us know about an unexpected error or an incorrect behavior.
+title: "[BUG] "
+labels: ["bug"]
+projects: ["getsolus/8"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ Before submitting this issue, please check the open issues and ensure that you fill in as much as possible in this template.
+        📝 If including build failures, or general tool output, please ensure they are in English, i.e. `LC_ALL=C LANG=C`.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe, in detail, the issue you encountered.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Version of Ypkg you are using.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Give the exact steps to reproduce the issue
+      placeholder: |
+        1. Run `ypkg ...`
+        2. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected-result
+    attributes:
+      label: Expected result
+      description: What you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: more-information
+    attributes:
+      label: Add any other information about this issue, such as tracebacks, screenshots, etc.
