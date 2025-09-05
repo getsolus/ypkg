@@ -1,6 +1,8 @@
 *.pyc
 .idea
 # test-harness related
+.venv/
+venv/
 ypkg_test_venv/
 pspec*.xml
 *.eopkg
