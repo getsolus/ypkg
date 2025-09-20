@@ -363,8 +363,32 @@
       "description": "Set to 'true' if this package benefits from being built with Clang."
     },
     "conflicts": {
-      "type": "string",
-      "description": "Specify packages that cannot be installed together with this one."
+      "description": "Specify packages that cannot be installed together with this one.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
     },
     "debug": {
       "type": "boolean",
