@@ -105,12 +105,11 @@
         "xorg.library",
         "xorg.proto",
         "xorg.server"
-      ], 
+      ],
       "type": "string",
       "description": "Possible package categories within `eopkg`."
     }
   },
-
   "properties": {
     "name": {
       "type": "string",
@@ -142,10 +141,9 @@
       "anyOf": [
         {
           "$ref": "#/definitions/licenseType"
-          
         },
         {
-          "type": "array", 
+          "type": "array",
           "minItems": 2,
           "items": {
             "$ref": "#/definitions/licenseType"
@@ -160,10 +158,13 @@
           "type": "string"
         },
         {
-          "type": "array", 
+          "type": "array",
           "minItems": 2,
           "items": {
-            "type": ["string", "object"]
+            "type": [
+              "string",
+              "object"
+            ]
           }
         }
       ]
@@ -173,9 +174,9 @@
       "anyOf": [
         {
           "$ref": "#/definitions/componentType"
-        }, 
+        },
         {
-          "type": "array", 
+          "type": "array",
           "minItems": 2,
           "items": {
             "anyOf": [
@@ -183,7 +184,7 @@
                 "$ref": "#/definitions/componentType"
               },
               {
-                "type": "object", 
+                "type": "object",
                 "additionalProperties": {
                   "$ref": "#/definitions/componentType"
                 }
@@ -192,7 +193,6 @@
           }
         }
       ]
-      
     },
     "description": {
       "description": "More extensive description of the software, usually taken from the vendor website.",
@@ -201,15 +201,17 @@
           "type": "string"
         },
         {
-          "type": "array", 
+          "type": "array",
           "minItems": 2,
           "items": {
-            "type": ["string", "object"]
+            "type": [
+              "string",
+              "object"
+            ]
           }
         }
       ]
     },
-
     "autodep": {
       "type": "boolean",
       "description": "Set to 'false' to disable automatic binary dependency resolution at build time."
@@ -219,9 +221,11 @@
       "description": "Set to 'true' to build package with the x86-64-v3 microarchitecture."
     },
     "build": {
-      "type":"string",
+      "type": "string",
       "description": "Use this step to run the build portion, for example, 'make'.",
-      "examples": ["%make"]
+      "examples": [
+        "%make"
+      ]
     },
     "builddeps": {
       "type": "array",
@@ -231,12 +235,12 @@
       "description": "Build dependencies for the package.",
       "uniqueItems": true
     },
-    "ccache":{
+    "ccache": {
       "type": "boolean",
       "description": "Set to 'false' to disable ccache."
     },
     "check": {
-      "type":"string",
+      "type": "string",
       "description": "This is where tests / checking should occur, for example, 'make check'."
     },
     "checkdeps": {
@@ -286,7 +290,9 @@
     "environment": {
       "type": "string",
       "description": "Specify code that will be exported to all packaging steps of the build (i.e. exporting variables for the entire build).",
-      "examples": ["export CCACHE_BASEDIR=$workdir"]
+      "examples": [
+        "export CCACHE_BASEDIR=$workdir"
+      ]
     },
     "emul32": {
       "type": "boolean",
@@ -297,9 +303,12 @@
       "description": "Set to 'false' to disable automatic source extraction."
     },
     "install": {
-      "type":"string",
+      "type": "string",
       "description": "This is where you should install the files into the final packaging directory, for example, 'make install'.",
-      "examples": ["%make_install", "install -D -m 00644 $pkgfiles/nanorc $installdir/usr/share/defaults/nano/nanorc"]
+      "examples": [
+        "%make_install",
+        "install -D -m 00644 $pkgfiles/nanorc $installdir/usr/share/defaults/nano/nanorc"
+      ]
     },
     "lastrip": {
       "type": "boolean",
@@ -321,7 +330,23 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["speed", "size", "no-bind-now", "no-symbolic", "unroll-loops", "runpath", "avx256", "thin-lto", "lto", "icf-safe", "icf-all", "polly", "function-sections", "no-reorder-blocks-partition", "emit-relocs"]
+        "enum": [
+          "speed",
+          "size",
+          "no-bind-now",
+          "no-symbolic",
+          "unroll-loops",
+          "runpath",
+          "avx256",
+          "thin-lto",
+          "lto",
+          "icf-safe",
+          "icf-all",
+          "polly",
+          "function-sections",
+          "no-reorder-blocks-partition",
+          "emit-relocs"
+        ]
       },
       "uniqueItems": true
     },
@@ -341,33 +366,41 @@
       "uniqueItems": true
     },
     "profile": {
-      "type":"string",
+      "type": "string",
       "description": "This is where profiling tests should be specified. ypkg will handle setting flags to generate profiling data and using that data for an optimized build."
     },
     "replaces": {
       "type": "array",
       "description": "Replace one package with another, used when renaming or deprecating packages for clean upgrade paths.",
       "items": {
-        "type": ["object", "string"]
+        "type": [
+          "object",
+          "string"
+        ]
       }
     },
     "rundeps": {
       "type": "array",
       "items": {
-        "type": ["object", "string"]
+        "type": [
+          "object",
+          "string"
+        ]
       },
       "description": "Further runtime dependencies for the packages.",
       "uniqueItems": true
     },
     "setup": {
-      "type":"string",
+      "type": "string",
       "description": "Performed after the source extraction. This is the correct place to perform any 'configure' routine, or to patch the sources.",
-      "examples": ["%patch -p1 -i $pkgfiles/0001-Use-a-stateless-configuration.patch", "%configure"]
+      "examples": [
+        "%patch -p1 -i $pkgfiles/0001-Use-a-stateless-configuration.patch",
+        "%configure"
+      ]
     },
     "strip": {
-      "type":"boolean", 
+      "type": "boolean",
       "description": "Set to 'false' to disable automatic 'ELF' library & binary stripping. \n In most cases, stripping should remain enabled. However, there are known cases when stripping should be avoided, such as when complying with a distribution policy of binary only software, or when dealing with files that only appear to be standard ELF files."
     }
-
   }
 }
