@@ -51,3 +51,4 @@ line-length = 120
 "data/man/man1/ypkg.1" = "/share/man/man1/ypkg.1"
 "data/man/man5/package.yml.5" = "/share/man/man5/package.yml.5"
 "data/macros" = "/share/ypkg/macros"
+"data/schema" = "/share/ypkg/schema"

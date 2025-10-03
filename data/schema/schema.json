@@ -1,0 +1,406 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Solus Package Schema",
+  "description": "Recipe for a Solus Package",
+  "type": "object",
+  "required": [
+    "name",
+    "version",
+    "release",
+    "source",
+    "homepage",
+    "license",
+    "summary",
+    "component",
+    "description"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "licenseType": {
+      "$ref": "licenses.json",
+      "type": "string",
+      "description": "SPDX License Identifier"
+    },
+    "componentType": {
+      "enum": [
+        "database",
+        "desktop",
+        "desktop.budgie",
+        "desktop.core",
+        "desktop.font",
+        "desktop.gnome",
+        "desktop.gnome.core",
+        "desktop.gnome.doc",
+        "desktop.gtk",
+        "desktop.i3",
+        "desktop.kde",
+        "desktop.kde.core",
+        "desktop.library",
+        "desktop.mate",
+        "desktop.multimedia",
+        "desktop.qt",
+        "desktop.theme",
+        "desktop.xfce",
+        "editor",
+        "games",
+        "games.action",
+        "games.arcade",
+        "games.card",
+        "games.emulator",
+        "games.mmo",
+        "games.platformer",
+        "games.puzzle",
+        "games.rpg",
+        "games.strategy",
+        "kernel.devel",
+        "kernel.drivers",
+        "kernel.image",
+        "multimedia.audio",
+        "multimedia.codecs",
+        "multimedia.graphics",
+        "multimedia.gstreamer",
+        "multimedia.library",
+        "multimedia.video",
+        "network.base",
+        "network.clients",
+        "network.download",
+        "network.im",
+        "network.irc",
+        "network.mail",
+        "network.news",
+        "network.remote",
+        "network.util",
+        "network.web",
+        "network.web.browser",
+        "office",
+        "office.finance",
+        "office.maths",
+        "office.notes",
+        "office.scientific",
+        "office.spelling",
+        "office.viewers",
+        "programming",
+        "programming.devel",
+        "programming.haskell",
+        "programming.ide",
+        "programming.java",
+        "programming.library",
+        "programming.perl",
+        "programming.python",
+        "programming.ruby",
+        "programming.tools",
+        "security",
+        "security.crypto",
+        "security.library",
+        "system.base",
+        "system.boot",
+        "system.devel",
+        "system.utils",
+        "virt",
+        "xorg.apps",
+        "xorg.base",
+        "xorg.display",
+        "xorg.driver",
+        "xorg.fonts",
+        "xorg.library",
+        "xorg.proto",
+        "xorg.server"
+      ],
+      "type": "string",
+      "description": "Possible package categories within `eopkg`."
+    }
+  },
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the package. All subpackages will have this name as a prefix."
+    },
+    "version": {
+      "type": "string",
+      "description": "Version of the package. This should match the upstream version, i.e. that of the tarball or git tag."
+    },
+    "release": {
+      "type": "integer",
+      "description": "Specifies the current release number. Updates in the package number are based on this release number, not the version number.",
+      "exclusiveMinimum": 0
+    },
+    "source": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "List of sources that this package will use. A 'simple source' could be a tarball, where the key is the upstream URL, and the value is the SHA-256 sum of that tarball.\n git sources are also supported, and can be identified by prefixing the URI with git|. The expected value should be a commit, sha reference, or a tag."
+    },
+    "homepage": {
+      "type": "string",
+      "description": "Homepage of the package",
+      "pattern": "^https://"
+    },
+    "license": {
+      "description": "Valid upstream license(s). Try to ensure these use SPDX identifiers.",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/licenseType"
+        },
+        {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/definitions/licenseType"
+          }
+        }
+      ]
+    },
+    "summary": {
+      "description": "Brief package summary.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": [
+              "string",
+              "object"
+            ]
+          }
+        }
+      ]
+    },
+    "component": {
+      "description": "Component / group of packages this package belongs to. Check available components via `eopkg lc`.",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/componentType"
+        },
+        {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/componentType"
+              },
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/definitions/componentType"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "description": {
+      "description": "More extensive description of the software, usually taken from the vendor website.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": [
+              "string",
+              "object"
+            ]
+          }
+        }
+      ]
+    },
+    "autodep": {
+      "type": "boolean",
+      "description": "Set to 'false' to disable automatic binary dependency resolution at build time."
+    },
+    "avx2": {
+      "type": "boolean",
+      "description": "Set to 'true' to build package with the x86-64-v3 microarchitecture."
+    },
+    "build": {
+      "type": "string",
+      "description": "Use this step to run the build portion, for example, 'make'.",
+      "examples": [
+        "%make"
+      ]
+    },
+    "builddeps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Build dependencies for the package.",
+      "uniqueItems": true
+    },
+    "ccache": {
+      "type": "boolean",
+      "description": "Set to 'false' to disable ccache."
+    },
+    "check": {
+      "type": "string",
+      "description": "This is where tests / checking should occur, for example, 'make check'."
+    },
+    "checkdeps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Build dependencies which will *not* be considered when determining build order for automatic builds. These dependencies should only be used during the 'check' build phase.",
+      "uniqueItems": true
+    },
+    "clang": {
+      "type": "boolean",
+      "description": "Set to 'true' if this package benefits from being built with Clang."
+    },
+    "conflicts": {
+      "description": "Specify packages that cannot be installed together with this one.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "debug": {
+      "type": "boolean",
+      "description": "Set to 'false' to disable automatic creation of '-dbginfo' packages."
+    },
+    "environment": {
+      "type": "string",
+      "description": "Specify code that will be exported to all packaging steps of the build (i.e. exporting variables for the entire build).",
+      "examples": [
+        "export CCACHE_BASEDIR=$workdir"
+      ]
+    },
+    "emul32": {
+      "type": "boolean",
+      "description": "Set to 'true' to enable an -m32 build (32-bit libs)."
+    },
+    "extract": {
+      "type": "boolean",
+      "description": "Set to 'false' to disable automatic source extraction."
+    },
+    "install": {
+      "type": "string",
+      "description": "This is where you should install the files into the final packaging directory, for example, 'make install'.",
+      "examples": [
+        "%make_install",
+        "install -D -m 00644 $pkgfiles/nanorc $installdir/usr/share/defaults/nano/nanorc"
+      ]
+    },
+    "lastrip": {
+      "type": "boolean",
+      "description": "Set to 'false' to disable *.la libtool file stripping."
+    },
+    "libsplit": {
+      "type": "boolean",
+      "description": "Set to 'false' to disable splitting of libraries into devel sub-packages."
+    },
+    "mancompress": {
+      "type": "boolean",
+      "description": "Set to 'false' to disable compression of man/info pages."
+    },
+    "networking": {
+      "type": "boolean",
+      "description": "Set to 'true' to enable networking within solbuild."
+    },
+    "optimize": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "speed",
+          "size",
+          "no-bind-now",
+          "no-symbolic",
+          "unroll-loops",
+          "runpath",
+          "avx256",
+          "thin-lto",
+          "lto",
+          "icf-safe",
+          "icf-all",
+          "polly",
+          "function-sections",
+          "no-reorder-blocks-partition",
+          "emit-relocs"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "patterns": {
+      "type": "array",
+      "description": "Allows fine grained control over file placement within the package or sub-packages. Useful for packages that are development only (i.e. /usr/bin files).",
+      "items": {
+        "type": "object"
+      }
+    },
+    "permanent": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of files that will be marked as permanent files. These files will not be removed from the filesystem when upgrading or reinstalling the package. They will persist during standard upgrade operations. \nThis should only be used in critical chain packages such as the kernel or drivers, where the domain of control is outside of the package manager, and the package is simply used as an update delivery mechanism.",
+      "uniqueItems": true
+    },
+    "profile": {
+      "type": "string",
+      "description": "This is where profiling tests should be specified. ypkg will handle setting flags to generate profiling data and using that data for an optimized build."
+    },
+    "replaces": {
+      "type": "array",
+      "description": "Replace one package with another, used when renaming or deprecating packages for clean upgrade paths.",
+      "items": {
+        "type": [
+          "object",
+          "string"
+        ]
+      }
+    },
+    "rundeps": {
+      "type": "array",
+      "items": {
+        "type": [
+          "object",
+          "string"
+        ]
+      },
+      "description": "Further runtime dependencies for the packages.",
+      "uniqueItems": true
+    },
+    "setup": {
+      "type": "string",
+      "description": "Performed after the source extraction. This is the correct place to perform any 'configure' routine, or to patch the sources.",
+      "examples": [
+        "%patch -p1 -i $pkgfiles/0001-Use-a-stateless-configuration.patch",
+        "%configure"
+      ]
+    },
+    "strip": {
+      "type": "boolean",
+      "description": "Set to 'false' to disable automatic 'ELF' library & binary stripping. \n In most cases, stripping should remain enabled. However, there are known cases when stripping should be avoided, such as when complying with a distribution policy of binary only software, or when dealing with files that only appear to be standard ELF files."
+    }
+  }
+}
