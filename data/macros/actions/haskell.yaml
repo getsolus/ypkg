@@ -43,6 +43,7 @@ actions:
     # Cargo-style build
     - cabal_configure: |
         function cabal_configure() {
+            export CABAL_DIR="$HOME/.cabal"
             export GHCV=$(ghc --numeric-version)
             cabal update
             cabal build %JOBS% --only-dependencies --disable-tests -O2 --ghc-options="-H128m %JOBS%" "$@"
