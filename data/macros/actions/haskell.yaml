@@ -7,7 +7,6 @@ actions:
                 echo "import Distribution.Simple" > Setup.hs
                 echo "main = defaultMain" >> Setup.hs
             fi
-            export GHCV=$(ghc --numeric-version)
             runhaskell Setup configure --prefix=%PREFIX% \
                                        --libdir=%libdir% \
                                        --libsubdir="\$compiler/lib/\$abi/\$pkg-\$version" \
@@ -44,11 +43,11 @@ actions:
     - cabal_configure: |
         function cabal_configure() {
             export CABAL_DIR="$HOME/.cabal"
-            export GHCV=$(ghc --numeric-version)
+            export GHCV=$(ghc-pkg field ghc id | cut -d ' ' -f 2)
             cabal update
             cabal build %JOBS% --only-dependencies --disable-tests -O2 --ghc-options="-H128m %JOBS%" "$@"
             %haskell_configure --disable-executable-dynamic \
-                               --package-db=$HOME/.cabal/store/ghc-$GHCV/package.db \
+                               --package-db=$HOME/.cabal/store/$GHCV/package.db \
                                "$@"
         }
         cabal_configure
