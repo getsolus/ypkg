@@ -39,6 +39,24 @@ actions:
             echo "No broken symlinks found.";
         fi
 
+    - install_license: |
+        function install_license() {
+            shopt -s failglob
+
+            license_dir="$installdir/%PREFIX%/share/licenses/$package"
+
+            if [[ ! -d "${license_dir}" ]]; then
+                install -dm00755 "${license_dir}"
+            fi
+
+            files=("$@")
+
+            for f in "${files[@]}"; do
+                install -Dm00644 "${f}" "${license_dir}/$(basename ${f})"
+            done
+        }
+        install_license
+
 defines:
     # Get LTS kernel version
     - kernel_version_lts: |
