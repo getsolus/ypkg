@@ -319,6 +319,10 @@
       "type": "boolean",
       "description": "Set to 'false' to disable splitting of libraries into devel sub-packages."
     },
+    "devel": {
+      "type": "boolean",
+      "description": "Set to 'true' to place the '-devel' sub-package into the 'system.devel' component."
+    },
     "mancompress": {
       "type": "boolean",
       "description": "Set to 'false' to disable compression of man/info pages."
