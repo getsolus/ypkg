@@ -43,7 +43,7 @@ def main():
     maxwidth = len(max(lines, key=len))
     try:
         with open(sys.argv[1], "w") as fp:
-            yaml.indent(mapping=4, sequence=4, offset=4)
+            yaml.indent(mapping=4, sequence=6, offset=4)
             yaml.width = maxwidth
             yaml.dump(data, fp)
     except Exception as e:
