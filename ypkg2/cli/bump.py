@@ -18,6 +18,7 @@ from ruamel.yaml import YAML
 ## to start with `- ?`. Override this limit in ruamel to allow us to continue to mangle the YAML spec in this way.
 ## 32x the limit oughta be enough for anyone, right?
 from ruamel.yaml.emitter import Emitter
+
 Emitter.MAX_SIMPLE_KEY_LENGTH = 4096
 
 
@@ -38,13 +39,11 @@ def main():
         fp.seek(0)
         yaml = YAML()
         data = yaml.load(fp)
-    data['release'] += 1
+    data["release"] += 1
     maxwidth = len(max(lines, key=len))
     try:
-        with open(sys.argv[1], 'w') as fp:
+        with open(sys.argv[1], "w") as fp:
             yaml.indent(mapping=4, sequence=4, offset=4)
-            yaml.top_level_colon_align = True
-            yaml.prefix_colon = ' '
             yaml.width = maxwidth
             yaml.dump(data, fp)
     except Exception as e:
