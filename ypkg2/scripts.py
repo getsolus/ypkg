@@ -139,10 +139,16 @@ class ScriptGenerator:
 
         self.define_macro("HOST", self.context.build.host)
         self.define_macro("ARCH", self.context.build.arch)
-        # Based on the default target list defined in rocBLAS's CMakeLists.txt
+        # Default target list defined in rocBLAS's CMakeLists.txt minus all
+        # architectures that are CDNA GPUs.
         self.define_macro(
             "AMDGPUTARGETS",
-            "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1010;gfx1030;gfx1100;gfx1101;gfx1102",
+            "gfx900;gfx1010;gfx1030;gfx1100;gfx1101;gfx1102;gfx1150;gfx1151;gfx1200;gfx1201",
+        )
+        self.define_macro(
+            "AMDGPUTARGETS_GENERIC",
+            # TODO(gzgz): include other generic architectures once upstream support is mature
+            "gfx9-generic;gfx10-1-generic;gfx10-3-generic;gfx11-generic;gfx1100;gfx1101;gfx1102;gfx1150;gfx1151;gfx1200;gfx1201",
         )
         self.define_macro("PKGNAME", self.spec.pkg_name)
         self.define_macro("PKGFILES", self.context.files_dir)
