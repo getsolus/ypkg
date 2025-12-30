@@ -147,6 +147,12 @@ def create_files_xml(context, package):
             # Preserve compatibility with older eopkg implementation
             console_ui.emit_warning("Package", "{} has suid bit set".format(full_path))
 
+        if st.st_uid >= 1000:
+            console_ui.emit_warning("Package", "{} has user ID {}".format(full_path, st.st_uid))
+
+        if st.st_gid >= 1000:
+            console_ui.emit_warning("Package", "{} has group ID {}".format(full_path, st.st_gid))
+
         file_info = pisi.files.FileInfo(
             path=path,
             type=ftype,
