@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ypkg2"
-version = "35.1.0"
+version = "35.1.1"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
 authors = [
