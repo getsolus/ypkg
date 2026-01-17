@@ -2,7 +2,7 @@
 title: YPKG
 section: 1
 header: User Manual
-footer: ypkg 35.1.0
+footer: ypkg 35.1.1
 date: December 8, 2025
 ---
 
