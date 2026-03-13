@@ -53,7 +53,13 @@ actions:
 
     - install_license: |
         function install_license() {
-            shopt -s failglob
+            failglobEnabled=0
+
+            if [[ ${SHELLOPTS} =~ "failglob" ]]; then
+                failglobEnabled=1
+            else
+                shopt -s failglob
+            fi
 
             license_dir="$installdir/%PREFIX%/share/licenses/$package"
 
@@ -66,6 +72,10 @@ actions:
             for f in "${files[@]}"; do
                 install -Dm00644 "${f}" "${license_dir}/$(basename ${f})"
             done
+
+            if [[ "${failglobEnabled}" -eq 0 ]]; then
+                shopt -u failglob
+            fi
         }
         install_license
 
