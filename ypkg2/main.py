@@ -11,9 +11,20 @@
 #  (at your option) any later version.
 #
 
+import multiprocessing
+import os
 import subprocess
 import sys
-import os
+
+# Set the multiprocessing start method to 'fork' if available.
+# This is to avoid issues with 'forkserver' and 'spawn' which require
+# all objects to be picklable, which is not the case for many
+# objects used in ypkg2/pisi.
+if hasattr(multiprocessing, "set_start_method"):
+    try:
+        multiprocessing.set_start_method("fork", force=True)
+    except RuntimeError:
+        pass
 
 import pisi.specfile
 from pisi.db.filesdb import FilesDB
