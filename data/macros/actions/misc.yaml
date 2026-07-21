@@ -39,6 +39,18 @@ actions:
             echo "No broken symlinks found.";
         fi
 
+    - install_bin: |
+        install -Dm 00755 -t ${installdir}/usr/bin
+
+    - install_dir: |
+        install -dm 00755
+
+    - install_exe: |
+        install -Dm 00755
+
+    - install_file: |
+        install -Dm 00644
+
     - install_license: |
         function install_license() {
             shopt -s failglob
@@ -56,6 +68,20 @@ actions:
             done
         }
         install_license
+
+    - tmpfiles: |
+        create_tmpfiles() {
+            mkdir -p ${installdir}/%libdir%/tmpfiles.d
+            echo "$@" >> ${installdir}/%libdir%/tmpfiles.d/${package}.conf
+        }
+        create_tmpfiles
+
+    - sysusers: |
+        create_sysusers() {
+            mkdir -p ${installdir}/%libdir%/sysusers.d
+            echo "$@" >> ${installdir}/%libdir%/sysusers.d/${package}.conf
+        }
+        create_sysusers
 
 defines:
     # Get LTS kernel version
