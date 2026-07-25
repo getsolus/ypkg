@@ -1,586 +1,545 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta http-equiv='content-type' content='text/html;charset=utf-8'>
-  <meta name='generator' content='Ronn-NG/v0.10.1 (http://github.com/apjanke/ronn-ng/tree/0.10.1)'>
-  <title>package.yml(5) - Solus package build format</title>
-  <style type='text/css' media='all'>
-  /* style: man */
-  body#manpage {margin:0}
-  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
-  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
-  .mp h2 {margin:10px 0 0 0}
-  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
-  .mp h3 {margin:0 0 0 4ex}
-  .mp dt {margin:0;clear:left}
-  .mp dt.flush {float:left;width:8ex}
-  .mp dd {margin:0 0 0 9ex}
-  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
-  .mp pre {margin-bottom:20px}
-  .mp pre+h2,.mp pre+h3 {margin-top:22px}
-  .mp h2+pre,.mp h3+pre {margin-top:5px}
-  .mp img {display:block;margin:auto}
-  .mp h1.man-title {display:none}
-  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
-  .mp h2 {font-size:16px;line-height:1.25}
-  .mp h1 {font-size:20px;line-height:2}
-  .mp {text-align:justify;background:#fff}
-  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
-  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
-  .mp u {text-decoration:underline}
-  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
-  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
-  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
-  .mp b.man-ref {font-weight:normal;color:#434241}
-  .mp pre {padding:0 4ex}
-  .mp pre code {font-weight:normal;color:#434241}
-  .mp h2+pre,h3+pre {padding-left:0}
-  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
-  ol.man-decor {width:100%}
-  ol.man-decor li.tl {text-align:left}
-  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
-  ol.man-decor li.tr {text-align:right;float:right}
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>package.yml.5</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
 </head>
-<!--
-  The following styles are deprecated and will be removed at some point:
-  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
-
-  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
-  .man-navigation should be used instead.
--->
-<body id='manpage'>
-  <div class='mp' id='man'>
-
-  <div class='man-navigation' style='display:none'>
-    <a href="#NAME">NAME</a>
-    <a href="#SYNOPSIS">SYNOPSIS</a>
-    <a href="#DESCRIPTION">DESCRIPTION</a>
-    <a href="#CONFIGURATION-FORMAT">CONFIGURATION FORMAT</a>
-    <a href="#EXAMPLES">EXAMPLES</a>
-    <a href="#COPYRIGHT">COPYRIGHT</a>
-    <a href="#SEE-ALSO">SEE ALSO</a>
-    <a href="#NOTES">NOTES</a>
-  </div>
-
-  <ol class='man-decor man-head man head'>
-    <li class='tl'>package.yml(5)</li>
-    <li class='tc'></li>
-    <li class='tr'>package.yml(5)</li>
-  </ol>
-
-  
-
-<h2 id="NAME">NAME</h2>
-<p class="man-name">
-  <code>package.yml</code> - <span class="man-whatis">Solus package build format</span>
-</p>
-<h2 id="SYNOPSIS">SYNOPSIS</h2>
-
-<pre><code>The Solus package build format, with YAML syntax.
-</code></pre>
-
-<h2 id="DESCRIPTION">DESCRIPTION</h2>
-
-<p>The primary format of package builds in Solus, <code>package.yml(5)</code> provides a modern,
-declarative, and structured format in which to define metadata and steps, to
-convert a build operation into a package.</p>
-
-<p><code>ypkg-build(1)</code> will use the advanced patterns system and some very specific
-internal rules to automatically split the package into multiple packages,
-refered to here as "subpackages".</p>
-
-<h2 id="CONFIGURATION-FORMAT">CONFIGURATION FORMAT</h2>
-
-<p><code>ypkg-build(1)</code> uses the YAML file format. However, this is a very specialised flavour
-of YAML with very specific extensions and types.</p>
-
+<body>
+<h1 id="package.yml5-solus-package-build-format">package.yml(5) – Solus
+package build format</h1>
+<h2 id="synopsis">SYNOPSIS</h2>
+<pre><code>The Solus package build format, with YAML syntax.</code></pre>
+<h2 id="description">DESCRIPTION</h2>
+<p>The primary format of package builds in Solus,
+<code>package.yml(5)</code> provides a modern, declarative, and
+structured format in which to define metadata and steps, to convert a
+build operation into a package.</p>
+<p><code>ypkg-build(1)</code> will use the advanced patterns system and
+some very specific internal rules to automatically split the package
+into multiple packages, refered to here as “subpackages”.</p>
+<h2 id="configuration-format">CONFIGURATION FORMAT</h2>
+<p><code>ypkg-build(1)</code> uses the YAML file format. However, this
+is a very specialised flavour of YAML with very specific extensions and
+types.</p>
 <p><code>Types</code></p>
-
-<p>Some of the specialised types expected by <code>package.yml(5)</code> are explained below.</p>
-
+<p>Some of the specialised types expected by <code>package.yml(5)</code>
+are explained below.</p>
 <ul>
-  <li>
-    <p><code>dict(s)</code></p>
-
-    <p>This is a set of one or more <code>key</code>:<code>value</code> mappings. These are always in
-  a list format.</p>
-  </li>
-  <li>
-    <p><code>multimap</code></p>
-
-    <p>This is a <code>key</code>:<code>value</code> mapping where the <code>key</code> is IMPLICIT. That is to
-  say, it is acceptable to omit the key. A single value passed as the <code>value</code>
-  will set the implicit key's component.</p>
-
-    <p>In all instances the implicit key is the <code>main package</code>. The <code>multimap</code>
-  format can accept a list instead of a string as a value, and each item
-  in that list also follows the implicit key policy.</p>
-
-    <p>For each item in the list, if the <code>key</code> is EXPLICIT, by using <code>dict</code> style
-  <code>key</code>:<code>value</code> mapping, then the key specified will be used.</p>
-
-    <p>Within <code>ypkg(1)</code>, that key is always a package name. This name should be
-  the shortform name, not the fully qualified name, i.e the subpackage name
-  without the <code>name</code> prefix.</p>
-
-    <p>As a special exception to the subpackage rule, keys beginning with <code>^</code> will
-  result in an explicitly named package lookup, i.e. one that doesn't follow
-  the subpackage convention. This should be used only in rare cases where
-  it is illogical to share a common root name, or a migration with name
-  changes from a legacy format is too complex.</p>
-
-    <p>This allows a general key to accept sane defaults, but also allows the key
-  to be extended to override attributes of a subpackage.</p>
-  </li>
+<li><p><code>dict(s)</code></p>
+<p>This is a set of one or more <code>key</code>:<code>value</code>
+mappings. These are always in a list format.</p></li>
+<li><p><code>multimap</code></p>
+<p>This is a <code>key</code>:<code>value</code> mapping where the
+<code>key</code> is IMPLICIT. That is to say, it is acceptable to omit
+the key. A single value passed as the <code>value</code> will set the
+implicit key’s component.</p>
+<p>In all instances the implicit key is the <code>main package</code>.
+The <code>multimap</code> format can accept a list instead of a string
+as a value, and each item in that list also follows the implicit key
+policy.</p>
+<p>For each item in the list, if the <code>key</code> is EXPLICIT, by
+using <code>dict</code> style <code>key</code>:<code>value</code>
+mapping, then the key specified will be used.</p>
+<p>Within <code>ypkg(1)</code>, that key is always a package name. This
+name should be the shortform name, not the fully qualified name, i.e the
+subpackage name without the <code>name</code> prefix.</p>
+<p>As a special exception to the subpackage rule, keys beginning with
+<code>^</code> will result in an explicitly named package lookup,
+i.e. one that doesn’t follow the subpackage convention. This should be
+used only in rare cases where it is illogical to share a common root
+name, or a migration with name changes from a legacy format is too
+complex.</p>
+<p>This allows a general key to accept sane defaults, but also allows
+the key to be extended to override attributes of a subpackage.</p></li>
 </ul>
-
 <p><code>Mandatory Keys</code></p>
-
 <ul>
-  <li>
-    <p><code>name</code> [string]</p>
-
-    <p>Set the name of the package. In general this should try to match the upstream
-  source name wherever possible. All subpackages generated by <code>ypkg-build(1)</code> will
-  have this <code>name</code> as a prefix.</p>
-  </li>
-  <li>
-    <p><code>version</code> [string]</p>
-
-    <p>The version of the software being packaged. This should match the upstream
-  version, i.e. that of the tarball or git tag.</p>
-  </li>
-  <li>
-    <p><code>release</code> [integer]</p>
-
-    <p>Packages within Solus are updated by their <strong>release number</strong>. This number
-  must start at 1 in new packages, and be incremented for every new update
-  or change to the package that is published.</p>
-
-    <p>It is perfectly acceptable to push an update with a <strong>lower version</strong> by
-  bumping the release number.</p>
-  </li>
-  <li>
-    <p><code>license</code> [string(s)]</p>
-
-    <p>One or more strings that identify the software license of this package.
-  This should in most cases be a recognised <code>SPDX</code> license name.</p>
-
-    <pre><code>  * https://spdx.org/licenses/
-</code></pre>
-  </li>
-  <li>
-    <p><code>source</code> [dict(s)]</p>
-
-    <p>This key expects a list of <code>key</code>:<code>value</code> mappings, to declare the sources that
-  this package will use. A "simple source" could be a tarball, where the key
-  is the upstream URL, and the value must be a valid <code>sha256sum(1)</code> for that
-  tarball.</p>
-
-    <p>You can list multiple sources and they will all be fetched for the build
-  process, but only the first will be extracted. You can locate these other
-  sources during your build with the <code>$sources</code> variable.</p>
-
-    <p><code>git(1)</code> sources are also supported, and can be identified by prefixing the
-  URI with <code>git|</code>. The expected value should be a commit, sha reference, or a
-  tag.</p>
-  </li>
-  <li>
-    <p><code>component</code> [multimap]</p>
-
-    <p>This key sets the package component, that is to say, the logical unit of
-  organisation that it belongs to. Check <code>eopkg lc</code> for existing component
-  names.</p>
-
-    <p><code>component</code> is a multimap key, therefore if passed a single string value
-  it will set the component for the main package. However, you may instead
-  pass a list of the subpackage names, and set their component individually
-  using the map <strong>value</strong>.</p>
-  </li>
-  <li>
-    <p><code>summary</code> [multimap]</p>
-
-    <p>Set the "short" description of a package, i.e. a one line explanation of
-  what an item is. Use the subpackage names in the explicit key for this
-  multimap to override subpackage summaries.</p>
-  </li>
-  <li>
-    <p><code>description</code> [multimap]</p>
-
-    <p>Set the full description of a package, i.e. a more in depth explanation
-  of the software/package's functionality. This is the large description
-  that will be displayed in <code>eopkg</code> and the <code>solus-sc</code>.
-  Use the subpackage names in the explicit key for this multimap to override
-  subpackage descriptions.</p>
-  </li>
+<li><p><code>name</code> [string]</p>
+<p>Set the name of the package. In general this should try to match the
+upstream source name wherever possible. All subpackages generated by
+<code>ypkg-build(1)</code> will have this <code>name</code> as a
+prefix.</p></li>
+<li><p><code>version</code> [string]</p>
+<p>The version of the software being packaged. This should match the
+upstream version, i.e. that of the tarball or git tag.</p></li>
+<li><p><code>release</code> [integer]</p>
+<p>Packages within Solus are updated by their <strong>release
+number</strong>. This number must start at 1 in new packages, and be
+incremented for every new update or change to the package that is
+published.</p>
+<p>It is perfectly acceptable to push an update with a <strong>lower
+version</strong> by bumping the release number.</p></li>
+<li><p><code>license</code> [string(s)]</p>
+<p>One or more strings that identify the software license of this
+package. This should in most cases be a recognised <code>SPDX</code>
+license name.</p>
+<pre><code>  * https://spdx.org/licenses/</code></pre></li>
+<li><p><code>source</code> [dict(s)]</p>
+<p>This key expects a list of <code>key</code>:<code>value</code>
+mappings, to declare the sources that this package will use. A “simple
+source” could be a tarball, where the key is the upstream URL, and the
+value must be a valid <code>sha256sum(1)</code> for that tarball.</p>
+<p>You can list multiple sources and they will all be fetched for the
+build process, but only the first will be extracted. You can locate
+these other sources during your build with the <code>$sources</code>
+variable.</p>
+<p><code>git(1)</code> sources are also supported, and can be identified
+by prefixing the URI with <code>git|</code>. The expected value should
+be a commit, sha reference, or a tag.</p></li>
+<li><p><code>component</code> [multimap]</p>
+<p>This key sets the package component, that is to say, the logical unit
+of organisation that it belongs to. Check <code>eopkg lc</code> for
+existing component names.</p>
+<p><code>component</code> is a multimap key, therefore if passed a
+single string value it will set the component for the main package.
+However, you may instead pass a list of the subpackage names, and set
+their component individually using the map
+<strong>value</strong>.</p></li>
+<li><p><code>summary</code> [multimap]</p>
+<p>Set the “short” description of a package, i.e. a one line explanation
+of what an item is. Use the subpackage names in the explicit key for
+this multimap to override subpackage summaries.</p></li>
+<li><p><code>description</code> [multimap]</p>
+<p>Set the full description of a package, i.e. a more in depth
+explanation of the software/package’s functionality. This is the large
+description that will be displayed in <code>eopkg</code> and the
+<code>solus-sc</code>. Use the subpackage names in the explicit key for
+this multimap to override subpackage descriptions.</p></li>
 </ul>
-
 <p><code>Optional Keys</code></p>
-
-<p>These keys are not mandatory to a <code>package.yml</code> file, but may be used to configure
-additional functionality.</p>
-
+<p>These keys are not mandatory to a <code>package.yml</code> file, but
+may be used to configure additional functionality.</p>
 <ul>
-  <li>
-    <p><code>builddeps</code> [list]</p>
-
-    <p>Specifies the build dependencies required to actually make this package
-  build in an isolated environment (<code>solbuild(1)</code>).</p>
-
-    <p>You may use full package names here, though it is preferable to use the
-  <code>pkg-config(1)</code> names.</p>
-
-    <p><code>ypkg-build(1)</code> understands pkgconfig dependencies denoted inside either
-  the <code>pkgconfig($name)</code> identifier, or <code>pkgconfig32($name)</code> for emul32
-  build dependencies.</p>
-
-    <p>It is not required to list any package here that exists in the <code>system.base</code>
-  or <code>system.devel</code> component.</p>
-  </li>
-  <li>
-    <p><code>checkdeps</code> [list]</p>
-
-    <p>Specifies the build and/or run dependencies required to build and/or run
-  the tests of
-  this package in an isolated environment (<code>solbuild(1)</code>).</p>
-
-    <p>You may use full package names here, though it is preferable to use the
-  <code>pkg-config(1)</code> names.</p>
-
-    <p><code>ypkg-build(1)</code> understands pkgconfig dependencies denoted inside either
-  the <code>pkgconfig($name)</code> identifier, or <code>pkgconfig32($name)</code> for emul32
-  build dependencies.</p>
-
-    <p>It is not required to list any package here that exists in the <code>system.base</code>
-  or <code>system.devel</code> component.</p>
-  </li>
-  <li>
-    <p><code>clang</code> [boolean]</p>
-
-    <p>Set this key to <code>yes</code> to force building this package with the <code>clang</code>
-  compiler. The build environment will be configured to use <code>clang</code> as the
-  <code>$CC</code> and <code>clang++</code> as the <code>$CXX</code> variables.</p>
-
-    <p>By default this key is set to <code>no</code>.</p>
-  </li>
-  <li>
-    <p><code>ccache</code> [boolean]</p>
-
-    <p>If configured correctly, <code>ypkg-build(1)</code> will automatically use <code>ccache(1)</code>.
-  When using <code>solbuild(1)</code> this is almost always the case. However, there
-  may be some cases when ccache can break the build, or is ill advised.</p>
-
-    <p>Whilst the default value of this key is <code>yes</code>, you can force disable the
-  use of ccache by setting it to <code>no</code>.</p>
-  </li>
-  <li>
-    <p><code>devel</code> [boolean]</p>
-
-    <p>Force all built packages to belong to the <code>system.devel</code> component. This
-  will become deprecated in future, and currently defaults to <code>no</code>.</p>
-  </li>
-  <li>
-    <p><code>extract</code> [boolean]</p>
-
-    <p>By default, <code>ypkg-build(1)</code> will extract all sources listed in the file.
-  If this is undesirable, set this key to <code>no</code> to disable this automatic
-  extraction.</p>
-  </li>
-  <li>
-    <p><code>autodep</code> [boolean]</p>
-
-    <p>After a build has finished, <code>ypkg-build(1)</code> will automatically scan the
-  package files to determine dependencies between the package and any of
-  it's subpackages, and to external packages in the build environment.</p>
-
-    <p>This is essential in most cases, as it allows packages to benefit from
-  automatic dependencies and ensures the user always gets all of the packages
-  needed to run this software when installing it.</p>
-
-    <p>If for any reason you need to disable this functionality, i.e. for bootstrapping
-  or sideloading, set this key to <code>no</code>.</p>
-  </li>
-  <li>
-    <p><code>emul32</code> [boolean]</p>
-
-    <p><code>ypkg-build(1)</code> can optionally build your package in a multilib configuration.
-  If this key is set to <code>yes</code>, the buildset will double, and the first build
-  configuration will be set up for a <code>32-bit</code> ("emul32") build. ypkg will
-  automatically split off <code>-32bit</code> and <code>-32bit-devel</code> subpackages in this
-  instance, using the <code>/usr/lib32</code> library directory. It will also add
-  additional build dependencies automatically for 32-bit builds.</p>
-
-    <p>By default, this key is set to <code>no</code>.</p>
-  </li>
-  <li>
-    <p><code>libsplit</code> [boolean]</p>
-
-    <p>The default patterns include logic to split subpackages according to the
-  library files in library directory. It is standard practice for ypkg to
-  split <code>*.so</code> symlinks into the automatic <code>devel</code> subpackage, along with
-  other development assets such as <code>pkgconfig</code> and <code>*.h</code> files.</p>
-
-    <p>Some software packages provide <code>*.so</code> files in the libdir that are not
-  symlinks, or are required for "main" operation. In this instance you can
-  set this key to <code>no</code> to disable this pattern.</p>
-
-    <p>By default, this key is set to <code>yes</code>, and should only be disabled if truly
-  required.</p>
-  </li>
-  <li>
-    <p><code>rundeps</code> [multimap]</p>
-
-    <p>Provide a list of additional runtime dependencies for the main package.
-  These names should be fully qualified package names in the list, even
-  for subpackages.</p>
-
-    <p>If the EXPLICIT multimap key is set, then the runtime dependencies will
-  be added to the subpackage instead. Note that you can pass a list or a
-  single string value to the EXPLICIT rundep.</p>
-  </li>
-  <li>
-    <p><code>replaces</code> [multimap]</p>
-
-    <p>When exported in the package index, this will indicate to the package manager
-  that THIS package now replaces the name in the value.</p>
-
-    <p>You may also set <code>replaces</code> on subpackages using the multimap notation.
-  Only one value per subpackage is allowed.</p>
-  </li>
-  <li>
-    <p><code>patterns</code> [multimap]</p>
-
-    <p>Control package splitting and dynamically generate subpackages. The EXPLICIT
-  key is used to specify the new (or existing!) subpackage name. The "pattern"
-  is a shell compatible <code>glob(3)</code> expression.</p>
-
-    <p>All files captured by this expression will then end up in that subpackage.
-  Each successive pattern takes priority over the one listed before it, so
-  if your first pattern unavoidably captures files you need in ANOTHER
-  subpackage, simply list that pattern later.</p>
-
-    <p><code>ypkg-build(1)</code> ensures that a file cannot belong to multiple packages,
-  and that the last specified pattern, if matching, ALWAYS wins. It is
-  even possible to suppress generation of the main package, by pattern
-  globbing <code>/*</code> to a subpackage. This will not cause any breakage.</p>
-  </li>
-  <li>
-    <p><code>permanent</code> [list]</p>
-
-    <p>A list of patterns used to mark files as permanent. Any file within the
-  resulting binary packages that matches the path pattern, is marked as
-  a permanent file.</p>
-
-    <p>These files will not be removed from the filesystem when upgrading or
-  reinstalling the package. They will persist during standard upgrade
-  operations.</p>
-
-    <p>This should only be used in critical chain packages such as the kernel
-  or drivers, where the domain of control is outside of the package manager,
-  and the package is simply used as an update delivery mechanism.</p>
-  </li>
-  <li>
-    <p><code>strip</code> [boolean]</p>
-
-    <p>By default, this key is enabled, and as a result <code>ypkg-build(1)</code> will
-  automatically strip files after the build has done, including <code>ELF</code>
-  libraries &amp; binaries.</p>
-
-    <p>In most cases, stripping should remain enabled. However, there are known
-  cases when stripping should be avoided, such as when complying with a
-  distribution policy of binary only software, or when dealing with
-  files that only appear to be standard ELF files.</p>
-
-    <p>The Go programming language generates <code>*.a</code> archive files that under
-  no circumstance should be stripped, and there are likely other cases.
-  This key, when set to <code>no</code>, will disable any and all stripping.</p>
-  </li>
-  <li>
-    <p><code>lastrip</code> [boolean]</p>
-
-    <p>By default, this key is enabled, and will result in <code>*.la</code> libtool files
-  being stripped from the build. However in some very rare cases these files
-  need to be preserved because they're not <strong>true</strong> libtool scripts which
-  led to the creation of successful <code>.so</code> linkage.</p>
-
-    <p>If in doubt, omit this option where possible.</p>
-  </li>
-  <li>
-    <p><code>mancompress</code> [boolean]</p>
-
-    <p>By default, this key is enabled. Enables compression of man/info pages
-  using zstd at the maximum compression level, to decrease the installed
-  size of the package on disk.</p>
-  </li>
-  <li>
-    <p><code>debug</code> [boolean]</p>
-
-    <p>By default, this key is enabled, and as a result <code>ypkg-build(1)</code> will
-  automatically create resulting <code>-dbginfo</code> packages where it can.</p>
-
-    <p>In the majority of cases, this is the desired behaviour in full build
-  environments, such as a build server. However in very rare cases, this
-  may cause problems for the package, especially if it contains binaries
-  that have not been bootstrapped with the native toolchain.</p>
-  </li>
-  <li>
-    <p><code>avx2</code> [boolean]</p>
-
-    <p>If set, the package will be rebuilt again with the <code>x86-64-v3</code> microarchitecture to enable
-  libraries to be optimised to use newer hardware instructions such as <strong>Advanced Vector Extensions</strong>.
-  From baseline (<code>x86-64</code>) to v3 (<code>x86-64-v3</code>) it allows the compiler to use additional instructions such as,
-  but not limited to; SSE4.2, SSSE3, POPCNT, CMPXCHG16B, MOVBE and AVX2.</p>
-
-    <p>The build will be configured to make use of the Glibc HWCaps (hardware capabilities) feature, by
-  placing the libraries into the library directory suffix of <code>glibc-hwcaps/x86-64-v3</code>
-  i.e. <code>/usr/lib64/glibc-hwcaps/x86-64-v3</code>.</p>
-
-    <p>These libraries will be automatically loaded on the Solus installation if the hardware supports the <code>x86-64-v3</code>
-  microarchitecture.</p>
-  </li>
-  <li>
-    <p><code>optimize</code> [list]</p>
-
-    <p>Valid keys are restricted to:</p>
-
-    <ul>
-      <li>
-<code>speed</code>: Optimise this package for speed performance</li>
-      <li>
-<code>size</code>: Optimize the package build solely for size.</li>
-      <li>
-<code>no-bind-now</code>: Configure the package to disable certain flags, where RELRO is unsupported.</li>
-      <li>
-<code>no-frame-pointer</code>: Disable <code>-fno-omit-frame-pointer</code> and <code>-mno-omit-leaf-frame-pointer</code> compiler flags</li>
-      <li>
-<code>no-symbolic</code>: Disable <code>-Wl,-Bsymbolic-functions</code> linker flag</li>
-      <li>
-<code>unroll-loops</code>: Enable <code>-funroll-loops</code>. Use this sparingly, only when it provides benefit.</li>
-      <li>
-<code>runpath</code>: Enable <code>-Wl,--enable-new-dtags</code> to make linker use RUNPATH's instead of RPATH's.</li>
-      <li>
-<code>avx256</code>: Disables <code>-mprefer-vector-width=128</code> in avx2 builds</li>
-      <li>
-<code>thin-lto</code>: Enable Thin Link Time Optimization</li>
-      <li>
-<code>lto</code>: Enable Link Time Optimization</li>
-      <li>
-<code>icf-safe</code>: Enable <code>-Wl,--icf=safe</code> to utilize the safe Identical Code Folding linker optimization.</li>
-      <li>
-<code>icf-all</code>: Enable <code>-Wl,--icf=all</code> to utilize the Identical Code Folding linker optimization.</li>
-      <li>
-<code>function-sections</code>: Enables <code>-ffunction-sections</code> to generate a seperate ELF section for each function. Recommended for icf with gcc.</li>
-    </ul>
-  </li>
-  <li>
-    <p><code>networking</code> [boolean]</p>
-
-    <p>When built using <code>solbuild(1)</code>, access to the network is removed. A new
-  loopback device will be provided within the container. This ensures that
-  packages do not accidently download unverifiable content during build.</p>
-
-    <p>If for any reason, networking is still required, you can set this key to <code>yes</code>.
-  However, always evaluate whether it is avoidable first.</p>
-  </li>
-  <li>
-    <p><code>environment</code> [unicode]</p>
-
-    <p>By default, this key is empty and no additional content is exported to
-  each build step. The <code>environment</code> key provides an easy method to
-  export content such as variables to the environment for the entirety of
-  the build (where the environment is reset between each build step).</p>
-  </li>
+<li><p><code>builddeps</code> [list]</p>
+<p>Specifies the build dependencies required to actually make this
+package build in an isolated environment (<code>solbuild(1)</code>).</p>
+<p>You may use full package names here, though it is preferable to use
+the <code>pkg-config(1)</code> names.</p>
+<p><code>ypkg-build(1)</code> understands pkgconfig dependencies denoted
+inside either the <code>pkgconfig($name)</code> identifier, or
+<code>pkgconfig32($name)</code> for emul32 build dependencies.</p>
+<p>It is not required to list any package here that exists in the
+<code>system.base</code> or <code>system.devel</code>
+component.</p></li>
+<li><p><code>checkdeps</code> [list]</p>
+<p>Specifies the build and/or run dependencies required to build and/or
+run the tests of this package in an isolated environment
+(<code>solbuild(1)</code>).</p>
+<p>You may use full package names here, though it is preferable to use
+the <code>pkg-config(1)</code> names.</p>
+<p><code>ypkg-build(1)</code> understands pkgconfig dependencies denoted
+inside either the <code>pkgconfig($name)</code> identifier, or
+<code>pkgconfig32($name)</code> for emul32 build dependencies.</p>
+<p>It is not required to list any package here that exists in the
+<code>system.base</code> or <code>system.devel</code>
+component.</p></li>
+<li><p><code>clang</code> [boolean]</p>
+<p>Set this key to <code>yes</code> to force building this package with
+the <code>clang</code> compiler. The build environment will be
+configured to use <code>clang</code> as the <code>$CC</code> and
+<code>clang++</code> as the <code>$CXX</code> variables.</p>
+<p>By default this key is set to <code>no</code>.</p></li>
+<li><p><code>ccache</code> [boolean]</p>
+<p>If configured correctly, <code>ypkg-build(1)</code> will
+automatically use <code>ccache(1)</code>. When using
+<code>solbuild(1)</code> this is almost always the case. However, there
+may be some cases when ccache can break the build, or is ill
+advised.</p>
+<p>Whilst the default value of this key is <code>yes</code>, you can
+force disable the use of ccache by setting it to
+<code>no</code>.</p></li>
+<li><p><code>devel</code> [boolean]</p>
+<p>Force all built packages to belong to the <code>system.devel</code>
+component. This will become deprecated in future, and currently defaults
+to <code>no</code>.</p></li>
+<li><p><code>extract</code> [boolean]</p>
+<p>By default, <code>ypkg-build(1)</code> will extract all sources
+listed in the file. If this is undesirable, set this key to
+<code>no</code> to disable this automatic extraction.</p></li>
+<li><p><code>autodep</code> [boolean]</p>
+<p>After a build has finished, <code>ypkg-build(1)</code> will
+automatically scan the package files to determine dependencies between
+the package and any of it’s subpackages, and to external packages in the
+build environment.</p>
+<p>This is essential in most cases, as it allows packages to benefit
+from automatic dependencies and ensures the user always gets all of the
+packages needed to run this software when installing it.</p>
+<p>If for any reason you need to disable this functionality, i.e. for
+bootstrapping or sideloading, set this key to <code>no</code>.</p></li>
+<li><p><code>emul32</code> [boolean]</p>
+<p><code>ypkg-build(1)</code> can optionally build your package in a
+multilib configuration. If this key is set to <code>yes</code>, the
+buildset will double, and the first build configuration will be set up
+for a <code>32-bit</code> (“emul32”) build. ypkg will automatically
+split off <code>-32bit</code> and <code>-32bit-devel</code> subpackages
+in this instance, using the <code>/usr/lib32</code> library directory.
+It will also add additional build dependencies automatically for 32-bit
+builds.</p>
+<p>By default, this key is set to <code>no</code>.</p></li>
+<li><p><code>libsplit</code> [boolean]</p>
+<p>The default patterns include logic to split subpackages according to
+the library files in library directory. It is standard practice for ypkg
+to split <code>*.so</code> symlinks into the automatic
+<code>devel</code> subpackage, along with other development assets such
+as <code>pkgconfig</code> and <code>*.h</code> files.</p>
+<p>Some software packages provide <code>*.so</code> files in the libdir
+that are not symlinks, or are required for “main” operation. In this
+instance you can set this key to <code>no</code> to disable this
+pattern.</p>
+<p>By default, this key is set to <code>yes</code>, and should only be
+disabled if truly required.</p></li>
+<li><p><code>rundeps</code> [multimap]</p>
+<p>Provide a list of additional runtime dependencies for the main
+package. These names should be fully qualified package names in the
+list, even for subpackages.</p>
+<p>If the EXPLICIT multimap key is set, then the runtime dependencies
+will be added to the subpackage instead. Note that you can pass a list
+or a single string value to the EXPLICIT rundep.</p></li>
+<li><p><code>replaces</code> [multimap]</p>
+<p>When exported in the package index, this will indicate to the package
+manager that THIS package now replaces the name in the value.</p>
+<p>You may also set <code>replaces</code> on subpackages using the
+multimap notation. Only one value per subpackage is allowed.</p></li>
+<li><p><code>patterns</code> [multimap]</p>
+<p>Control package splitting and dynamically generate subpackages. The
+EXPLICIT key is used to specify the new (or existing!) subpackage name.
+The “pattern” is a shell compatible <code>glob(3)</code> expression.</p>
+<p>All files captured by this expression will then end up in that
+subpackage. Each successive pattern takes priority over the one listed
+before it, so if your first pattern unavoidably captures files you need
+in ANOTHER subpackage, simply list that pattern later.</p>
+<p><code>ypkg-build(1)</code> ensures that a file cannot belong to
+multiple packages, and that the last specified pattern, if matching,
+ALWAYS wins. It is even possible to suppress generation of the main
+package, by pattern globbing <code>/*</code> to a subpackage. This will
+not cause any breakage.</p></li>
+<li><p><code>permanent</code> [list]</p>
+<p>A list of patterns used to mark files as permanent. Any file within
+the resulting binary packages that matches the path pattern, is marked
+as a permanent file.</p>
+<p>These files will not be removed from the filesystem when upgrading or
+reinstalling the package. They will persist during standard upgrade
+operations.</p>
+<p>This should only be used in critical chain packages such as the
+kernel or drivers, where the domain of control is outside of the package
+manager, and the package is simply used as an update delivery
+mechanism.</p></li>
+<li><p><code>strip</code> [boolean]</p>
+<p>By default, this key is enabled, and as a result
+<code>ypkg-build(1)</code> will automatically strip files after the
+build has done, including <code>ELF</code> libraries &amp; binaries.</p>
+<p>In most cases, stripping should remain enabled. However, there are
+known cases when stripping should be avoided, such as when complying
+with a distribution policy of binary only software, or when dealing with
+files that only appear to be standard ELF files.</p>
+<p>The Go programming language generates <code>*.a</code> archive files
+that under no circumstance should be stripped, and there are likely
+other cases. This key, when set to <code>no</code>, will disable any and
+all stripping.</p></li>
+<li><p><code>lastrip</code> [boolean]</p>
+<p>By default, this key is enabled, and will result in <code>*.la</code>
+libtool files being stripped from the build. However in some very rare
+cases these files need to be preserved because they’re not
+<strong>true</strong> libtool scripts which led to the creation of
+successful <code>.so</code> linkage.</p>
+<p>If in doubt, omit this option where possible.</p></li>
+<li><p><code>mancompress</code> [boolean]</p>
+<p>By default, this key is enabled. Enables compression of man/info
+pages using zstd at the maximum compression level, to decrease the
+installed size of the package on disk.</p></li>
+<li><p><code>debug</code> [boolean]</p>
+<p>By default, this key is enabled, and as a result
+<code>ypkg-build(1)</code> will automatically create resulting
+<code>-dbginfo</code> packages where it can.</p>
+<p>In the majority of cases, this is the desired behaviour in full build
+environments, such as a build server. However in very rare cases, this
+may cause problems for the package, especially if it contains binaries
+that have not been bootstrapped with the native toolchain.</p></li>
+<li><p><code>avx2</code> [boolean]</p>
+<p>If set, the package will be rebuilt again with the
+<code>x86-64-v3</code> microarchitecture to enable libraries to be
+optimised to use newer hardware instructions such as <strong>Advanced
+Vector Extensions</strong>. From baseline (<code>x86-64</code>) to v3
+(<code>x86-64-v3</code>) it allows the compiler to use additional
+instructions such as, but not limited to; SSE4.2, SSSE3, POPCNT,
+CMPXCHG16B, MOVBE and AVX2.</p>
+<p>The build will be configured to make use of the Glibc HWCaps
+(hardware capabilities) feature, by placing the libraries into the
+library directory suffix of <code>glibc-hwcaps/x86-64-v3</code>
+i.e. <code>/usr/lib64/glibc-hwcaps/x86-64-v3</code>.</p>
+<p>These libraries will be automatically loaded on the Solus
+installation if the hardware supports the <code>x86-64-v3</code>
+microarchitecture.</p></li>
+<li><p><code>optimize</code> [list]</p>
+<p>Valid keys are restricted to:</p>
+<ul>
+<li><code>speed</code>: Optimise this package for speed performance</li>
+<li><code>size</code>: Optimize the package build solely for size.</li>
+<li><code>no-bind-now</code>: Configure the package to disable certain
+flags, where RELRO is unsupported.</li>
+<li><code>no-frame-pointer</code>: Disable
+<code>-fno-omit-frame-pointer</code> and
+<code>-mno-omit-leaf-frame-pointer</code> compiler flags</li>
+<li><code>no-symbolic</code>: Disable
+<code>-Wl,-Bsymbolic-functions</code> linker flag</li>
+<li><code>unroll-loops</code>: Enable <code>-funroll-loops</code>. Use
+this sparingly, only when it provides benefit.</li>
+<li><code>runpath</code>: Enable <code>-Wl,--enable-new-dtags</code> to
+make linker use RUNPATH’s instead of RPATH’s.</li>
+<li><code>avx256</code>: Disables <code>-mprefer-vector-width=128</code>
+in avx2 builds</li>
+<li><code>thin-lto</code>: Enable Thin Link Time Optimization</li>
+<li><code>lto</code>: Enable Link Time Optimization</li>
+<li><code>icf-safe</code>: Enable <code>-Wl,--icf=safe</code> to utilize
+the safe Identical Code Folding linker optimization.</li>
+<li><code>icf-all</code>: Enable <code>-Wl,--icf=all</code> to utilize
+the Identical Code Folding linker optimization.</li>
+<li><code>function-sections</code>: Enables
+<code>-ffunction-sections</code> to generate a seperate ELF section for
+each function. Recommended for icf with gcc.</li>
+</ul></li>
+<li><p><code>networking</code> [boolean]</p>
+<p>When built using <code>solbuild(1)</code>, access to the network is
+removed. A new loopback device will be provided within the container.
+This ensures that packages do not accidently download unverifiable
+content during build.</p>
+<p>If for any reason, networking is still required, you can set this key
+to <code>yes</code>. However, always evaluate whether it is avoidable
+first.</p></li>
+<li><p><code>environment</code> [unicode]</p>
+<p>By default, this key is empty and no additional content is exported
+to each build step. The <code>environment</code> key provides an easy
+method to export content such as variables to the environment for the
+entirety of the build (where the environment is reset between each build
+step).</p></li>
 </ul>
-
 <p><code>Build Steps</code></p>
-
-<p>The build steps are text-only data values. <code>ypkg-build(1)</code> will interpret special
-"macro" values in these steps, and evaluate them in a new environment via the
-<code>bash(1)</code> shell.</p>
-
+<p>The build steps are text-only data values. <code>ypkg-build(1)</code>
+will interpret special “macro” values in these steps, and evaluate them
+in a new environment via the <code>bash(1)</code> shell.</p>
 <ul>
-  <li>
-    <p><code>setup</code></p>
-
-    <p>Performed immediately after source preparation and extraction. This is where
-  you should look to patch your package if necessary, and perform any configuration
-  routines (i.e. <code>%configure</code>)</p>
-  </li>
-  <li>
-    <p><code>build</code></p>
-
-    <p>The main build step. This is where you compile code and do long running code.
-  An example would be running <code>%make</code></p>
-  </li>
-  <li>
-    <p><code>install</code></p>
-
-    <p>The install step will install of the built files into the final installation
-  directory, to be converted into a native <code>.eopkg</code> file. This is where your
-  <code>%make_install</code> would happen, for example.</p>
-
-    <p>Remember, this is to install inside the <code>package</code>. This doesn't impact the
-  package installation on another users computer. There is no "postinstall"
-  concept currently supported by ypkg.</p>
-  </li>
-  <li>
-    <p><code>check</code></p>
-
-    <p>Run any test suites in this step. This is the final step in the chain, and
-  allows you to verify what you just built. This is a good place to run
-  <code>%make check</code></p>
-  </li>
-  <li>
-    <p><code>profile</code></p>
-
-    <p>If this step is present, then each build set that is enabled (native, <code>emul32</code>),
-  will gain a series of new steps. The build will be configured for profile
-  guided optimisation, and this step will be used to execute the PGO workload.</p>
-
-    <p>In essence the workflow looks like this:</p>
-
-    <pre><code>  - `setup` as PGO
+<li><p><code>setup</code></p>
+<p>Performed immediately after source preparation and extraction. This
+is where you should look to patch your package if necessary, and perform
+any configuration routines (i.e. <code>%configure</code>)</p></li>
+<li><p><code>build</code></p>
+<p>The main build step. This is where you compile code and do long
+running code. An example would be running <code>%make</code></p></li>
+<li><p><code>install</code></p>
+<p>The install step will install of the built files into the final
+installation directory, to be converted into a native
+<code>.eopkg</code> file. This is where your <code>%make_install</code>
+would happen, for example.</p>
+<p>Remember, this is to install inside the <code>package</code>. This
+doesn’t impact the package installation on another users computer. There
+is no “postinstall” concept currently supported by ypkg.</p></li>
+<li><p><code>check</code></p>
+<p>Run any test suites in this step. This is the final step in the
+chain, and allows you to verify what you just built. This is a good
+place to run <code>%make check</code></p></li>
+<li><p><code>profile</code></p>
+<p>If this step is present, then each build set that is enabled (native,
+<code>emul32</code>), will gain a series of new steps. The build will be
+configured for profile guided optimisation, and this step will be used
+to execute the PGO workload.</p>
+<p>In essence the workflow looks like this:</p>
+<pre><code>  - `setup` as PGO
   - `build` as PGO
   - `profile` as PGO
   - Clean happens here.
   - `setup` to use PGO data
   - `build` to use PGO data
   - `install`
-  - `check`
-</code></pre>
-
-    <p>The compiler flags will be modifed automatically during each step to make
-  PGO integration seamless. For an real world case on how this helps, check
-  out:</p>
-
-    <ul>
-      <li>https://clearlinux.org/blogs/profile-guided-optimization-mariadb-benchmarks</li>
-    </ul>
-  </li>
+  - `check`</code></pre>
+<p>The compiler flags will be modifed automatically during each step to
+make PGO integration seamless. For an real world case on how this helps,
+check out:</p>
+<ul>
+<li>https://clearlinux.org/blogs/profile-guided-optimization-mariadb-benchmarks</li>
+</ul></li>
 </ul>
-
 <p><code>Macros</code></p>
-
-<p>ypkg supports a wide range of macros for easier package building. They evolve
-often and quickly, so you should always refer to the main <code>package.yml</code>
-documentation:</p>
-
+<p>ypkg supports a wide range of macros for easier package building.
+They evolve often and quickly, so you should always refer to the main
+<code>package.yml</code> documentation:</p>
 <ul>
-  <li>https://getsol.us/articles/packaging/package.yml/en/#actionable-macros</li>
-  <li>https://getsol.us/articles/packaging/package.yml/en/#variable-macros</li>
+<li>https://getsol.us/articles/packaging/package.yml/en/#actionable-macros</li>
+<li>https://getsol.us/articles/packaging/package.yml/en/#variable-macros</li>
 </ul>
-
-<p>It may also be beneficial to study the <code>rc.yml</code> file defining the build macros:</p>
-
+<p>It may also be beneficial to study the <code>rc.yml</code> file
+defining the build macros:</p>
 <ul>
-  <li>https://github.com/getsolus/ypkg/blob/master/ypkg2/rc.yml</li>
+<li>https://github.com/getsolus/ypkg/blob/master/ypkg2/rc.yml</li>
 </ul>
-
-<h2 id="EXAMPLES">EXAMPLES</h2>
-
+<h2 id="examples">EXAMPLES</h2>
 <p><code>A Complete package</code></p>
-
 <pre><code>name       : nano
 version    : 2.7.1
 release    : 63
@@ -600,17 +559,11 @@ setup      : |
 build      : |
     %make
 install    : |
-    %make_install
-</code></pre>
-
+    %make_install</code></pre>
 <p><code>Git sources</code></p>
-
 <pre><code>source     :
-    - git|https://github.com/getsolus/ypkg.git : v17.0
-</code></pre>
-
+    - git|https://github.com/getsolus/ypkg.git : v17.0</code></pre>
 <p><code>Multimap examples</code></p>
-
 <pre><code># Set the component for the main package to `system.base`
 component: system.base
 
@@ -629,58 +582,38 @@ rundeps:
     - somepkg
     - devel: somepkg2
 
-# Rundeps, list as explicit key's value
+# Rundeps, list as explicit key&#39;s value
 rundeps:
     - somepkg
     - devel:
         - somepkg
-        - somepkg2
-</code></pre>
-
+        - somepkg2</code></pre>
 <p><code>Build dependencies examples</code></p>
-
 <pre><code># Build dependencies, in various flavours:
 builddeps:
     - glibc-32bit-devel
     - pkgconfig(gtk+-3.0)
-    - pkgconfig32(zlib)
-</code></pre>
-
-<h2 id="COPYRIGHT">COPYRIGHT</h2>
-
+    - pkgconfig32(zlib)</code></pre>
+<h2 id="copyright">COPYRIGHT</h2>
 <ul>
-  <li>Copyright © 2016-2020 Solus Project</li>
+<li>Copyright © 2016-2020 Solus Project</li>
 </ul>
-
 <p>Released under the terms of the CC-BY-SA-3.0 license</p>
-
-<h2 id="SEE-ALSO">SEE ALSO</h2>
-
-<p><code>solbuild(1)</code>, <code>ypkg(1)</code> <code>ypkg-build(1)</code>, <code>ypkg-install-deps(1)</code></p>
-
+<h2 id="see-also">SEE ALSO</h2>
+<p><code>solbuild(1)</code>, <code>ypkg(1)</code>
+<code>ypkg-build(1)</code>, <code>ypkg-install-deps(1)</code></p>
 <ul>
-  <li>https://getsol.us/articles/packaging/package.yml/en/</li>
-  <li>https://github.com/getsolus/ypkg</li>
-  <li>https://getsol.us/articles/packaging</li>
-  <li>https://spdx.org/licenses/</li>
-  <li>https://en.wikipedia.org/wiki/Advanced_Vector_Extensions</li>
-  <li>https://en.wikipedia.org/wiki/Profile-guided_optimization</li>
+<li>https://getsol.us/articles/packaging/package.yml/en/</li>
+<li>https://github.com/getsolus/ypkg</li>
+<li>https://getsol.us/articles/packaging</li>
+<li>https://spdx.org/licenses/</li>
+<li>https://en.wikipedia.org/wiki/Advanced_Vector_Extensions</li>
+<li>https://en.wikipedia.org/wiki/Profile-guided_optimization</li>
 </ul>
-
-<h2 id="NOTES">NOTES</h2>
-
+<h2 id="notes">NOTES</h2>
 <p>Creative Commons Attribution-ShareAlike 3.0 Unported</p>
-
 <ul>
-  <li>http://creativecommons.org/licenses/by-sa/3.0/</li>
+<li>http://creativecommons.org/licenses/by-sa/3.0/</li>
 </ul>
-
-  <ol class='man-decor man-foot man foot'>
-    <li class='tl'></li>
-    <li class='tc'>September 2024</li>
-    <li class='tr'>package.yml(5)</li>
-  </ol>
-
-  </div>
 </body>
 </html>
