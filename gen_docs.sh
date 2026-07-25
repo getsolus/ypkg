@@ -1,10 +1,19 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Credit to swupd developers: https://github.com/clearlinux/swupd-client
+_manpages=(
+    "data/man/man1/ypkg.1"
+    "data/man/man5/package.yml.5"
+)
 
-MANPAGES="man/ypkg.1 man/ypkg-install-deps.1 man/ypkg-build.1 man/package.yml.5"
+pandoc="/usr/bin/pandoc"
 
-for MANPAGE in ${MANPAGES}; do \
-    ronn --roff < ${MANPAGE}.md > ${MANPAGE}; \
-    ronn --html < ${MANPAGE}.md > ${MANPAGE}.html; \
+if ! command -v "${pandoc}" > /dev/null 2>&1; then
+    echo "Pandoc is not installed!"
+    echo "Install it on Solus with 'eopkg install pandoc'"
+    exit 1
+fi
+
+for manpage in "${_manpages[@]}"; do
+    "${pandoc}" "${manpage}.md" -s -t html -o "${manpage}.html"
+    "${pandoc}" "${manpage}.md" -s -t man -o "${manpage}"
 done
