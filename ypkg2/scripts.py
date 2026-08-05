@@ -143,12 +143,11 @@ class ScriptGenerator:
         # architectures that are CDNA GPUs.
         self.define_macro(
             "AMDGPUTARGETS",
-            "gfx900;gfx1010;gfx1030;gfx1100;gfx1101;gfx1102;gfx1150;gfx1151;gfx1200;gfx1201",
+            "gfx900;gfx906;gfx1010;gfx1030;gfx1100;gfx1101;gfx1102;gfx1103;gfx1150;gfx1151;gfx1152;gfx1153;gfx1200;gfx1201",
         )
         self.define_macro(
             "AMDGPUTARGETS_GENERIC",
-            # TODO(gzgz): include other generic architectures once upstream support is mature
-            "gfx9-generic;gfx10-1-generic;gfx10-3-generic;gfx11-generic;gfx1100;gfx1101;gfx1102;gfx1150;gfx1151;gfx1200;gfx1201",
+            "gfx9-generic;gfx10-1-generic;gfx10-3-generic;gfx11-generic;gfx12-generic;gfx1100;gfx1101;gfx1102;gfx1103;gfx1150;gfx1151;gfx1152;gfx1153;gfx1200;gfx1201",
         )
         self.define_macro("PKGNAME", self.spec.pkg_name)
         self.define_macro("PKGFILES", self.context.files_dir)
