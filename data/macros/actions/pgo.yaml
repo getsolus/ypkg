@@ -31,13 +31,12 @@ actions:
         boptim(){
             llvm-bolt ${1}.orig -o ${1}.bolt -data=$PKG_BUILD_DIR/BOLT/final/$(basename ${1}).fdata \
                 -reorder-blocks=ext-tsp \
-                -reorder-functions=hfsort+ \
+                -reorder-functions=cdsort \
                 -split-functions \
                 -split-all-cold \
                 -split-eh \
                 -dyno-stats \
-                -icf=1 \
-                -use-gnu-stack \
+                -icf \
                 -peepholes=all \
                 -frame-opt=hot \
                 -use-old-text ${2} ${3} ${4}
