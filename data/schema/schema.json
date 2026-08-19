@@ -308,7 +308,7 @@
       "description": "This is where you should install the files into the final packaging directory, for example, 'make install'.",
       "examples": [
         "%make_install",
-        "install -D -m 00644 $pkgfiles/nanorc $installdir/usr/share/defaults/nano/nanorc"
+        "%install_file $pkgfiles/nanorc $installdir/usr/share/defaults/nano/nanorc"
       ]
     },
     "lastrip": {
