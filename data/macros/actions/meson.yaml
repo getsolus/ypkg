@@ -1,3 +1,39 @@
 actions:
+    # Run meson with the default options in a subdirectory
     - meson_configure: |
-        CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" LDFLAGS="${LDFLAGS}" meson setup --prefix %PREFIX% --buildtype=plain --libdir="lib%LIBSUFFIX%" --libexecdir="lib%LIBSUFFIX%/%PKGNAME%" --sysconfdir=/etc --localstatedir=/var solusBuildDir
+        test -e ./meson.build || ( echo "meson: The meson.build script could not be found" ; exit 1 )
+        meson setup %options_meson% "solusBuildDir"
+
+    # Run meson with unity build enabled
+    - meson_unity: |
+        test -e ./meson.build || ( echo "%%meson: The meson.build script could not be found" ; exit 1 )
+        meson setup --unity on %options_meson% "solusBuildDir"
+
+    # Build the meson project
+    - meson_build: |
+        meson compile --verbose -j "%YJOBS%" -C solusBuildDir
+
+    # Install the meson project
+    - meson_install: |
+        DESTDIR="%installroot%" meson install --no-rebuild -C solusBuildDir
+
+    # Run meson test
+    - meson_test: |
+        meson test --no-rebuild --print-errorlogs --verbose -j "%YJOBS%" -C solusBuildDir
+
+defines:
+    - options_meson: |
+        --buildtype="plain" \
+        --prefix="%PREFIX%" \
+        --libdir="lib%LIBSUFFIX%" \
+        --bindir="bin" \
+        --sbindir="sbin" \
+        --libexecdir="lib%LIBSUFFIX%/%PKGNAME%" \
+        --includedir="include" \
+        --datadir="share" \
+        --mandir="share/man" \
+        --infodir="share/info" \
+        --localedir="share/locale" \
+        --sysconfdir="/etc" \
+        --localstatedir="/var" \
+        --wrap-mode="nodownload"
