@@ -1,11 +1,40 @@
 actions:
     - cmake: |
-        cmake -DCMAKE_C_FLAGS="${CFLAGS}" -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
-        -DCMAKE_LD_FLAGS="${LDFLAGS}" -DCMAKE_LIB_SUFFIX="%LIBSUFFIX%" \
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=%PREFIX%
+        cmake %options_cmake_make%
 
     - cmake_ninja: |
-        cmake -G Ninja . -B solusBuildDir \
-        -DCMAKE_C_FLAGS="${CFLAGS}" -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
-        -DCMAKE_LD_FLAGS="${LDFLAGS}" -DCMAKE_LIB_SUFFIX="%LIBSUFFIX%" \
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=%PREFIX%
+        cmake %options_cmake_ninja% 
+
+    - cmake_unity: |
+        cmake -DCMAKE_UNITY_BUILD=ON %options_cmake_ninja%
+
+    - cmake_build: |
+        cmake --build "${BUILDDIR:-solusBuildDir}" --verbose --parallel "%YJOBS%"
+
+    - cmake_install: |
+        DESTDIR=%installroot% cmake --install "${BUILDDIR:-solusBuildDir}" --verbose
+
+    - cmake_test: |
+        ctest --test-dir "${BUILDDIR:-solusBuildDir}" --verbose --parallel "%YJOBS%" --output-on-failure --force-new-ctest-process
+
+defines:
+    - options_cmake: |
+        -B solusBuildDir \
+        -DCMAKE_VERBOSE_MAKEFILE=ON \
+        -DCMAKE_C_FLAGS="${CFLAGS}" \
+        -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+        -DCMAKE_LD_FLAGS="${LDFLAGS}" \
+        -DCMAKE_BUILD_TYPE="RelWithDebInfo" \
+        -DCMAKE_INSTALL_DO_STRIP=OFF \
+        -DCMAKE_INSTALL_LIBDIR="lib%LIBSUFFIX%" \
+        -DCMAKE_INSTALL_LIBEXECDIR=lib%LIBSUFFIX%/${package} \
+        -DCMAKE_INSTALL_PREFIX=%PREFIX% \
+        -DCMAKE_LIB_SUFFIX=%LIBFUFFIX%
+
+    - options_cmake_ninja: |
+        -G Ninja \
+        %options_cmake%
+
+    - options_cmake_make: |
+        -G \"Unix Makefiles\" \
+        %options_cmake%
