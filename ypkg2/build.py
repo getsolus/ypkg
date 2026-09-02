@@ -279,6 +279,14 @@ def build_package(filename, outputDir, buildDir=None):
                         print(e)
                         sys.exit(1)
 
+                if context.lto_cache and not os.path.exists(context.lto_cache):
+                    try:
+                        os.makedirs(context.lto_cache, 0o0755)
+                    except Exception as e:
+                        console_ui.emit_error("Build", "Error creating LTO cache dir")
+                        print(e)
+                        sys.exit(1)
+
             work_dir = manager.get_working_dir(context)
             if not os.path.exists(work_dir):
                 try:
