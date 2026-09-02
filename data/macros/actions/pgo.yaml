@@ -15,7 +15,7 @@ actions:
         binstr(){
             mv ${1} ${1}.orig
             mkdir -p $PKG_BUILD_DIR/BOLT/final
-            llvm-bolt ${1}.orig -instrument --instrumentation-file=$PKG_BUILD_DIR/BOLT/$(basename ${1}) --instrumentation-file-append-pid ${2} ${3} ${4} -o ${1}
+            llvm-bolt ${1}.orig -instrument --instrumentation-file=$PKG_BUILD_DIR/BOLT/$(basename ${1}) --instrumentation-file-append-pid "${@:2}" -o ${1}
         }
         binstr
 
@@ -39,7 +39,7 @@ actions:
                 -icf \
                 -peepholes=all \
                 -frame-opt=hot \
-                -use-old-text ${2} ${3} ${4}
+                -use-old-text "${@:2}"
             cp ${1}.bolt ${1}
         }
         boptim
