@@ -136,8 +136,6 @@ def main():
     try:
         with open(ymlfile, "w") as fp:
             yaml.indent(mapping=4, sequence=4, offset=4)
-            yaml.top_level_colon_align = True
-            yaml.prefix_colon = " "
             yaml.width = maxwidth
             yaml.dump(data, fp)
     except Exception as e:
