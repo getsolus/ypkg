@@ -458,6 +458,14 @@ avx2 builds
 .IP \(bu 2
 \f[CR]lto\f[R]: Enable Link Time Optimization
 .IP \(bu 2
+\f[CR]fat\-lto\-objects\f[R]: Emit LTO objects that contain both the
+real object code and the LTO bytecode, i.e.\ compile with
+\f[CR]\-ffat\-lto\-objects\f[R].
+Only relevant in combination with \f[CR]lto\f[R]/\f[CR]thin\-lto\f[R];
+it is required for packages that install \f[CR].a\f[R]/\f[CR].o\f[R]
+files, as \f[CR]ypkg\-build(1)\f[R] refuses to package objects that only
+contain LTO bytecode.
+.IP \(bu 2
 \f[CR]icf\-safe\f[R]: Enable \f[CR]\-Wl,\-\-icf=safe\f[R] to utilize the
 safe Identical Code Folding linker optimization.
 .IP \(bu 2
