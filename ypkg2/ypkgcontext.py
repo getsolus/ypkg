@@ -41,10 +41,13 @@ SIZE_FLAGS = "-Os"
 SIZE_FLAGS_CLANG = "-O2"
 
 # Allow optimizing for LTO
-LTO_FLAGS = "-flto=auto -ffat-lto-objects"
+LTO_FLAGS = "-flto=auto"
 
 # Allow optimizing for thin-lto
-THIN_LTO_FLAGS = "-flto=thin -ffat-lto-objects"
+THIN_LTO_FLAGS = "-flto=thin"
+
+# Emit both real object code and LTO bytecode, opt-in only (see LTO_FLAGS)
+FAT_LTO_FLAGS = "-ffat-lto-objects"
 
 # Allow optimizing for ICF all (identical code folding)
 ICF_ALL_FLAGS = "-Wl,--icf=all"
@@ -150,6 +153,8 @@ class Flags:
                     newflags.extend(SIZE_FLAGS.split(" "))
         elif opt_type == "lto":
             newflags.extend(LTO_FLAGS.split(" "))
+        elif opt_type == "fat-lto-objects":
+            newflags.extend(FAT_LTO_FLAGS.split(" "))
         elif opt_type == "unroll-loops":
             newflags.extend(UNROLL_LOOPS_FLAGS.split(" "))
         elif opt_type == "runpath":
