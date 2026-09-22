@@ -10,7 +10,7 @@ actions:
             runhaskell Setup configure --prefix=%PREFIX% \
                                        --libdir=%libdir% \
                                        --libsubdir="\$compiler/lib/\$abi/\$pkg-\$version" \
-                                       --libexecdir=%libdir%/%PKGNAME% \
+                                       --libexecdir=/usr/libexec \
                                        --dynlibdir="%libdir%/\$compiler/lib/\$abi" \
                                        --datadir=/usr/share \
                                        --datasubdir=%PKGNAME% \

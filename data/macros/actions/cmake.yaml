@@ -27,7 +27,7 @@ defines:
         -DCMAKE_BUILD_TYPE="RelWithDebInfo" \
         -DCMAKE_INSTALL_DO_STRIP=OFF \
         -DCMAKE_INSTALL_LIBDIR="lib%LIBSUFFIX%" \
-        -DCMAKE_INSTALL_LIBEXECDIR=lib%LIBSUFFIX%/${package} \
+        -DCMAKE_INSTALL_LIBEXECDIR=libexec \
         -DCMAKE_INSTALL_PREFIX=%PREFIX% \
         -DCMAKE_LIB_SUFFIX=%LIBFUFFIX%
 

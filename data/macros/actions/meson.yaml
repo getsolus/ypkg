@@ -28,7 +28,7 @@ defines:
         --libdir="lib%LIBSUFFIX%" \
         --bindir="bin" \
         --sbindir="sbin" \
-        --libexecdir="lib%LIBSUFFIX%/%PKGNAME%" \
+        --libexecdir="libexec" \
         --includedir="include" \
         --datadir="share" \
         --mandir="share/man" \

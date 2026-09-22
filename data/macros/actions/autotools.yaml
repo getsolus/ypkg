@@ -33,4 +33,4 @@ defines:
         --sysconfdir=/etc \
         --localstatedir=/var \
         --runstatedir=/run \
-        --libexecdir=%libdir%/%PKGNAME%
+        --libexecdir=/usr/libexec
