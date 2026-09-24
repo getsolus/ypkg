@@ -11,15 +11,15 @@ actions:
 
     # Build the meson project
     - meson_build: |
-        meson compile --verbose -j "%YJOBS%" -C solusBuildDir
+        meson compile --verbose -j "%YJOBS%" -C "${BUILDDIR:-solusBuildDir}"
 
     # Install the meson project
     - meson_install: |
-        DESTDIR="%installroot%" meson install --no-rebuild -C solusBuildDir
+        DESTDIR="%installroot%" meson install --no-rebuild -C "${BUILDDIR:-solusBuildDir}"
 
     # Run meson test
     - meson_test: |
-        meson test --no-rebuild --print-errorlogs --verbose -j "%YJOBS%" -C solusBuildDir
+        meson test --no-rebuild --print-errorlogs --verbose -j "%YJOBS%" -C "${BUILDDIR:-solusBuildDir}"
 
 defines:
     - options_meson: |
