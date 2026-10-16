@@ -220,7 +220,7 @@ def install_deps(
             "-e",
             help="Specify which eopkg command to use.",
         ),
-    ] = "eopkg.py3",
+    ] = "eopkg.py",
     force: Annotated[
         bool,
         typer.Option("--force", "-f", help="Force install dependencies."),
