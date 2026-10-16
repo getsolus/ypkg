@@ -345,6 +345,7 @@
           "avx256",
           "thin-lto",
           "lto",
+          "fat-lto-objects",
           "icf-safe",
           "icf-all",
           "polly",

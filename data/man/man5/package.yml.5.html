@@ -460,6 +460,13 @@ make linker use RUNPATH’s instead of RPATH’s.</li>
 in avx2 builds</li>
 <li><code>thin-lto</code>: Enable Thin Link Time Optimization</li>
 <li><code>lto</code>: Enable Link Time Optimization</li>
+<li><code>fat-lto-objects</code>: Emit LTO objects that contain both the
+real object code and the LTO bytecode, i.e. compile with
+<code>-ffat-lto-objects</code>. Only relevant in combination with
+<code>lto</code>/<code>thin-lto</code>; it is required for packages that
+install <code>.a</code>/<code>.o</code> files, as
+<code>ypkg-build(1)</code> refuses to package objects that only contain
+LTO bytecode.</li>
 <li><code>icf-safe</code>: Enable <code>-Wl,--icf=safe</code> to utilize
 the safe Identical Code Folding linker optimization.</li>
 <li><code>icf-all</code>: Enable <code>-Wl,--icf=all</code> to utilize

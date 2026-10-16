@@ -343,6 +343,11 @@ additional functionality.
      * `avx256`: Disables `-mprefer-vector-width=128` in avx2 builds
      * `thin-lto`: Enable Thin Link Time Optimization
      * `lto`: Enable Link Time Optimization
+     * `fat-lto-objects`: Emit LTO objects that contain both the real object
+       code and the LTO bytecode, i.e. compile with `-ffat-lto-objects`.
+       Only relevant in combination with `lto`/`thin-lto`; it is required for
+       packages that install `.a`/`.o` files, as `ypkg-build(1)` refuses to
+       package objects that only contain LTO bytecode.
      * `icf-safe`: Enable `-Wl,--icf=safe` to utilize the safe Identical Code Folding linker optimization.
      * `icf-all`: Enable `-Wl,--icf=all` to utilize the Identical Code Folding linker optimization.
      * `function-sections`: Enables `-ffunction-sections` to generate a seperate ELF section for each function. Recommended for icf with gcc.
